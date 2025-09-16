@@ -1,0 +1,9 @@
+/* Minimal helpers (Tailwind handles most) */
+.role-tab, .cust-tab {
+    @apply px-4 py-2 text-sm rounded-full font-semibold text-gray-600;
+}
+.tab-active { @apply bg-white shadow text-gray-900; }
+.input { @apply w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600; }
+.btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-white font-semibold shadow hover:bg-emerald-700; }
+.btn-secondary { @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-gray-900 px-5 py-3 text-white font-semibold shadow hover:opacity-90; }
+.togglePwd { @apply absolute right-2 top-2.5 rounded-xl px-3 py-1.5 text-xs font-semibold bg-gray-200 hover:bg-gray-300; }
