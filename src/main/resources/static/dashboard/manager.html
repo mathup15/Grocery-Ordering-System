@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-blue-50">
+<script src="/js/app.js"></script>
+<script>
+    // enforce only managers can load this page
+    Auth.requireRole(["MANAGER"]);
+</script>
+
+<div class="max-w-5xl mx-auto p-6">
+    <!-- Header -->
+    <header class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-blue-700">Manager Dashboard</h1>
+        <button onclick="Auth.logout()" class="px-3 py-2 rounded bg-red-500 text-white">
+            <a href="../index.html">Logout</a>
+        </button>
+    </header>
+
+    <!-- Main content -->
+    <section class="mt-6 grid md:grid-cols-3 gap-4">
+        <div class="rounded-xl bg-white p-5 shadow hover:shadow-md transition">
+            <h3 class="font-semibold">Approve Orders</h3>
+            <p class="text-sm text-gray-600">Review and approve pending orders.</p>
+        </div>
+        <div class="rounded-xl bg-white p-5 shadow hover:shadow-md transition">
+            <h3 class="font-semibold">Manage Inventory</h3>
+            <p class="text-sm text-gray-600">Track low stock and reorder items.</p>
+        </div>
+        <div class="rounded-xl bg-white p-5 shadow hover:shadow-md transition">
+            <h3 class="font-semibold">Team Overview</h3>
+            <p class="text-sm text-gray-600">Assign orders and monitor staff/delivery staff.</p>
+        </div>
+        <div class="rounded-xl bg-white p-5 shadow hover:shadow-md transition">
+            <h3 class="font-semibold">Reports</h3>
+            <p class="text-sm text-gray-600">View revenue and performance insights.</p>
+        </div>
+        <div class="rounded-xl bg-white p-5 shadow hover:shadow-md transition">
+            <h3 class="font-semibold">Notifications</h3>
+            <p class="text-sm text-gray-600">Stay updated with system alerts.</p>
+        </div>
+        <div class="rounded-xl bg-white p-5 shadow hover:shadow-md transition">
+            <h3 class="font-semibold">Settings</h3>
+            <p class="text-sm text-gray-600">Update manager account details.</p>
+        </div>
+    </section>
+</div>
+</body>
+</html>
