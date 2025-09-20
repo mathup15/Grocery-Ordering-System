@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>FreshCartLanka • Access</title>  <!-- Changed here -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-[#fafafa]">
+<main class="mx-auto max-w-7xl p-4 md:p-8">
+    <header class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="h-10 w-10 rounded-xl bg-emerald-600 text-white grid place-content-center text-2xl font-extrabold shadow">🛒</div>
+            <div class="text-2xl font-extrabold">FreshCartLanka</div>  <!-- Changed here -->
+        </div>
+    </header>
+
+    <section class="mt-8 grid lg:grid-cols-2 gap-8 items-stretch">
+        <div class="rounded-3xl bg-white shadow p-6 md:p-10 border border-gray-100">
+            <p class="text-sm font-medium text-emerald-700">• Halal Products • Online Delivery Shop</p>
+            <h1 class="mt-2 text-3xl md:text-4xl font-extrabold leading-tight">
+                Welcome back to <span class="text-emerald-600">FreshCartLanka</span>
+            </h1>
+            <p class="mt-2 text-gray-600">Sign in with your ID/Email & password. Customers without an account can create one below.</p>
+
+            <!-- Sign in -->
+            <form id="formSignIn" class="mt-6 grid gap-4" novalidate>
+                <div>
+                    <input id="si-username" name="username" placeholder="User ID or Email" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
+                </div>
+                <div class="relative">
+                    <input id="si-password" name="password" type="password" placeholder="Password" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 pr-24 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
+                    <button type="button" id="togglePwd" class="absolute right-2 top-2.5 rounded-xl px-3 py-1.5 text-xs font-semibold bg-gray-200 hover:bg-gray-300">Show</button>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="remember" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-600"/>
+                        <span class="text-gray-600">Remember me</span>
+                    </label>
+                    <a href="#" class="font-semibold text-emerald-700 hover:opacity-80">Forgot password?</a>
+                </div>
+                <button class="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-white font-semibold shadow hover:bg-emerald-700 w-full">
+                    Sign in
+                </button>
+                <p id="si-error" class="hidden text-sm font-medium text-red-600"></p>
+            </form>
+
+            <!-- Divider -->
+            <div class="my-6 flex items-center gap-3 text-xs text-gray-400">
+                <div class="h-px flex-1 bg-gray-200"></div> <span>New to FreshCartMart?</span> <div class="h-px flex-1 bg-gray-200"></div>
+            </div>
+
+            <!-- Customer sign up -->
+            <form id="formSignUp" class="grid gap-4" novalidate>
+                <div class="grid md:grid-cols-2 gap-3">
+                    <input id="su-fullname" placeholder="Full name" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
+                    <input id="su-phone" placeholder="Phone" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
+                </div>
+                <input id="su-username" placeholder="Email / username" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
+                <div class="grid md:grid-cols-2 gap-3">
+                    <input id="su-password" type="password" placeholder="Password (min 6)" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
+                    <input id="su-confirm" type="password" placeholder="Confirm password" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
+                </div>
+                <button class="inline-flex items-center justify-center gap-2 rounded-2xl bg-gray-900 px-5 py-3 text-white font-semibold shadow hover:opacity-90 w-full">
+                    Create customer account
+                </button>
+                <p id="su-error" class="hidden text-sm font-medium text-red-600"></p>
+                <p class="text-xs text-gray-500">By creating an account you agree to our Terms & Privacy.</p>
+            </form>
+        </div>
+
+        <!-- right side promo kept as is -->
+        <aside class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#eff7f2] to-[#e9ffef] border border-gray-100">
+            <div class="absolute right-8 top-8 text-[9rem] md:text-[12rem] leading-none font-black text-emerald-200/50 select-none hidden lg:block">
+                GROCERY
+            </div>
+            <div class="relative h-full grid place-items-center p-10">
+                <div class="max-w-md text-center">
+                    <div class="mx-auto mb-6 h-24 w-24 grid place-content-center rounded-2xl bg-emerald-600 text-white text-5xl shadow">🥬</div>
+                    <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">Fast Delivery</h2>
+                    <p class="mt-2 text-gray-600">Order before 6 PM for same-day delivery.</p>
+                </div>
+            </div>
+        </aside>
+    </section>
+</main>
+
+<script src="/js/app.js"></script>
+</body>
+</html>

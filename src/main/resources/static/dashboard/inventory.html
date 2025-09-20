@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>FreshCartLanka • Inventory</title>
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --radius: 8px;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #f9fafb;
+            color: var(--gray-900);
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Header Styles */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            border-radius: var(--radius);
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            border: 1px solid transparent;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn.primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn.ghost {
+            background: transparent;
+            border-color: var(--gray-300);
+            color: var(--gray-700);
+        }
+
+        .btn.ghost:hover {
+            background: var(--gray-100);
+        }
+
+        .btn.danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn.small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Filter Styles */
+        .filters {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: white;
+            margin: 1rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters input, .filters select {
+            padding: 0.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            background: white;
+        }
+
+        #q {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        /* Main Content */
+        main {
+            padding: 0 1.5rem 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .thumb {
+            height: 160px;
+            overflow: hidden;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .meta {
+            padding: 1rem;
+        }
+
+        .meta h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .muted {
+            color: var(--gray-500);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .gap {
+            gap: 0.5rem;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-500);
+        }
+
+        .pager {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Dialog Styles */
+        dialog {
+            border: none;
+            border-radius: var(--radius);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 0;
+            width: 90%;
+            max-width: 700px;
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .dlg-title {
+            padding: 1.5rem 1.5rem 0;
+        }
+
+        .dlg-title h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .form {
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .col2 {
+            grid-column: 1 / span 2;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: 1rem;
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        .preview {
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .preview img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .dlg-actions {
+            padding: 0 1.5rem 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Stock Dialog Styles */
+        .stock-info {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .product-info {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: var(--radius);
+        }
+
+        .stock-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .stock-controls {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Image upload styles */
+        .image-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .image-option {
+            flex: 1;
+            padding: 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .image-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form {
+                grid-template-columns: 1fr;
+            }
+
+            .col2 {
+                grid-column: 1;
+            }
+
+            .stock-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .image-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="topbar">
+    <div class="brand">
+        <span class="logo">FC</span>
+        <h1>FreshCart • Inventory</h1>
+    </div>
+    <div class="actions">
+        <button id="btnExport" class="btn ghost">Export</button>
+        <button id="btnImport" class="btn ghost">Import</button>
+        <button id="btnAdd" class="btn primary">New Product</button>
+    </div>
+</header>
+
+<section class="filters">
+    <input id="q" type="search" placeholder="Search by name, SKU, category…"/>
+    <select id="cat">
+        <option value="">All Categories</option>
+        <option value="Grocery">Grocery</option>
+        <option value="Dairy">Dairy</option>
+        <option value="Produce">Produce</option>
+        <option value="Bakery">Bakery</option>
+        <option value="Beverages">Beverages</option>
+    </select>
+    <select id="sort">
+        <option value="name">Name</option>
+        <option value="price">Price</option>
+        <option value="stock">Stock</option>
+        <option value="new">Newest</option>
+    </select>
+    <label class="check">
+        <input id="lowOnly" type="checkbox"/> Low stock only
+    </label>
+</section>
+
+<main>
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty hidden">No products found. Add your first product!</div>
+    <div class="pager">
+        <p id="count">Showing 0 products</p>
+        <div>
+            <button id="prev" class="btn ghost" disabled>Prev</button>
+            <button id="next" class="btn ghost" disabled>Next</button>
+        </div>
+    </div>
+</main>
+
+<!-- Product Dialog -->
+<dialog id="dlg">
+    <form id="form" method="dialog" enctype="multipart/form-data">
+        <div class="dlg-title"><h3 id="dlgTitle">New Product</h3></div>
+        <div class="grid form">
+            <label> Name * <input name="name" required/> </label>
+            <label> SKU * <input name="sku" required/> </label>
+            <label> Category * <input name="category" required/> </label>
+            <label> Brand <input name="brand"/> </label>
+            <label> Unit * <input name="unit" placeholder="kg, pack, bottle" required/> </label>
+            <label> Price (LKR) * <input name="price" type="number" min="0" step="0.01" required/> </label>
+            <label> Stock Quantity * <input name="stock_quantity" type="number" min="0" step="1" value="0" required/> </label>
+            <label> Reorder Point * <input name="reorder_point" type="number" min="0" step="1" value="10" required/> </label>
+            <label> Reorder Quantity * <input name="reorder_quantity" type="number" min="0" step="1" value="50" required/> </label>
+            <label> Inventory ID * <input name="inventory_id" type="number" min="1" value="1" required/> </label>
+            <label> Status *
+                <select name="active" required>
+                    <option value="1" selected>Active</option>
+                    <option value="0">Inactive</option>
+                </select>
+            </label>
+            <div class="col2">
+                <label> Description <textarea name="description" rows="3"></textarea> </label>
+            </div>
+            <div class="col2">
+                <label> Expiry Date <input name="expiry_date" type="date"/> </label>
+            </div>
+
+            <div class="col2">
+                <h4>Product Image</h4>
+                <div class="image-options">
+                    <div class="image-option selected" data-option="url">
+                        <strong>Image URL</strong>
+                        <p class="hint">Enter a web address</p>
+                    </div>
+                    <div class="image-option" data-option="upload">
+                        <strong>Upload Image</strong>
+                        <p class="hint">Select a file</p>
+                    </div>
+                </div>
+
+                <div id="urlSection">
+                    <label> Image URL <input name="image_url" type="url" placeholder="https://example.com/image.jpg"/> </label>
+                </div>
+
+                <div id="uploadSection" class="hidden">
+                    <label> Image (upload file)
+                        <input id="image" name="image" type="file" accept=".jpg,.jpeg,.png,.gif,.webp"/>
+                    </label>
+                    <div id="preview" class="preview hidden">
+                        <img alt="preview"/><button id="clearImg" type="button" class="btn ghost small">Clear</button>
+                    </div>
+                    <p class="hint">Max 5MB. jpg, jpeg, png, gif, webp.</p>
+                </div>
+            </div>
+        </div>
+        <div class="dlg-actions">
+            <button class="btn ghost" value="cancel">Cancel</button>
+            <button class="btn primary" type="submit" value="save">Save</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Stock Management Dialog -->
+<dialog id="stockDlg">
+    <form id="stockForm" method="dialog">
+        <div class="dlg-title"><h3>Manage Stock</h3></div>
+        <div class="stock-info">
+            <div class="product-info">
+                <img id="stockProductImage" src="" alt="" class="product-img"/>
+                <div>
+                    <h4 id="stockProductName"></h4>
+                    <p class="muted" id="stockProductSku"></p>
+                    <p class="muted" id="stockProductCategory"></p>
+                </div>
+            </div>
+
+            <div class="stock-stats">
+                <div class="stat">
+                    <span class="stat-label">Current Stock:</span>
+                    <span class="stat-value" id="currentStock">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Reserved:</span>
+                    <span class="stat-value" id="reservedQty">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Available:</span>
+                    <span class="stat-value" id="availableQty">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Reorder Point:</span>
+                    <span class="stat-value" id="reorderPoint">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stock-controls">
+            <label>
+                Adjustment Type
+                <select id="adjustmentType" required>
+                    <option value="ADD">Add Stock</option>
+                    <option value="REMOVE">Remove Stock</option>
+                    <option value="SET">Set Stock</option>
+                </select>
+            </label>
+
+            <label>
+                Quantity
+                <input id="adjustmentQty" type="number" min="1" value="1" required/>
+            </label>
+
+            <label>
+                Reason
+                <input id="adjustmentReason" type="text" placeholder="Restock, Sale, Damage, etc." required/>
+            </label>
+        </div>
+
+        <div class="dlg-actions">
+            <button class="btn ghost" value="cancel">Cancel</button>
+            <button class="btn primary" value="save">Update Stock</button>
+        </div>
+    </form>
+</dialog>
+
+<input id="csv" type="file" accept=".csv" class="hidden"/>
+<template id="tpl">
+    <div class="card">
+        <div class="thumb"><img/></div>
+        <div class="meta">
+            <h3></h3>
+            <p class="muted"><span class="sku"></span> • <span class="cat"></span></p>
+            <div class="row">
+                <div>
+                    <div class="price"></div>
+                    <div class="muted"><span class="stock"></span> in stock</div>
+                </div>
+                <div class="row gap">
+                    <button class="btn ghost btn-edit">Edit</button>
+                    <button class="btn primary btn-stock">Stock</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    // Load products from localStorage or use sample data
+    let products = JSON.parse(localStorage.getItem('freshcart_products')) || [
+        {
+            id: 1,
+            name: "Basmati Rice",
+            sku: "RICE_001",
+            category: "Grocery",
+            brand: "India Gate",
+            unit: "kg",
+            price: 545,
+            stock_quantity: 100,
+            reorder_point: 10,
+            reorder_quantity: 50,
+            inventory_id: 1,
+            active: 1,
+            description: "Premium quality basmati rice",
+            image_url: "https://images.unsplash.com/photo-1586201375761-83865001e31c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+        },
+        {
+            id: 2,
+            name: "Whole Milk",
+            sku: "DAIRY_001",
+            category: "Dairy",
+            brand: "Anchor",
+            unit: "liters",
+            price: 320,
+            stock_quantity: 45,
+            reorder_point: 15,
+            reorder_quantity: 30,
+            inventory_id: 1,
+            active: 1,
+            description: "Fresh whole milk",
+            image_url: "https://images.unsplash.com/photo-1563636619-e9143da7973b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+        },
+        {
+            id: 3,
+            name: "Red Apples",
+            sku: "PRODUCE_001",
+            category: "Produce",
+            brand: "",
+            unit: "each",
+            price: 80,
+            stock_quantity: 8,
+            reorder_point: 20,
+            reorder_quantity: 40,
+            inventory_id: 1,
+            active: 1,
+            description: "Fresh red apples",
+            image_url: "https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+        }
+    ];
+
+    // Save products to localStorage
+    function saveProductsToStorage() {
+        localStorage.setItem('freshcart_products', JSON.stringify(products));
+    }
+
+    // DOM elements
+    const dlg = document.getElementById('dlg');
+    const form = document.getElementById('form');
+    const stockDlg = document.getElementById('stockDlg');
+    const grid = document.getElementById('grid');
+    const empty = document.getElementById('empty');
+    const tpl = document.getElementById('tpl');
+    const btnAdd = document.getElementById('btnAdd');
+    const btnExport = document.getElementById('btnExport');
+    const btnImport = document.getElementById('btnImport');
+    const count = document.getElementById('count');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const q = document.getElementById('q');
+    const cat = document.getElementById('cat');
+    const sort = document.getElementById('sort');
+    const lowOnly = document.getElementById('lowOnly');
+    const urlSection = document.getElementById('urlSection');
+    const uploadSection = document.getElementById('uploadSection');
+    const imageOptions = document.querySelectorAll('.image-option');
+
+    // State
+    let currentPage = 1;
+    const itemsPerPage = 6;
+    let editingId = null;
+    let currentProduct = null;
+    let uploadedImageData = null;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', init);
+
+    function init() {
+        renderProducts();
+        setupEventListeners();
+    }
+
+    function setupEventListeners() {
+        // Add product button
+        btnAdd.addEventListener('click', () => {
+            editingId = null;
+            form.reset();
+            document.getElementById('dlgTitle').textContent = 'New Product';
+            // Reset image options
+            selectImageOption('url');
+            uploadedImageData = null;
+            dlg.showModal();
+        });
+
+        // Form submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveProduct();
+        });
+
+        // Filter events
+        q.addEventListener('input', renderProducts);
+        cat.addEventListener('change', renderProducts);
+        sort.addEventListener('change', renderProducts);
+        lowOnly.addEventListener('change', renderProducts);
+
+        // Pagination
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderProducts();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            const totalPages = Math.ceil(filterProducts().length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderProducts();
+            }
+        });
+
+        // Export/Import
+        btnExport.addEventListener('click', exportProducts);
+        btnImport.addEventListener('click', () => {
+            document.getElementById('csv').click();
+        });
+
+        document.getElementById('csv').addEventListener('change', importProducts);
+
+        // Image option selection
+        imageOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                selectImageOption(option.dataset.option);
+            });
+        });
+
+        // Image upload preview
+        document.getElementById('image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadedImageData = event.target.result;
+                    const preview = document.getElementById('preview');
+                    preview.querySelector('img').src = uploadedImageData;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Clear image button
+        document.getElementById('clearImg').addEventListener('click', function() {
+            document.getElementById('image').value = '';
+            document.getElementById('preview').classList.add('hidden');
+            uploadedImageData = null;
+        });
+    }
+
+    function selectImageOption(option) {
+        imageOptions.forEach(opt => {
+            if (opt.dataset.option === option) {
+                opt.classList.add('selected');
+            } else {
+                opt.classList.remove('selected');
+            }
+        });
+
+        if (option === 'url') {
+            urlSection.classList.remove('hidden');
+            uploadSection.classList.add('hidden');
+        } else {
+            urlSection.classList.add('hidden');
+            uploadSection.classList.remove('hidden');
+        }
+    }
+
+    function renderProducts() {
+        const filtered = filterProducts();
+        const sorted = sortProducts(filtered);
+        const paginated = paginateProducts(sorted);
+
+        grid.innerHTML = '';
+
+        if (paginated.length === 0) {
+            empty.classList.remove('hidden');
+            count.textContent = 'Showing 0 products';
+        } else {
+            empty.classList.add('hidden');
+            paginated.forEach(product => {
+                const el = createProductElement(product);
+                grid.appendChild(el);
+            });
+
+            // Update count text
+            const start = (currentPage - 1) * itemsPerPage + 1;
+            const end = Math.min(start + itemsPerPage - 1, filtered.length);
+            count.textContent = `Showing ${start}-${end} of ${filtered.length} products`;
+        }
+
+        // Update pagination buttons
+        const totalPages = Math.ceil(filtered.length / itemsPerPage);
+        prevBtn.disabled = currentPage <= 1;
+        nextBtn.disabled = currentPage >= totalPages;
+    }
+
+    function filterProducts() {
+        const searchTerm = q.value.toLowerCase();
+        const category = cat.value;
+        const lowStockOnly = lowOnly.checked;
+
+        return products.filter(product => {
+            const matchesSearch = product.name.toLowerCase().includes(searchTerm) ||
+                product.sku.toLowerCase().includes(searchTerm) ||
+                product.category.toLowerCase().includes(searchTerm);
+
+            const matchesCategory = !category || product.category === category;
+
+            const matchesLowStock = !lowStockOnly || product.stock_quantity <= product.reorder_point;
+
+            return matchesSearch && matchesCategory && matchesLowStock;
+        });
+    }
+
+    function sortProducts(productsList) {
+        const sortBy = sort.value;
+
+        return [...productsList].sort((a, b) => {
+            switch(sortBy) {
+                case 'price': return b.price - a.price;
+                case 'stock': return a.stock_quantity - b.stock_quantity;
+                case 'new': return b.id - a.id;
+                default: return a.name.localeCompare(b.name);
+            }
+        });
+    }
+
+    function paginateProducts(productsList) {
+        const start = (currentPage - 1) * itemsPerPage;
+        return productsList.slice(start, start + itemsPerPage);
+    }
+
+    function createProductElement(product) {
+        const el = tpl.content.cloneNode(true);
+
+        // Fill in product data
+        const card = el.querySelector('.card');
+        card.dataset.id = product.id;
+
+        const img = el.querySelector('.thumb img');
+        if (product.image_data) {
+            // Use uploaded image data if available
+            img.src = product.image_data;
+        } else if (product.image_url) {
+            // Use image URL if available
+            img.src = product.image_url;
+        } else {
+            // Use placeholder if no image
+            img.src = 'https://via.placeholder.com/300x150?text=No+Image';
+        }
+        img.alt = product.name;
+
+        el.querySelector('h3').textContent = product.name;
+        el.querySelector('.sku').textContent = product.sku;
+        el.querySelector('.cat').textContent = product.category;
+        el.querySelector('.price').textContent = `LKR ${product.price.toFixed(2)}`;
+
+        const stockEl = el.querySelector('.stock');
+        stockEl.textContent = product.stock_quantity;
+
+        // Style based on stock level
+        if (product.stock_quantity === 0) {
+            stockEl.style.color = 'var(--danger)';
+            stockEl.style.fontWeight = 'bold';
+        } else if (product.stock_quantity <= product.reorder_point) {
+            stockEl.style.color = 'var(--warning)';
+            stockEl.style.fontWeight = 'bold';
+        }
+
+        // Edit button
+        el.querySelector('.btn-edit').addEventListener('click', () => {
+            editingId = product.id;
+            document.getElementById('dlgTitle').textContent = 'Edit Product';
+            fillForm(product);
+            dlg.showModal();
+        });
+
+        // Stock button
+        el.querySelector('.btn-stock').addEventListener('click', () => {
+            currentProduct = product;
+            showStockDialog(product);
+        });
+
+        return el;
+    }
+
+    function fillForm(product) {
+        form.querySelector('[name="name"]').value = product.name;
+        form.querySelector('[name="sku"]').value = product.sku;
+        form.querySelector('[name="category"]').value = product.category;
+        form.querySelector('[name="brand"]').value = product.brand || '';
+        form.querySelector('[name="unit"]').value = product.unit;
+        form.querySelector('[name="price"]').value = product.price;
+        form.querySelector('[name="stock_quantity"]').value = product.stock_quantity;
+        form.querySelector('[name="reorder_point"]').value = product.reorder_point;
+        form.querySelector('[name="reorder_quantity"]').value = product.reorder_quantity;
+        form.querySelector('[name="inventory_id"]').value = product.inventory_id;
+        form.querySelector('[name="active"]').value = product.active;
+        form.querySelector('[name="description"]').value = product.description || '';
+        form.querySelector('[name="expiry_date"]').value = product.expiry_date || '';
+
+        // Set image option based on what's available
+        if (product.image_data) {
+            selectImageOption('upload');
+            uploadedImageData = product.image_data;
+            const preview = document.getElementById('preview');
+            preview.querySelector('img').src = product.image_data;
+            preview.classList.remove('hidden');
+        } else {
+            selectImageOption('url');
+            form.querySelector('[name="image_url"]').value = product.image_url || '';
+        }
+    }
+
+    function saveProduct() {
+        const formData = new FormData(form);
+        const selectedImageOption = document.querySelector('.image-option.selected').dataset.option;
+
+        const product = {
+            name: formData.get('name'),
+            sku: formData.get('sku'),
+            category: formData.get('category'),
+            brand: formData.get('brand'),
+            unit: formData.get('unit'),
+            price: parseFloat(formData.get('price')),
+            stock_quantity: parseInt(formData.get('stock_quantity')),
+            reorder_point: parseInt(formData.get('reorder_point')),
+            reorder_quantity: parseInt(formData.get('reorder_quantity')),
+            inventory_id: parseInt(formData.get('inventory_id')),
+            active: parseInt(formData.get('active')),
+            description: formData.get('description'),
+            expiry_date: formData.get('expiry_date')
+        };
+
+        // Handle image based on selected option
+        if (selectedImageOption === 'upload' && uploadedImageData) {
+            product.image_data = uploadedImageData;
+            product.image_url = '';
+        } else {
+            product.image_url = formData.get('image_url');
+            product.image_data = '';
+        }
+
+        // Check for duplicate SKU (excluding current product when editing)
+        const isDuplicate = products.some(p =>
+            p.sku === product.sku && (!editingId || p.id !== editingId)
+        );
+
+        if (isDuplicate) {
+            alert('SKU already exists. Please use a unique SKU.');
+            return;
+        }
+
+        if (editingId) {
+            // Update existing product
+            product.id = editingId;
+            const index = products.findIndex(p => p.id === editingId);
+            if (index !== -1) {
+                products[index] = product;
+            }
+        } else {
+            // Add new product
+            product.id = Math.max(...products.map(p => p.id), 0) + 1;
+            products.push(product);
+        }
+
+        // Save to localStorage
+        saveProductsToStorage();
+
+        dlg.close();
+        renderProducts();
+    }
+
+    function showStockDialog(product) {
+        document.getElementById('stockProductName').textContent = product.name;
+        document.getElementById('stockProductSku').textContent = product.sku;
+        document.getElementById('stockProductCategory').textContent = product.category;
+        document.getElementById('currentStock').textContent = product.stock_quantity;
+        document.getElementById('reorderPoint').textContent = product.reorder_point;
+
+        // Set product image if available
+        const img = document.getElementById('stockProductImage');
+        if (product.image_data) {
+            img.src = product.image_data;
+            img.style.display = 'block';
+        } else if (product.image_url) {
+            img.src = product.image_url;
+            img.style.display = 'block';
+        } else {
+            img.style.display = 'none';
+        }
+
+        // For demo purposes, set arbitrary values for reserved and available
+        document.getElementById('reservedQty').textContent = Math.floor(product.stock_quantity * 0.2);
+        document.getElementById('availableQty').textContent = Math.floor(product.stock_quantity * 0.8);
+
+        stockDlg.showModal();
+    }
+
+    function exportProducts() {
+        const headers = ['ID', 'Name', 'SKU', 'Category', 'Brand', 'Unit', 'Price', 'Stock', 'Reorder Point', 'Reorder Quantity', 'Inventory ID', 'Status'];
+        const csvData = products.map(p => [
+            p.id, p.name, p.sku, p.category, p.brand, p.unit, p.price,
+            p.stock_quantity, p.reorder_point, p.reorder_quantity,
+            p.inventory_id, p.active ? 'Active' : 'Inactive'
+        ]);
+
+        const csvContent = [headers, ...csvData].map(row =>
+            row.map(field => `"${field}"`).join(',')
+        ).join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'freshcart-products.csv');
+        link.style.visibility = 'hidden';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function importProducts(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const csvData = event.target.result;
+            // In a real app, you would parse the CSV and update products
+            alert('Import functionality would be implemented here. In a real application, this would parse the CSV file and update the product inventory.');
+        };
+        reader.readAsText(file);
+
+        // Reset file input
+        e.target.value = '';
+    }
+</script>
+</body>
+</html>
