@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed - PioMart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="/css/checkout.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-green-50 to-emerald-50">
+<!-- Header -->
+<header class="bg-white/90 backdrop-blur-md shadow-lg border-b border-white/20">
+  <div class="max-w-7xl mx-auto px-4 py-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white grid place-content-center text-xl font-bold shadow-lg">
+          🛒
+        </div>
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
+          PioMart
+        </h1>
+      </div>
+      <nav class="flex items-center gap-6">
+        <a href="/dashboard/customer.html" class="text-gray-600 hover:text-emerald-600 transition-colors">
+          <i class="fas fa-home mr-2"></i>Dashboard
+        </a>
+        <button onclick="Auth.logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+          <i class="fas fa-sign-out-alt mr-2"></i>Logout
+        </button>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="max-w-4xl mx-auto px-4 py-12">
+  <!-- Success Animation -->
+  <div class="text-center mb-12">
+    <div class="relative inline-block">
+      <div class="w-32 h-32 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mb-6 mx-auto shadow-2xl animate-pulse">
+        <i class="fas fa-check text-white text-5xl"></i>
+      </div>
+      <div class="absolute -inset-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full blur-xl opacity-30 animate-ping"></div>
+    </div>
+
+    <h1 class="text-4xl font-bold text-gray-800 mb-4">Order Confirmed!</h1>
+    <p class="text-xl text-gray-600 mb-2">Thank you for your purchase</p>
+    <p class="text-lg text-gray-500">We're preparing your order for delivery</p>
+  </div>
+
+  <!-- Order Details Card -->
+  <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8 mb-8">
+    <div class="grid md:grid-cols-2 gap-8">
+      <!-- Order Info -->
+      <div>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
+          <i class="fas fa-receipt text-emerald-500"></i>
+          Order Details
+        </h2>
+
+        <div class="space-y-4">
+          <div class="flex justify-between items-center py-3 border-b border-gray-100">
+            <span class="text-gray-600">Order Number</span>
+            <span id="orderNumber" class="font-mono font-semibold text-gray-800">Loading...</span>
+          </div>
+          <div class="flex justify-between items-center py-3 border-b border-gray-100">
+            <span class="text-gray-600">Order Date</span>
+            <span id="orderDate" class="font-semibold text-gray-800">Loading...</span>
+          </div>
+          <div class="flex justify-between items-center py-3 border-b border-gray-100">
+            <span class="text-gray-600">Payment Method</span>
+            <span id="paymentMethod" class="font-semibold text-gray-800">Loading...</span>
+          </div>
+          <div class="flex justify-between items-center py-3 border-b border-gray-100">
+            <span class="text-gray-600">Order Status</span>
+            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                                <i class="fas fa-clock mr-1"></i>Processing
+                            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery Info -->
+      <div>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
+          <i class="fas fa-truck text-emerald-500"></i>
+          Delivery Details
+        </h2>
+
+        <div class="space-y-4">
+          <div>
+            <span class="text-gray-600 block mb-1">Delivery Address</span>
+            <div id="deliveryAddress" class="font-semibold text-gray-800">Loading...</div>
+          </div>
+          <div>
+            <span class="text-gray-600 block mb-1">Estimated Delivery</span>
+            <div id="estimatedDelivery" class="font-semibold text-emerald-600">Loading...</div>
+          </div>
+          <div>
+            <span class="text-gray-600 block mb-1">Delivery Instructions</span>
+            <div id="deliveryInstructions" class="text-gray-700">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Items -->
+  <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8 mb-8">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
+      <i class="fas fa-shopping-basket text-emerald-500"></i>
+      Order Items
+    </h2>
+
+    <div id="orderItems" class="space-y-4">
+      <!-- Items will be loaded here -->
+    </div>
+  </div>
+
+  <!-- Order Summary -->
+  <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8 mb-8">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
+      <i class="fas fa-calculator text-emerald-500"></i>
+      Order Summary
+    </h2>
+
+    <div class="space-y-3">
+      <div class="flex justify-between text-gray-600">
+        <span>Subtotal</span>
+        <span id="summarySubtotal">Loading...</span>
+      </div>
+      <div class="flex justify-between text-gray-600">
+        <span>Delivery Fee</span>
+        <span id="summaryDeliveryFee">Loading...</span>
+      </div>
+      <div class="flex justify-between text-gray-600">
+        <span>Tax</span>
+        <span id="summaryTax">Loading...</span>
+      </div>
+      <div id="summaryDiscountRow" class="flex justify-between text-green-600 hidden">
+        <span>Discount</span>
+        <span id="summaryDiscount">Loading...</span>
+      </div>
+      <hr class="border-gray-200 my-4">
+      <div class="flex justify-between text-2xl font-bold text-gray-800">
+        <span>Total Paid</span>
+        <span id="summaryTotal">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex flex-col sm:flex-row gap-4 justify-center">
+    <a href="/dashboard/customer.html"
+       class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-2xl hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
+      <i class="fas fa-home mr-3"></i>
+      Continue Shopping
+    </a>
+
+    <button id="trackOrderBtn"
+            class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
+      <i class="fas fa-map-marker-alt mr-3"></i>
+      Track Order
+    </button>
+
+    <button onclick="window.print()"
+            class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-2xl hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
+      <i class="fas fa-print mr-3"></i>
+      Print Receipt
+    </button>
+  </div>
+
+  <!-- Next Steps -->
+  <div class="mt-12 text-center">
+    <h3 class="text-2xl font-semibold text-gray-800 mb-6">What happens next?</h3>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20">
+        <div class="w-16 h-16 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-boxes text-white text-2xl"></i>
+        </div>
+        <h4 class="font-semibold text-gray-800 mb-2">1. Order Processing</h4>
+        <p class="text-gray-600 text-sm">We're preparing your items with care</p>
+      </div>
+
+      <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20">
+        <div class="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-truck text-white text-2xl"></i>
+        </div>
+        <h4 class="font-semibold text-gray-800 mb-2">2. Out for Delivery</h4>
+        <p class="text-gray-600 text-sm">Your order is on its way to you</p>
+      </div>
+
+      <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20">
+        <div class="w-16 h-16 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-check-circle text-white text-2xl"></i>
+        </div>
+        <h4 class="font-semibold text-gray-800 mb-2">3. Delivered</h4>
+        <p class="text-gray-600 text-sm">Enjoy your fresh groceries!</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+  <div class="bg-white rounded-2xl p-8 text-center shadow-2xl">
+    <div class="animate-spin w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+    <p class="text-gray-600 font-medium">Loading order details...</p>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+<script>
+  // Get order number from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const orderNumber = urlParams.get('orderNumber');
+
+  if (!orderNumber) {
+    window.location.href = '/dashboard/customer.html';
+  }
+
+  // Load order details
+  async function loadOrderDetails() {
+    try {
+      const response = await fetch(`/api/orders/order/${orderNumber}`);
+      if (!response.ok) throw new Error('Order not found');
+
+      const order = await response.json();
+      displayOrderDetails(order);
+
+    } catch (error) {
+      console.error('Error loading order:', error);
+      alert('Error loading order details');
+      window.location.href = '/dashboard/customer.html';
+    } finally {
+      document.getElementById('loadingOverlay').classList.add('hidden');
+    }
+  }
+
+  function displayOrderDetails(order) {
+    // Basic order info
+    document.getElementById('orderNumber').textContent = order.orderNumber;
+    document.getElementById('orderDate').textContent = new Date(order.createdAt).toLocaleDateString();
+    document.getElementById('paymentMethod').textContent = order.paymentMethod === 'ONLINE' ? 'Credit Card' :
+            order.paymentMethod === 'COD' ? 'Cash on Delivery' :
+                    order.paymentMethod;
+
+    // Delivery details
+    document.getElementById('deliveryAddress').textContent = order.deliveryAddress;
+    document.getElementById('estimatedDelivery').textContent = order.preferredDeliveryTime ?
+            new Date(order.preferredDeliveryTime).toLocaleDateString() : 'Within 24 hours';
+    document.getElementById('deliveryInstructions').textContent = order.deliveryInstructions || 'No special instructions';
+
+    // Order items
+    const itemsContainer = document.getElementById('orderItems');
+    itemsContainer.innerHTML = '';
+
+    order.items.forEach(item => {
+      const itemElement = document.createElement('div');
+      itemElement.className = 'flex items-center justify-between p-4 border-b border-gray-100 last:border-b-0';
+      itemElement.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <img src="${item.productImage || '/images/placeholder.jpg'}" alt="${item.productName}"
+                             class="w-16 h-16 object-cover rounded-lg">
+                        <div>
+                            <h4 class="font-medium text-gray-800">${item.productName}</h4>
+                            <p class="text-gray-600">Quantity: ${item.quantity}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold text-gray-800">$${item.subtotal.toFixed(2)}</p>
+                        <p class="text-sm text-gray-600">$${item.unitPrice.toFixed(2)} each</p>
+                    </div>
+                `;
+      itemsContainer.appendChild(itemElement);
+    });
+
+    // Order summary
+    document.getElementById('summarySubtotal').textContent = `$${order.subtotal.toFixed(2)}`;
+    document.getElementById('summaryDeliveryFee').textContent = `$${order.deliveryFee.toFixed(2)}`;
+    document.getElementById('summaryTax').textContent = `$${order.tax.toFixed(2)}`;
+
+    if (order.discountAmount > 0) {
+      document.getElementById('summaryDiscountRow').classList.remove('hidden');
+      document.getElementById('summaryDiscount').textContent = `-$${order.discountAmount.toFixed(2)}`;
+    }
+
+    document.getElementById('summaryTotal').textContent = `$${order.totalAmount.toFixed(2)}`;
+
+    // Track order button
+    document.getElementById('trackOrderBtn').addEventListener('click', () => {
+      alert('Order tracking feature will be implemented by the delivery team!');
+    });
+  }
+
+  // Load order details when page loads
+  loadOrderDetails();
+</script>
+</body>
+</html>
