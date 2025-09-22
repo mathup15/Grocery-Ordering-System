@@ -3,29 +3,128 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopping Cart - PioMart</title>
+  <title>Shopping Cart - Lankafresh</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="/css/checkout.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --primary: #16a34a;
+      --primary-dark: #15803d;
+      --secondary: #ea580c;
+      --light-bg: #f8fafc;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      min-height: 100vh;
+    }
+
+    .header-bg {
+      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    }
+
+    .cart-item {
+      transition: all 0.3s ease;
+      border-left: 4px solid #16a34a;
+    }
+
+    .cart-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .quantity-btn {
+      transition: all 0.2s ease;
+    }
+
+    .quantity-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .promo-success {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .item-remove {
+      transition: all 0.3s ease;
+    }
+
+    .item-remove:hover {
+      color: #ef4444;
+      transform: scale(1.1);
+    }
+
+    .progress-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, var(--primary), var(--primary-dark));
+      border-radius: 3px;
+      width: 60%;
+    }
+
+    .lkr-badge {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    .fresh-badge {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50">
+<body class="bg-green-50">
 <!-- Header -->
-<header class="bg-white/90 backdrop-blur-md shadow-lg border-b border-white/20">
+<header class="header-bg text-white shadow-lg">
   <div class="max-w-7xl mx-auto px-4 py-4">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white grid place-content-center text-xl font-bold shadow-lg">
-          🛒
+        <div class="h-10 w-10 rounded-xl bg-white text-green-600 grid place-content-center text-xl font-bold shadow-lg">
+          <i class="fas fa-leaf"></i>
         </div>
-        <h1 class="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
-          PioMart
+        <h1 class="text-2xl font-bold text-white">
+          Lankafresh
         </h1>
       </div>
       <nav class="flex items-center gap-6">
-        <a href="/dashboard/customer.html" class="text-gray-600 hover:text-emerald-600 transition-colors">
+        <a href="/dashboard/customer.html" class="text-white/90 hover:text-white transition-colors flex items-center">
           <i class="fas fa-home mr-2"></i>Dashboard
         </a>
-        <button onclick="Auth.logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+        <button class="bg-white text-green-600 hover:bg-green-50 px-4 py-2 rounded-lg transition-colors flex items-center font-medium">
           <i class="fas fa-sign-out-alt mr-2"></i>Logout
         </button>
       </nav>
@@ -35,35 +134,130 @@
 
 <!-- Main Content -->
 <main class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Progress Bar -->
+  <div class="mb-10">
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-sm font-medium text-green-600">Shopping Cart</span>
+      <span class="text-sm font-medium text-gray-500">Delivery</span>
+      <span class="text-sm font-medium text-gray-500">Payment</span>
+      <span class="text-sm font-medium text-gray-500">Confirmation</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+  </div>
+
   <!-- Cart Header -->
-  <div class="text-center mb-8">
-    <h2 class="text-4xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-      Shopping Cart
+  <div class="text-center mb-8 fade-in">
+    <h2 class="text-4xl font-bold mb-2 text-green-800">
+      Your Shopping Cart
     </h2>
-    <p class="text-gray-600 text-lg">Review your items before checkout</p>
+    <p class="text-green-600 text-lg">Review your fresh items before checkout</p>
   </div>
 
   <!-- Cart Content -->
   <div class="grid lg:grid-cols-3 gap-8">
     <!-- Cart Items -->
     <div class="lg:col-span-2">
-      <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6">
+      <div class="bg-white rounded-2xl shadow-md border border-green-100 p-6">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-gray-800">Cart Items</h3>
-          <button id="clearCart" class="text-red-500 hover:text-red-600 transition-colors">
+          <h3 class="text-xl font-semibold text-gray-800">Cart Items <span id="itemsCountBadge" class="bg-green-100 text-green-800 text-sm font-medium ml-2 px-2.5 py-0.5 rounded-full">3 items</span></h3>
+          <button id="clearCart" class="text-red-500 hover:text-red-600 transition-colors flex items-center">
             <i class="fas fa-trash mr-2"></i>Clear Cart
           </button>
         </div>
 
         <div id="cartItems" class="space-y-4">
-          <!-- Cart items will be loaded here -->
+          <!-- Sample Cart Item 1 -->
+          <div class="cart-item bg-white rounded-xl p-4 shadow-sm border border-green-100 flex items-start fade-in">
+            <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 mr-4">
+              <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80" alt="Fresh Vegetables" class="h-full w-full object-cover">
+            </div>
+            <div class="flex-grow">
+              <div class="flex justify-between">
+                <h4 class="text-lg font-medium text-gray-900">Organic Mixed Vegetables <span class="fresh-badge">FRESH</span></h4>
+                <p class="text-lg font-semibold text-gray-900">LKR 1,250 <span class="lkr-badge">LKR</span></p>
+              </div>
+              <p class="text-gray-500 text-sm mt-1">Farm fresh organic vegetables, 500g package</p>
+              <div class="flex items-center mt-3">
+                <div class="flex items-center border border-gray-300 rounded-lg">
+                  <button class="quantity-btn px-3 py-1 text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <span class="px-3 py-1 text-gray-800 font-medium">2</span>
+                  <button class="quantity-btn px-3 py-1 text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+                <button class="item-remove ml-4 text-gray-400 hover:text-red-500">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sample Cart Item 2 -->
+          <div class="cart-item bg-white rounded-xl p-4 shadow-sm border border-green-100 flex items-start fade-in">
+            <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 mr-4">
+              <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80" alt="Fresh Fruits" class="h-full w-full object-cover">
+            </div>
+            <div class="flex-grow">
+              <div class="flex justify-between">
+                <h4 class="text-lg font-medium text-gray-900">Tropical Fruit Basket <span class="fresh-badge">LOCAL</span></h4>
+                <p class="text-lg font-semibold text-gray-900">LKR 2,350 <span class="lkr-badge">LKR</span></p>
+              </div>
+              <p class="text-gray-500 text-sm mt-1">Assorted tropical fruits, 1.5kg</p>
+              <div class="flex items-center mt-3">
+                <div class="flex items-center border border-gray-300 rounded-lg">
+                  <button class="quantity-btn px-3 py-1 text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <span class="px-3 py-1 text-gray-800 font-medium">1</span>
+                  <button class="quantity-btn px-3 py-1 text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+                <button class="item-remove ml-4 text-gray-400 hover:text-red-500">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sample Cart Item 3 -->
+          <div class="cart-item bg-white rounded-xl p-4 shadow-sm border border-green-100 flex items-start fade-in">
+            <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 mr-4">
+              <img src="https://images.unsplash.com/photo-1582515073490-39981397c445?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80" alt="Fresh Herbs" class="h-full w-full object-cover">
+            </div>
+            <div class="flex-grow">
+              <div class="flex justify-between">
+                <h4 class="text-lg font-medium text-gray-900">Fresh Organic Herbs <span class="fresh-badge">ORGANIC</span></h4>
+                <p class="text-lg font-semibold text-gray-900">LKR 850 <span class="lkr-badge">LKR</span></p>
+              </div>
+              <p class="text-gray-500 text-sm mt-1">Assorted fresh herbs, 200g</p>
+              <div class="flex items-center mt-3">
+                <div class="flex items-center border border-gray-300 rounded-lg">
+                  <button class="quantity-btn px-3 py-1 text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <span class="px-3 py-1 text-gray-800 font-medium">3</span>
+                  <button class="quantity-btn px-3 py-1 text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+                <button class="item-remove ml-4 text-gray-400 hover:text-red-500">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div id="emptyCart" class="hidden text-center py-12">
-          <div class="text-6xl mb-4">🛒</div>
+          <div class="text-6xl mb-4 opacity-60 text-green-500"><i class="fas fa-shopping-basket"></i></div>
           <h3 class="text-xl font-semibold text-gray-600 mb-2">Your cart is empty</h3>
-          <p class="text-gray-500 mb-6">Add some delicious items to get started!</p>
-          <a href="/dashboard/customer.html" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+          <p class="text-gray-500 mb-6">Add some fresh items to get started!</p>
+          <a href="/dashboard/customer.html" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300">
             <i class="fas fa-arrow-left mr-2"></i>Continue Shopping
           </a>
         </div>
@@ -72,16 +266,25 @@
 
     <!-- Cart Summary -->
     <div class="lg:col-span-1">
-      <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 sticky top-8">
+      <div class="bg-white rounded-2xl shadow-md border border-green-100 p-6 sticky top-28">
         <h3 class="text-xl font-semibold text-gray-800 mb-6">Order Summary</h3>
 
+        <!-- Delivery Estimate -->
+        <div class="mb-6 p-4 bg-green-50 rounded-xl border border-green-200">
+          <div class="flex items-center text-green-700 mb-2">
+            <i class="fas fa-truck-fast mr-2"></i>
+            <span class="font-medium">Delivery Estimate</span>
+          </div>
+          <p class="text-sm text-green-600">Tomorrow, 2:00 PM - 5:00 PM</p>
+        </div>
+
         <!-- Promo Code Section -->
-        <div class="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+        <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
           <label class="block text-sm font-medium text-gray-700 mb-2">Promo Code</label>
           <div class="flex gap-2">
             <input type="text" id="promoCode" placeholder="Enter code"
-                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-            <button id="applyPromo" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:shadow-lg transition-all duration-300">
+                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all">
+            <button id="applyPromo" class="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition-all duration-300">
               Apply
             </button>
           </div>
@@ -91,34 +294,34 @@
         <!-- Summary Details -->
         <div class="space-y-3 mb-6">
           <div class="flex justify-between text-gray-600">
-            <span>Subtotal (<span id="itemCount">0</span> items)</span>
-            <span id="subtotal">$0.00</span>
+            <span>Subtotal (<span id="itemCount">6</span> items)</span>
+            <span id="subtotal">LKR 5,600 <span class="lkr-badge">LKR</span></span>
           </div>
           <div class="flex justify-between text-gray-600">
             <span>Delivery Fee</span>
-            <span id="deliveryFee">$0.00</span>
+            <span id="deliveryFee">LKR 300 <span class="lkr-badge">LKR</span></span>
           </div>
           <div class="flex justify-between text-gray-600">
             <span>Tax</span>
-            <span id="tax">$0.00</span>
+            <span id="tax">LKR 450 <span class="lkr-badge">LKR</span></span>
           </div>
-          <div id="discountRow" class="flex justify-between text-green-600 hidden">
-            <span>Discount</span>
-            <span id="discount">-$0.00</span>
+          <div id="discountRow" class="flex justify-between text-green-600">
+            <span>Discount <span class="text-xs bg-green-100 text-green-800 ml-1 px-2 py-0.5 rounded">FRESH15</span></span>
+            <span id="discount">- LKR 840 <span class="lkr-badge">LKR</span></span>
           </div>
           <hr class="border-gray-200">
           <div class="flex justify-between text-lg font-semibold text-gray-800">
             <span>Total</span>
-            <span id="total">$0.00</span>
+            <span id="total">LKR 5,510 <span class="lkr-badge">LKR</span></span>
           </div>
         </div>
 
         <!-- Action Buttons -->
         <div class="space-y-3">
-          <button id="proceedToCheckout" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 font-semibold">
+          <button id="proceedToCheckout" class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300 font-semibold flex items-center justify-center">
             <i class="fas fa-credit-card mr-2"></i>Proceed to Checkout
           </button>
-          <a href="/dashboard/customer.html" class="block w-full text-center py-3 text-gray-600 hover:text-gray-800 transition-colors">
+          <a href="/dashboard/customer.html" class="block w-full text-center py-3 text-gray-600 hover:text-gray-800 transition-colors flex items-center justify-center">
             <i class="fas fa-arrow-left mr-2"></i>Continue Shopping
           </a>
         </div>
@@ -127,15 +330,15 @@
         <div class="mt-6 pt-6 border-t border-gray-200">
           <div class="grid grid-cols-3 gap-2 text-xs text-gray-500">
             <div class="text-center">
-              <i class="fas fa-shield-alt text-green-500 mb-1"></i>
+              <i class="fas fa-shield-alt text-green-500 mb-1 text-sm"></i>
               <div>Secure</div>
             </div>
             <div class="text-center">
-              <i class="fas fa-truck text-blue-500 mb-1"></i>
+              <i class="fas fa-truck text-green-500 mb-1 text-sm"></i>
               <div>Fast Delivery</div>
             </div>
             <div class="text-center">
-              <i class="fas fa-undo text-purple-500 mb-1"></i>
+              <i class="fas fa-undo text-green-500 mb-1 text-sm"></i>
               <div>Easy Returns</div>
             </div>
           </div>
@@ -148,12 +351,133 @@
 <!-- Loading Overlay -->
 <div id="loadingOverlay" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
   <div class="bg-white rounded-2xl p-8 text-center shadow-2xl">
-    <div class="animate-spin w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+    <div class="animate-spin w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full mx-auto mb-4"></div>
     <p class="text-gray-600 font-medium">Processing...</p>
   </div>
 </div>
 
-<script src="/js/app.js"></script>
-<script src="/js/cart.js"></script>
+<script>
+  // Basic functionality for demonstration
+  document.addEventListener('DOMContentLoaded', function() {
+    // Quantity buttons
+    const quantityButtons = document.querySelectorAll('.quantity-btn');
+    quantityButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const parent = this.closest('.cart-item');
+        const quantitySpan = parent.querySelector('.quantity-btn + span');
+        let quantity = parseInt(quantitySpan.textContent);
+
+        if (this.querySelector('.fa-minus')) {
+          if (quantity > 1) {
+            quantitySpan.textContent = quantity - 1;
+          } else {
+            // Remove item if quantity becomes 0
+            parent.style.opacity = '0';
+            parent.style.transform = 'translateX(100px)';
+            setTimeout(() => {
+              parent.remove();
+              updateCartSummary();
+            }, 300);
+          }
+        } else if (this.querySelector('.fa-plus')) {
+          quantitySpan.textContent = quantity + 1;
+        }
+
+        updateCartSummary();
+      });
+    });
+
+    // Remove item buttons
+    const removeButtons = document.querySelectorAll('.item-remove');
+    removeButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const parent = this.closest('.cart-item');
+        parent.style.opacity = '0';
+        parent.style.transform = 'translateX(100px)';
+        setTimeout(() => {
+          parent.remove();
+          updateCartSummary();
+        }, 300);
+      });
+    });
+
+    // Clear cart button
+    const clearCartBtn = document.getElementById('clearCart');
+    clearCartBtn.addEventListener('click', function() {
+      const cartItems = document.querySelectorAll('.cart-item');
+      cartItems.forEach(item => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(100px)';
+        setTimeout(() => {
+          item.remove();
+          updateCartSummary();
+        }, 300);
+      });
+    });
+
+    // Promo code application
+    const applyPromoBtn = document.getElementById('applyPromo');
+    applyPromoBtn.addEventListener('click', function() {
+      const promoCode = document.getElementById('promoCode').value;
+      const promoMessage = document.getElementById('promoMessage');
+
+      if (promoCode.toUpperCase() === 'FRESH15') {
+        promoMessage.innerHTML = '<span class="text-green-600"><i class="fas fa-check-circle mr-1"></i>Promo code applied successfully! 15% discount.</span>';
+        document.getElementById('discountRow').classList.remove('hidden');
+        document.getElementById('discount').textContent = '- LKR 840 LKR';
+        document.getElementById('promoCode').parentElement.classList.add('promo-success');
+        updateCartSummary();
+      } else if (promoCode) {
+        promoMessage.innerHTML = '<span class="text-red-600"><i class="fas fa-exclamation-circle mr-1"></i>Invalid promo code. Please try again.</span>';
+      } else {
+        promoMessage.innerHTML = '<span class="text-red-600"><i class="fas fa-exclamation-circle mr-1"></i>Please enter a promo code.</span>';
+      }
+    });
+
+    // Update cart summary
+    function updateCartSummary() {
+      const items = document.querySelectorAll('.cart-item');
+      let totalItems = 0;
+      let subtotal = 0;
+
+      items.forEach(item => {
+        const priceText = item.querySelector('.text-lg.font-semibold.text-gray-900').textContent;
+        const price = parseFloat(priceText.replace('LKR', '').replace(',', '').trim());
+        const quantity = parseInt(item.querySelector('.quantity-btn + span').textContent);
+
+        totalItems += quantity;
+        subtotal += price * quantity;
+      });
+
+      document.getElementById('itemCount').textContent = totalItems;
+      document.getElementById('itemsCountBadge').textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'items'}`;
+      document.getElementById('subtotal').textContent = `LKR ${subtotal.toLocaleString('en-US')} LKR`;
+
+      const deliveryFee = subtotal > 0 ? 300 : 0;
+      const tax = subtotal > 0 ? (subtotal * 0.08) : 0;
+
+      document.getElementById('deliveryFee').textContent = `LKR ${deliveryFee.toLocaleString('en-US')} LKR`;
+      document.getElementById('tax').textContent = `LKR ${tax.toLocaleString('en-US')} LKR`;
+
+      // Check if discount is applied
+      const discountApplied = !document.getElementById('discountRow').classList.contains('hidden');
+      const discount = discountApplied ? (subtotal * 0.15) : 0;
+
+      const total = subtotal + deliveryFee + tax - discount;
+      document.getElementById('total').textContent = `LKR ${total.toLocaleString('en-US')} LKR`;
+
+      // Show empty cart message if no items
+      const emptyCart = document.getElementById('emptyCart');
+      if (items.length === 0) {
+        emptyCart.classList.remove('hidden');
+      } else {
+        emptyCart.classList.add('hidden');
+      }
+    }
+
+    // Initialize cart summary
+    updateCartSummary();
+  });
+</script>
 </body>
 </html>

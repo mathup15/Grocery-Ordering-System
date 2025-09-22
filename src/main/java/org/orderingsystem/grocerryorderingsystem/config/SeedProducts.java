@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 public class SeedProducts {
 
     @Bean
-    CommandLineRunner seedProducts(ProductRepository productRepo) {
+    CommandLineRunner seedData(ProductRepository productRepo) { // Changed method name to seedData
         return args -> {
             if (productRepo.count() == 0) {
                 // Fruits

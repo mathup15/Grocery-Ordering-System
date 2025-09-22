@@ -1,91 +1,1243 @@
-<!-- src/main/resources/static/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>PioMart • Access</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshMart - Online Grocery Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #16a34a;
+            --primary-dark: #15803d;
+            --secondary: #ea580c;
+            --light-bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            min-height: 100vh;
+        }
+
+        .header-bg {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        }
+
+        .product-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary);
+        }
+
+        .cart-item {
+            transition: all 0.3s ease;
+            border-left: 4px solid #16a34a;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background-color: white;
+            border-radius: 9999px;
+            margin: 0 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+            z-index: 1;
+        }
+
+        .step.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .step.inactive {
+            color: #6b7280;
+            background-color: #f9fafb;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background-color: #e5e7eb;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .checkout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+
+        .checkout-main, .checkout-sidebar {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .checkout-sidebar {
+            align-self: start;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-method {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .payment-method:hover, .payment-method.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+
+        .payment-method.selected {
+            background-color: #f0fdf4;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .lkr-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .success-pulse {
+            animation: successPulse 2s infinite;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        @media (max-width: 1024px) {
+            .checkout-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .checkout-sidebar {
+                position: static;
+            }
+
+            .step-indicator::before {
+                left: 10%;
+                right: 10%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .payment-methods {
+                grid-template-columns: 1fr;
+            }
+
+            .step {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+
+            .step-indicator::before {
+                display: none;
+            }
+
+            .step-indicator {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
-<body class="min-h-screen bg-[#fafafa]">
-<main class="mx-auto max-w-7xl p-4 md:p-8">
-    <header class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-xl bg-emerald-600 text-white grid place-content-center text-2xl font-extrabold shadow">🛒</div>
-            <div class="text-2xl font-extrabold">PioMart</div>
+<body>
+<!-- Header -->
+<header class="header-bg text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-xl bg-white text-green-600 grid place-content-center text-xl font-bold shadow-lg">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-white">FreshMart</h1>
+            </div>
+            <div class="flex items-center gap-6">
+                <button id="viewCartBtn" class="relative bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-shopping-cart mr-1"></i>Cart
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+            </div>
         </div>
-    </header>
+    </div>
+</header>
 
-    <section class="mt-8 grid lg:grid-cols-2 gap-8 items-stretch">
-        <div class="rounded-3xl bg-white shadow p-6 md:p-10 border border-gray-100">
-            <p class="text-sm font-medium text-emerald-700">• Halal Products • Online Delivery Shop</p>
-            <h1 class="mt-2 text-3xl md:text-4xl font-extrabold leading-tight">
-                Welcome back to <span class="text-emerald-600">PioMart</span>
-            </h1>
-            <p class="mt-2 text-gray-600">Sign in with your ID/Email & password. Customers without an account can create one below.</p>
+<!-- Main Content -->
+<main>
+    <!-- Product Listing Section -->
+    <section id="productsSection" class="max-w-7xl mx-auto px-4 py-8">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-2 text-green-800">Fresh Groceries</h2>
+            <p class="text-green-600 text-lg">Select from our premium selection of fresh produce</p>
+        </div>
 
-            <!-- Sign in -->
-            <form id="formSignIn" class="mt-6 grid gap-4" novalidate>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Product 1 -->
+            <div class="product-card bg-white rounded-2xl p-6 shadow-md border border-green-100">
+                <div class="h-48 overflow-hidden rounded-xl mb-4">
+                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80"
+                         alt="Organic Mixed Vegetables" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Organic Mixed Vegetables</h3>
+                <p class="text-gray-600 mb-4">Farm fresh organic vegetables, 500g package</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-2xl font-bold text-green-700">LKR 1,250 <span class="lkr-badge">LKR</span></span>
+                    <button class="add-to-cart-btn bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                            data-id="1" data-name="Organic Mixed Vegetables" data-price="1250" data-image="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80">
+                        <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-card bg-white rounded-2xl p-6 shadow-md border border-green-100">
+                <div class="h-48 overflow-hidden rounded-xl mb-4">
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80"
+                         alt="Tropical Fruit Basket" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Tropical Fruit Basket</h3>
+                <p class="text-gray-600 mb-4">Assorted tropical fruits, 1.5kg</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-2xl font-bold text-green-700">LKR 2,350 <span class="lkr-badge">LKR</span></span>
+                    <button class="add-to-cart-btn bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                            data-id="2" data-name="Tropical Fruit Basket" data-price="2350" data-image="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80">
+                        <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-card bg-white rounded-2xl p-6 shadow-md border border-green-100">
+                <div class="h-48 overflow-hidden rounded-xl mb-4">
+                    <img src="https://images.unsplash.com/photo-1582515073490-39981397c445?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80"
+                         alt="Fresh Organic Herbs" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Fresh Organic Herbs</h3>
+                <p class="text-gray-600 mb-4">Assorted fresh herbs, 200g</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-2xl font-bold text-green-700">LKR 850 <span class="lkr-badge">LKR</span></span>
+                    <button class="add-to-cart-btn bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                            data-id="3" data-name="Fresh Organic Herbs" data-price="850" data-image="https://images.unsplash.com/photo-1582515073490-39981397c445?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80">
+                        <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Shopping Cart Section -->
+    <section id="cartSection" class="max-w-7xl mx-auto px-4 py-8 hidden">
+        <div class="text-center mb-8">
+            <h2 class="text-4xl font-bold mb-2 text-green-800">Your Shopping Cart</h2>
+            <p class="text-green-600 text-lg">Review your items before checkout</p>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Cart Items -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-2xl shadow-md border border-green-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-gray-800">Cart Items</h3>
+                        <button id="continueShopping" class="text-green-600 hover:text-green-700 transition-colors flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i>Continue Shopping
+                        </button>
+                    </div>
+
+                    <div id="cartItems" class="space-y-4">
+                        <!-- Cart items will be populated here -->
+                    </div>
+
+                    <div id="emptyCart" class="text-center py-12">
+                        <div class="text-6xl mb-4 opacity-60 text-green-500"><i class="fas fa-shopping-basket"></i></div>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">Your cart is empty</h3>
+                        <p class="text-gray-500 mb-6">Add some fresh items to get started!</p>
+                        <button id="emptyCartShopBtn" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+                            <i class="fas fa-arrow-left mr-2"></i>Continue Shopping
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-md border border-green-100 p-6 sticky top-28">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-6">Order Summary</h3>
+
+                    <!-- Order Totals -->
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between text-gray-600">
+                            <span>Subtotal</span>
+                            <span id="subtotal">LKR 0 <span class="lkr-badge">LKR</span></span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Delivery Fee</span>
+                            <span id="deliveryFee">LKR 300 <span class="lkr-badge">LKR</span></span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Tax</span>
+                            <span id="tax">LKR 0 <span class="lkr-badge">LKR</span></span>
+                        </div>
+                        <hr class="border-gray-200">
+                        <div class="flex justify-between text-lg font-semibold text-gray-800">
+                            <span>Total</span>
+                            <span id="total">LKR 300 <span class="lkr-badge">LKR</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-3">
+                        <button id="proceedToCheckout" class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300 font-semibold flex items-center justify-center">
+                            <i class="fas fa-credit-card mr-2"></i>Proceed to Checkout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checkout Section -->
+    <section id="checkoutSection" class="checkout-container hidden">
+        <!-- Header -->
+        <div class="checkout-header">
+            <h1 class="checkout-title">Complete Your Order</h1>
+            <p class="checkout-subtitle">Just a few more steps to get your fresh groceries delivered!</p>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step active" data-step="1">
+                <i class="fas fa-map-marker-alt mr-2"></i>Delivery
+            </div>
+            <div class="step inactive" data-step="2">
+                <i class="fas fa-credit-card mr-2"></i>Payment
+            </div>
+            <div class="step inactive" data-step="3">
+                <i class="fas fa-check-circle mr-2"></i>Review
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="checkout-grid">
+            <!-- Main Form Area -->
+            <div class="checkout-main">
+                <!-- Step 1: Delivery Information -->
+                <div id="step1" class="checkout-step">
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-map-marker-alt section-icon"></i>
+                            Delivery Address
+                        </h2>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Street Address *</label>
+                                <input type="text" id="streetAddress" class="form-input" placeholder="123 Main Street" required>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="form-group">
+                                    <label class="form-label">City *</label>
+                                    <input type="text" id="city" class="form-input" placeholder="Colombo" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Postal Code *</label>
+                                    <input type="text" id="postalCode" class="form-input" placeholder="00100" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Delivery Instructions</label>
+                                <textarea id="deliveryInstructions" class="form-textarea" placeholder="Special instructions for delivery (e.g., gate code, preferred location)"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-clock section-icon"></i>
+                            Delivery Time
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Preferred Date</label>
+                                <input type="date" id="deliveryDate" class="form-input" min="">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Time Slot</label>
+                                <select id="deliveryTime" class="form-select">
+                                    <option value="">Select time slot</option>
+                                    <option value="09:00-12:00">9:00 AM - 12:00 PM</option>
+                                    <option value="12:00-15:00">12:00 PM - 3:00 PM</option>
+                                    <option value="15:00-18:00">3:00 PM - 6:00 PM</option>
+                                    <option value="18:00-21:00">6:00 PM - 9:00 PM</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Payment Information -->
+                <div id="step2" class="checkout-step hidden">
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-credit-card section-icon"></i>
+                            Payment Method
+                        </h2>
+
+                        <div class="payment-methods">
+                            <div class="payment-method selected" data-method="card">
+                                <i class="fas fa-credit-card payment-icon"></i>
+                                <div class="font-medium">Credit/Debit Card</div>
+                                <div class="text-xs text-gray-500">Visa, Mastercard</div>
+                            </div>
+
+                            <div class="payment-method" data-method="cod">
+                                <i class="fas fa-money-bill-wave payment-icon"></i>
+                                <div class="font-medium">Cash on Delivery</div>
+                                <div class="text-xs text-gray-500">Pay when delivered</div>
+                            </div>
+
+                            <div class="payment-method" data-method="bank">
+                                <i class="fas fa-university payment-icon"></i>
+                                <div class="font-medium">Bank Transfer</div>
+                                <div class="text-xs text-gray-500">Direct bank payment</div>
+                            </div>
+                        </div>
+
+                        <!-- Credit Card Form (shown when card is selected) -->
+                        <div id="cardForm" class="mt-6">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Card Number *</label>
+                                    <input type="text" id="cardNumber" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19">
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Expiry Date *</label>
+                                        <input type="text" id="expiryDate" class="form-input" placeholder="MM/YY" maxlength="5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">CVV *</label>
+                                        <input type="text" id="cvv" class="form-input" placeholder="123" maxlength="4">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Cardholder Name *</label>
+                                    <input type="text" id="cardholderName" class="form-input" placeholder="John Doe">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Review Order -->
+                <div id="step3" class="checkout-step hidden">
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-check-circle section-icon"></i>
+                            Review Your Order
+                        </h2>
+
+                        <!-- Order Summary -->
+                        <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+                            <h3 class="font-semibold text-gray-800 mb-4">Order Items</h3>
+                            <div id="reviewItems" class="space-y-3">
+                                <!-- Items will be populated here -->
+                            </div>
+                        </div>
+
+                        <!-- Delivery Details -->
+                        <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+                            <h3 class="font-semibold text-gray-800 mb-4">Delivery Details</h3>
+                            <div id="reviewDelivery" class="text-gray-600">
+                                <!-- Delivery details will be populated here -->
+                            </div>
+                        </div>
+
+                        <!-- Payment Details -->
+                        <div class="bg-gray-50 rounded-2xl p-6">
+                            <h3 class="font-semibold text-gray-800 mb-4">Payment Method</h3>
+                            <div id="reviewPayment" class="text-gray-600">
+                                <!-- Payment details will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="navigation-buttons">
+                    <button id="backBtn" class="btn btn-secondary hidden">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button id="nextBtn" class="btn btn-primary">
+                        Next
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button id="placeOrderBtn" class="btn btn-primary hidden">
+                        <i class="fas fa-shopping-cart"></i>
+                        Place Order
+                    </button>
+                </div>
+            </div>
+
+            <!-- Order Summary Sidebar -->
+            <div class="checkout-sidebar">
+                <div class="order-summary">
+                    <h2 class="summary-title">Order Summary</h2>
+
+                    <!-- Cart Items -->
+                    <div class="cart-items" id="sidebarItems">
+                        <!-- Items will be populated here -->
+                    </div>
+
+                    <!-- Order Totals -->
+                    <div class="order-totals">
+                        <div class="total-row">
+                            <span>Subtotal</span>
+                            <span id="sidebarSubtotal">LKR 0 <span class="lkr-badge">LKR</span></span>
+                        </div>
+                        <div class="total-row">
+                            <span>Delivery Fee</span>
+                            <span id="sidebarDeliveryFee">LKR 300 <span class="lkr-badge">LKR</span></span>
+                        </div>
+                        <div class="total-row">
+                            <span>Tax</span>
+                            <span id="sidebarTax">LKR 0 <span class="lkr-badge">LKR</span></span>
+                        </div>
+                        <div class="total-row final">
+                            <span>Total</span>
+                            <span id="sidebarTotal">LKR 300 <span class="lkr-badge">LKR</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Confirmation Section -->
+    <section id="confirmationSection" class="max-w-4xl mx-auto px-4 py-12 hidden">
+        <!-- Success Animation -->
+        <div class="text-center mb-12">
+            <div class="relative inline-block">
+                <div class="w-32 h-32 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mb-6 mx-auto shadow-2xl success-pulse">
+                    <i class="fas fa-check text-white text-5xl"></i>
+                </div>
+                <div class="absolute -inset-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full blur-xl opacity-30"></div>
+            </div>
+
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Order Confirmed!</h1>
+            <p class="text-xl text-gray-600 mb-2">Thank you for your purchase</p>
+            <p class="text-lg text-gray-500">We're preparing your fresh order for delivery</p>
+        </div>
+
+        <!-- Order Details Card -->
+        <div class="bg-white rounded-3xl shadow-xl border border-green-100 p-8 mb-8 card-hover">
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Order Info -->
                 <div>
-                    <input id="si-username" name="username" placeholder="User ID or Email" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
-                </div>
-                <div class="relative">
-                    <input id="si-password" name="password" type="password" placeholder="Password" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 pr-24 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
-                    <button type="button" id="togglePwd" class="absolute right-2 top-2.5 rounded-xl px-3 py-1.5 text-xs font-semibold bg-gray-200 hover:bg-gray-300">Show</button>
-                </div>
-                <div class="flex items-center justify-between text-sm">
-                    <label class="inline-flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="remember" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-600"/>
-                        <span class="text-gray-600">Remember me</span>
-                    </label>
-                    <a href="#" class="font-semibold text-emerald-700 hover:opacity-80">Forgot password?</a>
-                </div>
-                <button class="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-white font-semibold shadow hover:bg-emerald-700 w-full">
-                    Sign in
-                </button>
-                <p id="si-error" class="hidden text-sm font-medium text-red-600"></p>
-            </form>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
+                        <i class="fas fa-receipt text-green-500"></i>
+                        Order Details
+                    </h2>
 
-            <!-- Divider -->
-            <div class="my-6 flex items-center gap-3 text-xs text-gray-400">
-                <div class="h-px flex-1 bg-gray-200"></div> <span>New to PioMart?</span> <div class="h-px flex-1 bg-gray-200"></div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center py-3 border-b border-green-100">
+                            <span class="text-gray-600">Order Number</span>
+                            <span id="orderNumber" class="font-mono font-semibold text-gray-800">LF-984523</span>
+                        </div>
+                        <div class="flex justify-between items-center py-3 border-b border-green-100">
+                            <span class="text-gray-600">Order Date</span>
+                            <span id="orderDate" class="font-semibold text-gray-800"></span>
+                        </div>
+                        <div class="flex justify-between items-center py-3 border-b border-green-100">
+                            <span class="text-gray-600">Payment Method</span>
+                            <span id="confirmationPaymentMethod" class="font-semibold text-gray-800"></span>
+                        </div>
+                        <div class="flex justify-between items-center py-3 border-b border-green-100">
+                            <span class="text-gray-600">Order Status</span>
+                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                                    <i class="fas fa-clock mr-1"></i>Processing
+                                </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Info -->
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
+                        <i class="fas fa-truck text-green-500"></i>
+                        Delivery Details
+                    </h2>
+
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-gray-600 block mb-1">Delivery Address</span>
+                            <div id="confirmationAddress" class="font-semibold text-gray-800"></div>
+                        </div>
+                        <div>
+                            <span class="text-gray-600 block mb-1">Estimated Delivery</span>
+                            <div id="confirmationDeliveryTime" class="font-semibold text-green-600"></div>
+                        </div>
+                        <div>
+                            <span class="text-gray-600 block mb-1">Delivery Instructions</span>
+                            <div id="confirmationInstructions" class="text-gray-700"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <!-- Customer sign up -->
-            <form id="formSignUp" class="grid gap-4" novalidate>
-                <div class="grid md:grid-cols-2 gap-3">
-                    <input id="su-fullname" placeholder="Full name" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
-                    <input id="su-phone" placeholder="Phone" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
-                </div>
-                <input id="su-username" placeholder="Email / username" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
-                <div class="grid md:grid-cols-2 gap-3">
-                    <input id="su-password" type="password" placeholder="Password (min 6)" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
-                    <input id="su-confirm" type="password" placeholder="Confirm password" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
-                </div>
-                <button class="inline-flex items-center justify-center gap-2 rounded-2xl bg-gray-900 px-5 py-3 text-white font-semibold shadow hover:opacity-90 w-full">
-                    Create customer account
-                </button>
-                <p id="su-error" class="hidden text-sm font-medium text-red-600"></p>
-                <p class="text-xs text-gray-500">By creating an account you agree to our Terms & Privacy.</p>
-            </form>
         </div>
 
-        <!-- right side promo kept as is -->
-        <aside class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#eff7f2] to-[#e9ffef] border border-gray-100">
-            <div class="absolute right-8 top-8 text-[9rem] md:text-[12rem] leading-none font-black text-emerald-200/50 select-none hidden lg:block">
-                GROCERY
+        <!-- Order Items -->
+        <div class="bg-white rounded-3xl shadow-xl border border-green-100 p-8 mb-8 card-hover">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
+                <i class="fas fa-shopping-basket text-green-500"></i>
+                Order Items
+            </h2>
+
+            <div id="confirmationItems" class="space-y-4">
+                <!-- Items will be populated here -->
             </div>
-            <div class="relative h-full grid place-items-center p-10">
-                <div class="max-w-md text-center">
-                    <div class="mx-auto mb-6 h-24 w-24 grid place-content-center rounded-2xl bg-emerald-600 text-white text-5xl shadow">🥬</div>
-                    <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">Fast Delivery</h2>
-                    <p class="mt-2 text-gray-600">Order before 6 PM for same-day delivery.</p>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="bg-white rounded-3xl shadow-xl border border-green-100 p-8 mb-8 card-hover">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
+                <i class="fas fa-calculator text-green-500"></i>
+                Order Summary
+            </h2>
+
+            <div class="space-y-3">
+                <div class="flex justify-between text-gray-600">
+                    <span>Subtotal</span>
+                    <span id="confirmationSubtotal">LKR 0 <span class="lkr-badge">LKR</span></span>
+                </div>
+                <div class="flex justify-between text-gray-600">
+                    <span>Delivery Fee</span>
+                    <span id="confirmationDeliveryFee">LKR 300 <span class="lkr-badge">LKR</span></span>
+                </div>
+                <div class="flex justify-between text-gray-600">
+                    <span>Tax</span>
+                    <span id="confirmationTax">LKR 0 <span class="lkr-badge">LKR</span></span>
+                </div>
+                <hr class="border-gray-200 my-4">
+                <div class="flex justify-between text-2xl font-bold text-gray-800">
+                    <span>Total Paid</span>
+                    <span id="confirmationTotal">LKR 300 <span class="lkr-badge">LKR</span></span>
                 </div>
             </div>
-        </aside>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button id="backToShopping" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
+                <i class="fas fa-home mr-3"></i>
+                Continue Shopping
+            </button>
+        </div>
     </section>
 </main>
 
-<script src="/js/app.js"></script>
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl p-8 text-center shadow-2xl">
+        <div class="animate-spin w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <p class="text-gray-600 font-medium">Processing your order...</p>
+    </div>
+</div>
+
+<script>
+    // DOM Elements
+    const productsSection = document.getElementById('productsSection');
+    const cartSection = document.getElementById('cartSection');
+    const checkoutSection = document.getElementById('checkoutSection');
+    const confirmationSection = document.getElementById('confirmationSection');
+    const viewCartBtn = document.getElementById('viewCartBtn');
+    const continueShopping = document.getElementById('continueShopping');
+    const emptyCartShopBtn = document.getElementById('emptyCartShopBtn');
+    const proceedToCheckout = document.getElementById('proceedToCheckout');
+    const backToShopping = document.getElementById('backToShopping');
+    const cartItems = document.getElementById('cartItems');
+    const emptyCart = document.getElementById('emptyCart');
+    const cartCount = document.getElementById('cartCount');
+    const subtotal = document.getElementById('subtotal');
+    const deliveryFee = document.getElementById('deliveryFee');
+    const tax = document.getElementById('tax');
+    const total = document.getElementById('total');
+    const sidebarItems = document.getElementById('sidebarItems');
+    const sidebarSubtotal = document.getElementById('sidebarSubtotal');
+    const sidebarDeliveryFee = document.getElementById('sidebarDeliveryFee');
+    const sidebarTax = document.getElementById('sidebarTax');
+    const sidebarTotal = document.getElementById('sidebarTotal');
+    const backBtn = document.getElementById('backBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const placeOrderBtn = document.getElementById('placeOrderBtn');
+    const reviewItems = document.getElementById('reviewItems');
+    const reviewDelivery = document.getElementById('reviewDelivery');
+    const reviewPayment = document.getElementById('reviewPayment');
+    const confirmationItems = document.getElementById('confirmationItems');
+    const confirmationSubtotal = document.getElementById('confirmationSubtotal');
+    const confirmationDeliveryFee = document.getElementById('confirmationDeliveryFee');
+    const confirmationTax = document.getElementById('confirmationTax');
+    const confirmationTotal = document.getElementById('confirmationTotal');
+    const confirmationAddress = document.getElementById('confirmationAddress');
+    const confirmationDeliveryTime = document.getElementById('confirmationDeliveryTime');
+    const confirmationInstructions = document.getElementById('confirmationInstructions');
+    const confirmationPaymentMethod = document.getElementById('confirmationPaymentMethod');
+    const orderNumber = document.getElementById('orderNumber');
+    const orderDate = document.getElementById('orderDate');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    // State
+    let cart = [];
+    let currentStep = 1;
+    let selectedPaymentMethod = 'card';
+    let orderDetails = {};
+
+    // Initialize the app
+    function init() {
+        // Set minimum delivery date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('deliveryDate').min = tomorrow.toISOString().split('T')[0];
+
+        // Set order date to today
+        const today = new Date();
+        orderDate.textContent = today.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Generate random order number
+        orderNumber.textContent = 'FM-' + Math.floor(100000 + Math.random() * 900000);
+
+        // Load cart from localStorage if available
+        const savedCart = localStorage.getItem('freshmart_cart');
+        if (savedCart) {
+            cart = JSON.parse(savedCart);
+            updateCartUI();
+        }
+
+        // Add event listeners
+        setupEventListeners();
+    }
+
+    // Set up event listeners
+    function setupEventListeners() {
+        // Navigation
+        viewCartBtn.addEventListener('click', () => showSection(cartSection));
+        continueShopping.addEventListener('click', () => showSection(productsSection));
+        emptyCartShopBtn.addEventListener('click', () => showSection(productsSection));
+        proceedToCheckout.addEventListener('click', () => showSection(checkoutSection));
+        backToShopping.addEventListener('click', () => {
+            showSection(productsSection);
+            // Clear cart after successful order
+            cart = [];
+            localStorage.removeItem('freshmart_cart');
+            updateCartUI();
+        });
+
+        // Add to cart buttons
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.target.getAttribute('data-id');
+                const name = e.target.getAttribute('data-name');
+                const price = parseInt(e.target.getAttribute('data-price'));
+                const image = e.target.getAttribute('data-image');
+
+                addToCart(id, name, price, image);
+            });
+        });
+
+        // Checkout navigation
+        backBtn.addEventListener('click', () => navigateCheckout(-1));
+        nextBtn.addEventListener('click', () => navigateCheckout(1));
+        placeOrderBtn.addEventListener('click', placeOrder);
+
+        // Payment method selection
+        document.querySelectorAll('.payment-method').forEach(method => {
+            method.addEventListener('click', () => {
+                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+                method.classList.add('selected');
+                selectedPaymentMethod = method.getAttribute('data-method');
+
+                // Show/hide card form based on selection
+                const cardForm = document.getElementById('cardForm');
+                if (selectedPaymentMethod === 'card') {
+                    cardForm.classList.remove('hidden');
+                } else {
+                    cardForm.classList.add('hidden');
+                }
+            });
+        });
+    }
+
+    // Add item to cart
+    function addToCart(id, name, price, image) {
+        // Check if item already in cart
+        const existingItem = cart.find(item => item.id === id);
+
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart.push({
+                id,
+                name,
+                price,
+                image,
+                quantity: 1
+            });
+        }
+
+        // Save to localStorage
+        localStorage.setItem('freshmart_cart', JSON.stringify(cart));
+
+        // Update UI
+        updateCartUI();
+
+        // Show success animation
+        const button = document.querySelector(`.add-to-cart-btn[data-id="${id}"]`);
+        button.innerHTML = '<i class="fas fa-check mr-2"></i>Added to Cart';
+        button.classList.add('bg-green-700');
+
+        setTimeout(() => {
+            button.innerHTML = '<i class="fas fa-cart-plus mr-2"></i>Add to Cart';
+            button.classList.remove('bg-green-700');
+        }, 1500);
+    }
+
+    // Remove item from cart
+    function removeFromCart(id) {
+        cart = cart.filter(item => item.id !== id);
+        localStorage.setItem('freshmart_cart', JSON.stringify(cart));
+        updateCartUI();
+    }
+
+    // Update cart quantity
+    function updateQuantity(id, change) {
+        const item = cart.find(item => item.id === id);
+        if (item) {
+            item.quantity += change;
+
+            if (item.quantity <= 0) {
+                removeFromCart(id);
+            } else {
+                localStorage.setItem('freshmart_cart', JSON.stringify(cart));
+                updateCartUI();
+            }
+        }
+    }
+
+    // Update cart UI
+    function updateCartUI() {
+        // Update cart count
+        const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+        cartCount.textContent = totalItems;
+
+        // Show/hide empty cart message
+        if (cart.length === 0) {
+            emptyCart.classList.remove('hidden');
+            cartItems.innerHTML = '';
+        } else {
+            emptyCart.classList.add('hidden');
+
+            // Render cart items
+            cartItems.innerHTML = cart.map(item => `
+                    <div class="cart-item bg-white rounded-xl p-4 shadow-sm border border-green-100">
+                        <div class="flex items-center gap-4">
+                            <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-800">${item.name}</h4>
+                                <p class="text-green-600 font-semibold">LKR ${item.price.toLocaleString()} <span class="lkr-badge">LKR</span></p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="quantity-btn w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors" onclick="updateQuantity('${item.id}', -1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span class="w-8 text-center font-medium">${item.quantity}</span>
+                                <button class="quantity-btn w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors" onclick="updateQuantity('${item.id}', 1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <button class="remove-btn text-red-500 hover:text-red-700 transition-colors" onclick="removeFromCart('${item.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        // Update totals
+        const cartSubtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+        const cartTax = Math.round(cartSubtotal * 0.12); // 12% tax
+        const cartDeliveryFee = 300;
+        const cartTotal = cartSubtotal + cartTax + cartDeliveryFee;
+
+        subtotal.innerHTML = `LKR ${cartSubtotal.toLocaleString()} <span class="lkr-badge">LKR</span>`;
+        tax.innerHTML = `LKR ${cartTax.toLocaleString()} <span class="lkr-badge">LKR</span>`;
+        deliveryFee.innerHTML = `LKR ${cartDeliveryFee.toLocaleString()} <span class="lkr-badge">LKR</span>`;
+        total.innerHTML = `LKR ${cartTotal.toLocaleString()} <span class="lkr-badge">LKR</span>`;
+
+        // Update sidebar in checkout
+        updateCheckoutSidebar(cartSubtotal, cartTax, cartDeliveryFee, cartTotal);
+    }
+
+    // Update checkout sidebar
+    function updateCheckoutSidebar(subtotal, tax, deliveryFee, total) {
+        sidebarItems.innerHTML = cart.map(item => `
+                <div class="checkout-item flex items-center gap-3 py-3 border-b border-gray-100">
+                    <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-medium text-sm text-gray-800">${item.name}</h4>
+                        <p class="text-xs text-gray-500">Qty: ${item.quantity}</p>
+                    </div>
+                    <span class="text-sm font-semibold text-green-600">LKR ${(item.price * item.quantity).toLocaleString()} <span class="lkr-badge">LKR</span></span>
+                </div>
+            `).join('');
+
+        sidebarSubtotal.innerHTML = `LKR ${subtotal.toLocaleString()} <span class="lkr-badge">LKR</span>`;
+        sidebarTax.innerHTML = `LKR ${tax.toLocaleString()} <span class="lkr-badge">LKR</span>`;
+        sidebarDeliveryFee.innerHTML = `LKR ${deliveryFee.toLocaleString()} <span class="lkr-badge">LKR</span>`;
+        sidebarTotal.innerHTML = `LKR ${total.toLocaleString()} <span class="lkr-badge">LKR</span>`;
+    }
+
+    // Show a specific section
+    function showSection(section) {
+        productsSection.classList.add('hidden');
+        cartSection.classList.add('hidden');
+        checkoutSection.classList.add('hidden');
+        confirmationSection.classList.add('hidden');
+
+        section.classList.remove('hidden');
+
+        // If showing checkout, reset to step 1
+        if (section === checkoutSection) {
+            currentStep = 1;
+            updateCheckoutSteps();
+        }
+    }
+
+    // Navigate between checkout steps
+    function navigateCheckout(direction) {
+        // Validate current step before proceeding
+        if (direction > 0 && !validateStep(currentStep)) {
+            return;
+        }
+
+        currentStep += direction;
+
+        // If moving to step 3, update the review
+        if (currentStep === 3) {
+            updateOrderReview();
+        }
+
+        // If moving beyond step 3, complete the order
+        if (currentStep > 3) {
+            placeOrder();
+            return;
+        }
+
+        updateCheckoutSteps();
+    }
+
+    // Validate current step
+    function validateStep(step) {
+        if (step === 1) {
+            const streetAddress = document.getElementById('streetAddress').value;
+            const city = document.getElementById('city').value;
+            const postalCode = document.getElementById('postalCode').value;
+
+            if (!streetAddress || !city || !postalCode) {
+                alert('Please fill in all required delivery information.');
+                return false;
+            }
+        } else if (step === 2 && selectedPaymentMethod === 'card') {
+            const cardNumber = document.getElementById('cardNumber').value;
+            const expiryDate = document.getElementById('expiryDate').value;
+            const cvv = document.getElementById('cvv').value;
+            const cardholderName = document.getElementById('cardholderName').value;
+
+            if (!cardNumber || !expiryDate || !cvv || !cardholderName) {
+                alert('Please fill in all required payment information.');
+                return false;
+            }
+
+            // Simple validation for card number (just checking length)
+            if (cardNumber.replace(/\s/g, '').length !== 16) {
+                alert('Please enter a valid 16-digit card number.');
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Update checkout steps UI
+    function updateCheckoutSteps() {
+        // Update step indicators
+        document.querySelectorAll('.step').forEach((step, index) => {
+            step.classList.remove('active', 'inactive');
+            if (index + 1 === currentStep) {
+                step.classList.add('active');
+            } else {
+                step.classList.add('inactive');
+            }
+        });
+
+        // Show/hide steps
+        document.querySelectorAll('.checkout-step').forEach((step, index) => {
+            if (index + 1 === currentStep) {
+                step.classList.remove('hidden');
+            } else {
+                step.classList.add('hidden');
+            }
+        });
+
+        // Update navigation buttons
+        if (currentStep === 1) {
+            backBtn.classList.add('hidden');
+        } else {
+            backBtn.classList.remove('hidden');
+        }
+
+        if (currentStep === 3) {
+            nextBtn.classList.add('hidden');
+            placeOrderBtn.classList.remove('hidden');
+        } else {
+            nextBtn.classList.remove('hidden');
+            placeOrderBtn.classList.add('hidden');
+        }
+    }
+
+    // Update order review
+    function updateOrderReview() {
+        // Update items
+        reviewItems.innerHTML = cart.map(item => `
+                <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-cover rounded-lg">
+                        <div>
+                            <h4 class="font-medium text-gray-800">${item.name}</h4>
+                            <p class="text-sm text-gray-500">Qty: ${item.quantity}</p>
+                        </div>
+                    </div>
+                    <span class="font-semibold text-green-600">LKR ${(item.price * item.quantity).toLocaleString()} <span class="lkr-badge">LKR</span></span>
+                </div>
+            `).join('');
+
+        // Update delivery details
+        const streetAddress = document.getElementById('streetAddress').value;
+        const city = document.getElementById('city').value;
+        const postalCode = document.getElementById('postalCode').value;
+        const deliveryDate = document.getElementById('deliveryDate').value;
+        const deliveryTime = document.getElementById('deliveryTime').value;
+        const instructions = document.getElementById('deliveryInstructions').value;
+
+        reviewDelivery.innerHTML = `
+                <p class="mb-2"><strong>Address:</strong> ${streetAddress}, ${city}, ${postalCode}</p>
+                <p class="mb-2"><strong>Delivery Date:</strong> ${deliveryDate ? new Date(deliveryDate).toLocaleDateString() : 'Not specified'}</p>
+                <p class="mb-2"><strong>Time Slot:</strong> ${deliveryTime || 'Not specified'}</p>
+                ${instructions ? `<p><strong>Instructions:</strong> ${instructions}</p>` : ''}
+            `;
+
+        // Update payment details
+        let paymentDetails = '';
+        if (selectedPaymentMethod === 'card') {
+            const cardNumber = document.getElementById('cardNumber').value;
+            paymentDetails = `Credit/Debit Card ending in ${cardNumber.slice(-4)}`;
+        } else if (selectedPaymentMethod === 'cod') {
+            paymentDetails = 'Cash on Delivery';
+        } else if (selectedPaymentMethod === 'bank') {
+            paymentDetails = 'Bank Transfer';
+        }
+
+        reviewPayment.innerHTML = `<p>${paymentDetails}</p>`;
+
+        // Save order details for confirmation
+        const cartSubtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+        const cartTax = Math.round(cartSubtotal * 0.12);
+        const cartDeliveryFee = 300;
+        const cartTotal = cartSubtotal + cartTax + cartDeliveryFee;
+
+        orderDetails = {
+            items: [...cart],
+            delivery: {
+                address: `${streetAddress}, ${city}, ${postalCode}`,
+                date: deliveryDate,
+                time: deliveryTime,
+                instructions: instructions
+            },
+            payment: {
+                method: selectedPaymentMethod,
+                details: paymentDetails
+            },
+            totals: {
+                subtotal: cartSubtotal,
+                tax: cartTax,
+                delivery: cartDeliveryFee,
+                total: cartTotal
+            }
+        };
+    }
+
+    // Place order
+    function placeOrder() {
+        // Show loading overlay
+        loadingOverlay.classList.remove('hidden');
+
+        // Simulate order processing
+        setTimeout(() => {
+            loadingOverlay.classList.add('hidden');
+
+            // Update confirmation page with order details
+            confirmationItems.innerHTML = orderDetails.items.map(item => `
+                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                            <div>
+                                <h4 class="font-medium text-gray-800">${item.name}</h4>
+                                <p class="text-sm text-gray-500">Qty: ${item.quantity}</p>
+                            </div>
+                        </div>
+                        <span class="font-semibold text-green-600">LKR ${(item.price * item.quantity).toLocaleString()} <span class="lkr-badge">LKR</span></span>
+                    </div>
+                `).join('');
+
+            confirmationSubtotal.innerHTML = `LKR ${orderDetails.totals.subtotal.toLocaleString()} <span class="lkr-badge">LKR</span>`;
+            confirmationTax.innerHTML = `LKR ${orderDetails.totals.tax.toLocaleString()} <span class="lkr-badge">LKR</span>`;
+            confirmationDeliveryFee.innerHTML = `LKR ${orderDetails.totals.delivery.toLocaleString()} <span class="lkr-badge">LKR</span>`;
+            confirmationTotal.innerHTML = `LKR ${orderDetails.totals.total.toLocaleString()} <span class="lkr-badge">LKR</span>`;
+
+            confirmationAddress.textContent = orderDetails.delivery.address;
+            confirmationDeliveryTime.textContent = orderDetails.delivery.date ?
+                `${new Date(orderDetails.delivery.date).toLocaleDateString()} at ${orderDetails.delivery.time}` :
+                'To be scheduled';
+            confirmationInstructions.textContent = orderDetails.delivery.instructions || 'None';
+            confirmationPaymentMethod.textContent = orderDetails.payment.details;
+
+            // Show confirmation section
+            showSection(confirmationSection);
+        }, 2000);
+    }
+
+    // Initialize the app
+    init();
+</script>
 </body>
 </html>
