@@ -16,8 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/inventory")
@@ -27,7 +27,7 @@ public class ProductController {
     private final ProductRepository products;
     private final FileStorageService files;
 
-    // ===== LIST =====
+    // ------- LIST -------
     @GetMapping("/products")
     public PageResp<ProductResp> list(@RequestParam(defaultValue = "0") int page,
                                       @RequestParam(defaultValue = "12") int size,
@@ -46,56 +46,58 @@ public class ProductController {
             p = products.findByNameContainingIgnoreCaseOrSkuContainingIgnoreCase(q, q, pageable);
         } else if (category != null && !category.isBlank()) {
             p = products.findByCategoryIgnoreCase(category, pageable);
-        } else if (lowOnly != null && lowOnly) {
-            p = products.findLowStockProducts(pageable);
         } else {
             p = products.findAll(pageable);
         }
 
-        var items = p.getContent().stream().map(Dtos::toResp).toList();
-        return new PageResp<>(items, p.getTotalElements());
+        // Optional low-stock filter (manual, keeps repo simple)
+        List<Product> source = p.getContent();
+        List<Product> filtered = new ArrayList<>();
+        if (Boolean.TRUE.equals(lowOnly)) {
+            for (Product prod : source) {
+                int soh = prod.getInventory() == null || prod.getInventory().getStockOnHand() == null
+                        ? 0 : prod.getInventory().getStockOnHand();
+                int res = prod.getInventory() == null || prod.getInventory().getReservedQty() == null
+                        ? 0 : prod.getInventory().getReservedQty();
+                int avail = Math.max(0, soh - res);
+                int rp = prod.getReorderPoint() == null ? 0 : prod.getReorderPoint();
+                if (avail <= rp) filtered.add(prod);
+            }
+        } else {
+            filtered = source;
+        }
+
+        var items = filtered.stream().map(ProductController::toResp).toList();
+        long total = Boolean.TRUE.equals(lowOnly) ? items.size() : p.getTotalElements();
+        return new PageResp<>(items, total);
     }
 
-    // ===== CREATE (multipart) =====
-    @PostMapping(value = "/products", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // ------- CREATE (JSON or multipart) -------
+    @PostMapping(value = "/products",
+            consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @Transactional
-    public ProductResp create(@RequestParam String sku,
-                              @RequestParam String name,
-                              @RequestParam(required = false) String category,
-                              @RequestParam(required = false) String unit,
-                              @RequestParam Double price,
-                              @RequestParam(defaultValue = "0") Integer reorderPoint,
-                              @RequestPart(value = "image", required = false) MultipartFile image) {
-        validate(sku, name, price);
-
-       /* // Debug: Check what's really in the database
-        System.out.println("=== DEBUG SKU CHECK ===");
-        System.out.println("Input SKU: '" + sku + "'");
-        System.out.println("Input SKU length: " + sku.length());
-
-        // Check with regular method
-        Optional<Product> existingRegular = products.findBySku(sku);
-        System.out.println("Regular check found: " + existingRegular.isPresent());
-
-        // Check with trimmed method
-        Optional<Product> existingTrimmed = products.findBySkuTrimmed(sku);
-        System.out.println("Trimmed check found: " + existingTrimmed.isPresent());
-
-        // Check with LIKE for similar SKUs
-        List<Product> similarSkus = products.findBySkuContainingIgnoreCase(sku.substring(0, Math.min(3, sku.length())));
-        System.out.println("Similar SKUs found: " + similarSkus.size());
-        similarSkus.forEach(p -> System.out.println(" - '" + p.getSku() + "'"));
-
-        // Now do the actual validation
-        products.findBySku(sku).ifPresent(x -> {
-            throw new IllegalArgumentException("SKU '" + sku + "' already exists as '" + x.getSku() + "' (ID: " + x.getId() + ")");
-        });*/
-
-        String imageUrl = null;
-        if (image != null && !image.isEmpty()) {
-            imageUrl = files.save(image);
+    public ProductResp create(
+            @RequestBody(required = false) ProductCreateJson json,
+            @RequestParam(required = false) String sku,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String unit,
+            @RequestParam(required = false) Double price,
+            @RequestParam(required = false, defaultValue = "0") Integer reorderPoint,
+            @RequestParam(required = false) String imageUrl,
+            @RequestPart(value = "image", required = false) MultipartFile image
+    ) {
+        if (json != null) {
+            sku = json.sku(); name = json.name(); category = json.category(); unit = json.unit();
+            price = json.price(); reorderPoint = json.reorderPoint(); imageUrl = json.imageUrl();
         }
+        validate(sku, name, price);
+        products.findBySku(sku).ifPresent(x -> { throw new IllegalArgumentException("SKU already exists"); });
+
+        String finalImageUrl = null;
+        if (image != null && !image.isEmpty()) finalImageUrl = files.save(image);
+        else if (imageUrl != null && !imageUrl.isBlank()) finalImageUrl = imageUrl.trim();
 
         Product p = Product.builder()
                 .sku(sku.trim())
@@ -104,43 +106,46 @@ public class ProductController {
                 .unit(nz(unit))
                 .price(price)
                 .reorderPoint(reorderPoint == null ? 0 : reorderPoint)
-                .imageUrl(imageUrl)
+                .imageUrl(finalImageUrl)
                 .active(true)
                 .build();
 
-        // Create inventory with product reference
-        Inventory inventory = Inventory.builder()
-                .stockOnHand(0)
-                .reservedQty(0)
-                .product(p)
-                .build();
-        p.setInventory(inventory);
+        // Product owns the relation (inventory_id on products)
+        if (p.getInventory() == null) {
+            p.setInventory(Inventory.builder().stockOnHand(0).reservedQty(0).build());
+        }
 
         p = products.save(p);
-        return Dtos.toResp(p);
+        return toResp(p);
     }
 
-    // ===== UPDATE (multipart; file optional) =====
-    @PutMapping(value = "/products/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // ------- UPDATE (JSON or multipart) -------
+    @PutMapping(value = "/products/{id}",
+            consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @Transactional
     public ProductResp update(@PathVariable Long id,
-                              @RequestParam String sku,
-                              @RequestParam String name,
+                              @RequestBody(required = false) ProductCreateJson json,
+                              @RequestParam(required = false) String sku,
+                              @RequestParam(required = false) String name,
                               @RequestParam(required = false) String category,
                               @RequestParam(required = false) String unit,
-                              @RequestParam Double price,
-                              @RequestParam(defaultValue = "0") Integer reorderPoint,
+                              @RequestParam(required = false) Double price,
+                              @RequestParam(required = false) Integer reorderPoint,
+                              @RequestParam(required = false) String imageUrl,
                               @RequestPart(value = "image", required = false) MultipartFile image) {
 
+        if (json != null) {
+            sku = json.sku(); name = json.name(); category = json.category(); unit = json.unit();
+            price = json.price(); reorderPoint = json.reorderPoint(); imageUrl = json.imageUrl();
+        }
         validate(sku, name, price);
 
         Product p = products.findById(id).orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        Optional<Product> existingSku = products.findBySku(sku);
-        if (existingSku.isPresent() && !existingSku.get().getId().equals(id)) {
-            throw new IllegalArgumentException("SKU already exists");
-        }
+        products.findBySku(sku)
+                .filter(x -> !x.getId().equals(id))
+                .ifPresent(x -> { throw new IllegalArgumentException("SKU already exists"); });
 
         p.setSku(sku.trim());
         p.setName(name.trim());
@@ -151,21 +156,18 @@ public class ProductController {
 
         if (image != null && !image.isEmpty()) {
             p.setImageUrl(files.save(image));
+        } else if (imageUrl != null) {
+            p.setImageUrl(imageUrl.isBlank() ? null : imageUrl.trim());
         }
 
         if (p.getInventory() == null) {
-            Inventory inventory = Inventory.builder()
-                    .stockOnHand(0)
-                    .reservedQty(0)
-                    .product(p)
-                    .build();
-            p.setInventory(inventory);
+            p.setInventory(Inventory.builder().stockOnHand(0).reservedQty(0).build());
         }
 
-        return Dtos.toResp(p);
+        return toResp(p);
     }
 
-    // ===== EXPORT LOW STOCK (CSV) =====
+    // ------- EXPORT LOW STOCK (CSV) -------
     @GetMapping("/reports/low-stock")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     public ResponseEntity<byte[]> exportLowStock() {
@@ -186,44 +188,42 @@ public class ProductController {
                 .body(csv);
     }
 
-    // ===== IMPORT CSV (accept & 204) =====
-    @PostMapping(value = "/csv/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
-    public ResponseEntity<Void> importCsv(@RequestPart("file") MultipartFile file) {
-        // TODO: parse & upsert (left intentionally minimal to keep scope)
-        return ResponseEntity.noContent().build();
-    }
-
-    // ===== DEBUG ENDPOINTS =====
-    @GetMapping("/debug/sku-check/{sku}")
-    public String checkSku(@PathVariable String sku) {
-        Optional<Product> product = products.findBySku(sku);
-        if (product.isPresent()) {
-            return "SKU EXISTS: '" + product.get().getSku() + "' (ID: " + product.get().getId() + ")";
-        } else {
-            return "SKU NOT FOUND: '" + sku + "'";
-        }
-    }
-
-    @GetMapping("/debug/all-skus")
-    public List<String> getAllSkus() {
-        List<Product> allProducts = products.findAll();
-        return allProducts.stream()
-                .map(p -> "'" + p.getSku() + "' (ID: " + p.getId() + ")")
-                .toList();
-    }
-
-    // ===== helpers =====
+    // ------- helpers -------
     private static void validate(String sku, String name, Double price){
         if (sku == null || sku.isBlank())  throw new IllegalArgumentException("SKU is required");
         if (name == null || name.isBlank())throw new IllegalArgumentException("Name is required");
         if (price == null || price < 0)    throw new IllegalArgumentException("Price must be >= 0");
     }
-
     private static String nz(String s){ return (s == null || s.isBlank()) ? null : s.trim(); }
+    private static String escape(String s){ return s == null ? "" : "\"" + s.replace("\"","\"\"") + "\""; }
 
-    private static String escape(String s){
-        if (s == null) return "";
-        return "\"" + s.replace("\"", "\"\"") + "\"";
+    private static ProductResp toResp(Product p){
+        var inv = p.getInventory();
+        int soh = (inv == null || inv.getStockOnHand() == null) ? 0 : inv.getStockOnHand();
+        int res = (inv == null || inv.getReservedQty() == null) ? 0 : inv.getReservedQty();
+        int avail = Math.max(0, soh - res);
+        return ProductResp.builder()
+                .id(p.getId())
+                .sku(p.getSku())
+                .name(p.getName())
+                .category(p.getCategory())
+                .unit(p.getUnit())
+                .price(p.getPrice())
+                .reorderPoint(p.getReorderPoint())
+                .imageUrl(p.getImageUrl())
+                .active(p.getActive() != null ? p.getActive() : Boolean.TRUE)
+                .stockOnHand(soh)
+                .reservedQty(res)
+                .availableQty(avail)
+                .build();
     }
+
+    // JSON DTO (when not uploading a file)
+    public record ProductCreateJson(
+            String sku, String name, String category, String unit,
+            Double price, Integer reorderPoint, String imageUrl
+    ){}
+
+    // Page wrapper
+    public record PageResp<T>(List<T> items, long total){}
 }

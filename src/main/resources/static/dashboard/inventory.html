@@ -20,383 +20,98 @@
             --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
 
-        body {
-            background-color: #f9fafb;
-            color: var(--gray-900);
-            line-height: 1.5;
-        }
-
-        .hidden {
-            display: none !important;
-        }
+        body { background-color: #f9fafb; color: var(--gray-900); line-height: 1.5; }
+        .hidden { display: none !important; }
 
         /* Header Styles */
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            background: white;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+        .topbar { display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem 1.5rem; background: white; box-shadow: var(--shadow);
+            position: sticky; top: 0; z-index: 10; }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 2.5rem;
-            height: 2.5rem;
-            background: var(--primary);
-            color: white;
-            font-weight: bold;
-            border-radius: var(--radius);
-        }
-
-        h1 {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .actions {
-            display: flex;
-            gap: 0.75rem;
-        }
+        .brand { display: flex; align-items: center; gap: 0.75rem; }
+        .logo { display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem;
+            background: var(--primary); color: white; font-weight: bold; border-radius: var(--radius); }
+        h1 { font-size: 1.25rem; font-weight: 600; }
+        .actions { display: flex; gap: 0.75rem; }
 
         /* Button Styles */
-        .btn {
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius);
-            border: 1px solid transparent;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.875rem;
-        }
-
-        .btn.primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn.primary:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn.ghost {
-            background: transparent;
-            border-color: var(--gray-300);
-            color: var(--gray-700);
-        }
-
-        .btn.ghost:hover {
-            background: var(--gray-100);
-        }
-
-        .btn.danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn.small {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-        }
+        .btn { padding: 0.5rem 1rem; border-radius: var(--radius); border: 1px solid transparent;
+            font-weight: 500; cursor: pointer; transition: all 0.2s; font-size: 0.875rem; }
+        .btn.primary { background: var(--primary); color: white; }
+        .btn.primary:hover { background: var(--primary-dark); }
+        .btn.ghost { background: transparent; border-color: var(--gray-300); color: var(--gray-700); }
+        .btn.ghost:hover { background: var(--gray-100); }
+        .btn.danger { background: var(--danger); color: white; }
+        .btn.small { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
 
         /* Filter Styles */
-        .filters {
-            display: flex;
-            gap: 1rem;
-            padding: 1.5rem;
-            background: white;
-            margin: 1rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .filters input, .filters select {
-            padding: 0.5rem;
-            border: 1px solid var(--gray-300);
-            border-radius: var(--radius);
-            background: white;
-        }
-
-        #q {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .check {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            white-space: nowrap;
-        }
+        .filters { display: flex; gap: 1rem; padding: 1.5rem; background: white; margin: 1rem;
+            border-radius: var(--radius); box-shadow: var(--shadow); flex-wrap: wrap; align-items: center; }
+        .filters input, .filters select { padding: 0.5rem; border: 1px solid var(--gray-300);
+            border-radius: var(--radius); background: white; }
+        #q { flex: 1; min-width: 200px; }
+        .check { display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
 
         /* Main Content */
-        main {
-            padding: 0 1.5rem 2rem;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .card {
-            background: white;
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-        }
-
-        .thumb {
-            height: 160px;
-            overflow: hidden;
-            background: var(--gray-100);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .meta {
-            padding: 1rem;
-        }
-
-        .meta h3 {
-            font-size: 1.125rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .muted {
-            color: var(--gray-500);
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-        }
-
-        .row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .price {
-            font-weight: 600;
-            font-size: 1.125rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .gap {
-            gap: 0.5rem;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 3rem;
-            color: var(--gray-500);
-        }
-
-        .pager {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        main { padding: 0 1.5rem 2rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem; margin-bottom: 2rem; }
+        .card { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+            transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); }
+        .thumb { height: 160px; overflow: hidden; background: var(--gray-100); display: flex; align-items: center; justify-content: center; }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .meta { padding: 1rem; }
+        .meta h3 { font-size: 1.125rem; margin-bottom: 0.25rem; }
+        .muted { color: var(--gray-500); font-size: 0.875rem; margin-bottom: 1rem; }
+        .row { display: flex; justify-content: space-between; align-items: center; }
+        .price { font-weight: 600; font-size: 1.125rem; margin-bottom: 0.25rem; }
+        .gap { gap: 0.5rem; }
+        .empty { text-align: center; padding: 3rem; color: var(--gray-500); }
+        .pager { display: flex; justify-content: space-between; align-items: center; }
 
         /* Dialog Styles */
-        dialog {
-            border: none;
-            border-radius: var(--radius);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            padding: 0;
-            width: 90%;
-            max-width: 700px;
-        }
-
-        dialog::backdrop {
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .dlg-title {
-            padding: 1.5rem 1.5rem 0;
-        }
-
-        .dlg-title h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .form {
-            padding: 1.5rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .col2 {
-            grid-column: 1 / span 2;
-        }
-
-        label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--gray-300);
-            border-radius: var(--radius);
-            font-size: 1rem;
-        }
-
-        .hint {
-            font-size: 0.75rem;
-            color: var(--gray-500);
-            margin-top: 0.25rem;
-        }
-
-        .preview {
-            margin-top: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .preview img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-
-        .dlg-actions {
-            padding: 0 1.5rem 1.5rem;
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-        }
+        dialog { border: none; border-radius: var(--radius); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 0; width: 90%; max-width: 700px; }
+        dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+        .dlg-title { padding: 1.5rem 1.5rem 0; }
+        .dlg-title h3 { font-size: 1.25rem; font-weight: 600; }
+        .form { padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .col2 { grid-column: 1 / span 2; }
+        label { display: block; font-weight: 500; margin-bottom: 0.5rem; }
+        input, select, textarea { width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300);
+            border-radius: var(--radius); font-size: 1rem; }
+        .hint { font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem; }
+        .preview { margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .preview img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
+        .dlg-actions { padding: 0 1.5rem 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; }
 
         /* Stock Dialog Styles */
-        .stock-info {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        .product-info {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .product-img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: var(--radius);
-        }
-
-        .stock-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-
-        .stat {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: var(--gray-500);
-        }
-
-        .stat-value {
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .stock-controls {
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+        .stock-info { padding: 1.5rem; border-bottom: 1px solid var(--gray-200); }
+        .product-info { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        .product-img { width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius); }
+        .stock-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        .stat { display: flex; flex-direction: column; }
+        .stat-label { font-size: 0.875rem; color: var(--gray-500); }
+        .stat-value { font-weight: 600; font-size: 1.125rem; }
+        .stock-controls { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
 
         /* Image upload styles */
-        .image-options {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .image-option {
-            flex: 1;
-            padding: 1rem;
-            border: 1px solid var(--gray-300);
-            border-radius: var(--radius);
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .image-option.selected {
-            border-color: var(--primary);
-            background-color: rgba(16, 185, 129, 0.1);
-        }
+        .image-options { display: flex; gap: 1rem; margin-bottom: 1rem; }
+        .image-option { flex: 1; padding: 1rem; border: 1px solid var(--gray-300);
+            border-radius: var(--radius); cursor: pointer; text-align: center; }
+        .image-option.selected { border-color: var(--primary); background-color: rgba(16, 185, 129, 0.1); }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .filters {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .form {
-                grid-template-columns: 1fr;
-            }
-
-            .col2 {
-                grid-column: 1;
-            }
-
-            .stock-stats {
-                grid-template-columns: 1fr;
-            }
-
-            .image-options {
-                flex-direction: column;
-            }
+            .filters { flex-direction: column; align-items: stretch; }
+            .form { grid-template-columns: 1fr; }
+            .col2 { grid-column: 1; }
+            .stock-stats { grid-template-columns: 1fr; }
+            .image-options { flex-direction: column; }
         }
     </style>
 </head>
@@ -593,64 +308,24 @@
 </template>
 
 <script>
-    // Load products from localStorage or use sample data
-    let products = JSON.parse(localStorage.getItem('freshcart_products')) || [
-        {
-            id: 1,
-            name: "Basmati Rice",
-            sku: "RICE_001",
-            category: "Grocery",
-            brand: "India Gate",
-            unit: "kg",
-            price: 545,
-            stock_quantity: 100,
-            reorder_point: 10,
-            reorder_quantity: 50,
-            inventory_id: 1,
-            active: 1,
-            description: "Premium quality basmati rice",
-            image_url: "https://images.unsplash.com/photo-1586201375761-83865001e31c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-        },
-        {
-            id: 2,
-            name: "Whole Milk",
-            sku: "DAIRY_001",
-            category: "Dairy",
-            brand: "Anchor",
-            unit: "liters",
-            price: 320,
-            stock_quantity: 45,
-            reorder_point: 15,
-            reorder_quantity: 30,
-            inventory_id: 1,
-            active: 1,
-            description: "Fresh whole milk",
-            image_url: "https://images.unsplash.com/photo-1563636619-e9143da7973b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-        },
-        {
-            id: 3,
-            name: "Red Apples",
-            sku: "PRODUCE_001",
-            category: "Produce",
-            brand: "",
-            unit: "each",
-            price: 80,
-            stock_quantity: 8,
-            reorder_point: 20,
-            reorder_quantity: 40,
-            inventory_id: 1,
-            active: 1,
-            description: "Fresh red apples",
-            image_url: "https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-        }
-    ];
+    /* ===== ONLY MAPPING LOGIC CHANGED BELOW (UI/CSS kept exactly) ===== */
 
-    // Save products to localStorage
-    function saveProductsToStorage() {
-        localStorage.setItem('freshcart_products', JSON.stringify(products));
+    /* --- Auth header from your login token --- */
+    function authHeaders(){
+        const t = localStorage.getItem('auth.token');
+        return t ? { Authorization: `Bearer ${t}` } : {};
     }
 
-    // DOM elements
+    /* --- API endpoints (match your Spring controller) --- */
+    const API = {
+        list: "/api/inventory/products",
+        create: "/api/inventory/products",
+        update: id => `/api/inventory/products/${id}`,
+        export: "/api/inventory/reports/low-stock",
+        adjust: id => `/api/inventory/stock/${id}/adjust`,
+    };
+
+    /* DOM elements (unchanged) */
     const dlg = document.getElementById('dlg');
     const form = document.getElementById('form');
     const stockDlg = document.getElementById('stockDlg');
@@ -671,68 +346,65 @@
     const uploadSection = document.getElementById('uploadSection');
     const imageOptions = document.querySelectorAll('.image-option');
 
-    // State
+    /* State (front-end pagination mirrors server pagination) */
     let currentPage = 1;
     const itemsPerPage = 6;
     let editingId = null;
     let currentProduct = null;
     let uploadedImageData = null;
 
-    // Initialize
+    /* Data from server */
+    let products = [];       // current page items mapped for UI
+    let serverTotal = 0;     // total items count on server
+    let serverRaw = [];      // raw objects from server (for edit/stock)
+
+    /* Initialize */
     document.addEventListener('DOMContentLoaded', init);
 
     function init() {
-        renderProducts();
+        renderSkeletons();
         setupEventListeners();
+        loadFromServer(); // initial fetch
     }
 
     function setupEventListeners() {
-        // Add product button
+        // Add product
         btnAdd.addEventListener('click', () => {
             editingId = null;
             form.reset();
             document.getElementById('dlgTitle').textContent = 'New Product';
-            // Reset image options
             selectImageOption('url');
             uploadedImageData = null;
             dlg.showModal();
         });
 
-        // Form submission
+        // Save product -> backend
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            saveProduct();
+            saveProductToServer();
         });
 
-        // Filter events
-        q.addEventListener('input', renderProducts);
-        cat.addEventListener('change', renderProducts);
-        sort.addEventListener('change', renderProducts);
-        lowOnly.addEventListener('change', renderProducts);
+        // Filters -> refetch from server
+        q.addEventListener('input', debounce(() => { currentPage = 1; loadFromServer(); }, 300));
+        cat.addEventListener('change', () => { currentPage = 1; loadFromServer(); });
+        sort.addEventListener('change', () => { currentPage = 1; loadFromServer(); });
+        lowOnly.addEventListener('change', () => { currentPage = 1; loadFromServer(); });
 
-        // Pagination
+        // Pagination -> fetch next/prev page
         prevBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                renderProducts();
-            }
+            if (currentPage > 1) { currentPage--; loadFromServer(); }
         });
-
         nextBtn.addEventListener('click', () => {
-            const totalPages = Math.ceil(filterProducts().length / itemsPerPage);
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderProducts();
-            }
+            const totalPages = Math.max(1, Math.ceil(serverTotal / itemsPerPage));
+            if (currentPage < totalPages) { currentPage++; loadFromServer(); }
         });
 
         // Export/Import
-        btnExport.addEventListener('click', exportProducts);
-        btnImport.addEventListener('click', () => {
-            document.getElementById('csv').click();
+        btnExport.addEventListener('click', exportFromServer);
+        btnImport.addEventListener('click', () => document.getElementById('csv').click());
+        document.getElementById('csv').addEventListener('change', () => {
+            alert('Import placeholder — hook to /api/inventory/csv/import if needed.');
         });
-
-        document.getElementById('csv').addEventListener('change', importProducts);
 
         // Image option selection
         imageOptions.forEach(option => {
@@ -756,115 +428,120 @@
             }
         });
 
-        // Clear image button
+        // Clear image
         document.getElementById('clearImg').addEventListener('click', function() {
             document.getElementById('image').value = '';
             document.getElementById('preview').classList.add('hidden');
             uploadedImageData = null;
         });
+
+        // Stock form -> backend
+        document.getElementById('stockForm').addEventListener('submit', onApplyStockServer);
     }
 
+    /* Image option UI */
     function selectImageOption(option) {
-        imageOptions.forEach(opt => {
-            if (opt.dataset.option === option) {
-                opt.classList.add('selected');
-            } else {
-                opt.classList.remove('selected');
-            }
-        });
+        imageOptions.forEach(opt => opt.classList.toggle('selected', opt.dataset.option === option));
+        if (option === 'url') { urlSection.classList.remove('hidden'); uploadSection.classList.add('hidden'); }
+        else { urlSection.classList.add('hidden'); uploadSection.classList.remove('hidden'); }
+    }
 
-        if (option === 'url') {
-            urlSection.classList.remove('hidden');
-            uploadSection.classList.add('hidden');
-        } else {
-            urlSection.classList.add('hidden');
-            uploadSection.classList.remove('hidden');
+    /* Normalize sort value for backend */
+    function mapSortValue() {
+        const v = sort.value || 'name';
+        if (v === 'new') return 'new';  // mapped in backend to id DESC
+        if (v === 'price') return 'price';
+        // backend may not support "stock" sort; fallback to name
+        return 'name';
+    }
+
+    /* Load from server */
+    async function loadFromServer(){
+        try{
+            renderSkeletons();
+            const url = new URL(API.list, location.origin);
+            url.searchParams.set('page', String(currentPage - 1));
+            url.searchParams.set('size', String(itemsPerPage));
+            if (q.value.trim()) url.searchParams.set('q', q.value.trim());
+            if (cat.value) url.searchParams.set('category', cat.value);
+            url.searchParams.set('sort', mapSortValue());
+            if (lowOnly.checked) url.searchParams.set('lowOnly', 'true');
+
+            const res = await fetch(url, { headers: { ...authHeaders() } });
+            if (!res.ok) throw new Error(`Load failed (${res.status})`);
+            const data = await res.json();
+
+            const items = data.items || data.content || [];
+            serverTotal = Number(data.total || data.totalElements || items.length) || 0;
+            serverRaw = items;
+
+            // map to view objects expected by your template
+            products = items.map(toViewProduct);
+
+            renderProductsServer();
+        }catch(err){
+            grid.innerHTML = `<div class="muted">Error loading products: ${err.message}</div>`;
+            empty.classList.add('hidden');
+            // (optional) keep UI usable if backend down – leave as is
         }
     }
 
-    function renderProducts() {
-        const filtered = filterProducts();
-        const sorted = sortProducts(filtered);
-        const paginated = paginateProducts(sorted);
+    /* Map backend ProductResp -> view model used by this page */
+    function toViewProduct(p){
+        const soh = Number(p.stockOnHand ?? 0);
+        const res = Number(p.reservedQty ?? 0);
+        const avail = Number(p.availableQty ?? Math.max(0, soh - res));
+        return {
+            id: p.id,
+            name: p.name,
+            sku: p.sku,
+            category: p.category || '',
+            brand: '', // not provided by backend
+            unit: p.unit || '',
+            price: Number(p.price || 0),
+            stock_quantity: avail,
+            reorder_point: Number(p.reorderPoint || 0),
+            reorder_quantity: 0,
+            inventory_id: 0,
+            active: p.active ? 1 : 0,
+            description: '',
+            image_url: p.imageUrl || '',
+            image_data: '',
+            // keep raw stock numbers for stock dialog math
+            _soh: soh,
+            _res: res,
+            _avail: avail
+        };
+    }
 
+    /* Render grid using server page */
+    function renderProductsServer(){
         grid.innerHTML = '';
-
-        if (paginated.length === 0) {
+        if (products.length === 0) {
             empty.classList.remove('hidden');
             count.textContent = 'Showing 0 products';
         } else {
             empty.classList.add('hidden');
-            paginated.forEach(product => {
-                const el = createProductElement(product);
-                grid.appendChild(el);
-            });
-
-            // Update count text
+            products.forEach(product => { grid.appendChild(createProductElement(product)); });
             const start = (currentPage - 1) * itemsPerPage + 1;
-            const end = Math.min(start + itemsPerPage - 1, filtered.length);
-            count.textContent = `Showing ${start}-${end} of ${filtered.length} products`;
+            const end = Math.min(start + products.length - 1, serverTotal);
+            count.textContent = `Showing ${start}-${end} of ${serverTotal} products`;
         }
-
-        // Update pagination buttons
-        const totalPages = Math.ceil(filtered.length / itemsPerPage);
+        const totalPages = Math.max(1, Math.ceil(serverTotal / itemsPerPage));
         prevBtn.disabled = currentPage <= 1;
         nextBtn.disabled = currentPage >= totalPages;
     }
 
-    function filterProducts() {
-        const searchTerm = q.value.toLowerCase();
-        const category = cat.value;
-        const lowStockOnly = lowOnly.checked;
-
-        return products.filter(product => {
-            const matchesSearch = product.name.toLowerCase().includes(searchTerm) ||
-                product.sku.toLowerCase().includes(searchTerm) ||
-                product.category.toLowerCase().includes(searchTerm);
-
-            const matchesCategory = !category || product.category === category;
-
-            const matchesLowStock = !lowStockOnly || product.stock_quantity <= product.reorder_point;
-
-            return matchesSearch && matchesCategory && matchesLowStock;
-        });
-    }
-
-    function sortProducts(productsList) {
-        const sortBy = sort.value;
-
-        return [...productsList].sort((a, b) => {
-            switch(sortBy) {
-                case 'price': return b.price - a.price;
-                case 'stock': return a.stock_quantity - b.stock_quantity;
-                case 'new': return b.id - a.id;
-                default: return a.name.localeCompare(b.name);
-            }
-        });
-    }
-
-    function paginateProducts(productsList) {
-        const start = (currentPage - 1) * itemsPerPage;
-        return productsList.slice(start, start + itemsPerPage);
-    }
-
+    /* Card creation (unchanged, uses mapped view fields) */
     function createProductElement(product) {
         const el = tpl.content.cloneNode(true);
-
-        // Fill in product data
         const card = el.querySelector('.card');
         card.dataset.id = product.id;
 
         const img = el.querySelector('.thumb img');
-        if (product.image_data) {
-            // Use uploaded image data if available
-            img.src = product.image_data;
-        } else if (product.image_url) {
-            // Use image URL if available
-            img.src = product.image_url;
-        } else {
-            // Use placeholder if no image
-            img.src = 'https://via.placeholder.com/300x150?text=No+Image';
-        }
+        if (product.image_data) img.src = product.image_data;
+        else if (product.image_url) img.src = product.image_url;
+        else img.src = 'https://via.placeholder.com/300x150?text=No+Image';
         img.alt = product.name;
 
         el.querySelector('h3').textContent = product.name;
@@ -874,17 +551,9 @@
 
         const stockEl = el.querySelector('.stock');
         stockEl.textContent = product.stock_quantity;
+        if (product.stock_quantity === 0) { stockEl.style.color = 'var(--danger)'; stockEl.style.fontWeight = 'bold'; }
+        else if (product.stock_quantity <= product.reorder_point) { stockEl.style.color = 'var(--warning)'; stockEl.style.fontWeight = 'bold'; }
 
-        // Style based on stock level
-        if (product.stock_quantity === 0) {
-            stockEl.style.color = 'var(--danger)';
-            stockEl.style.fontWeight = 'bold';
-        } else if (product.stock_quantity <= product.reorder_point) {
-            stockEl.style.color = 'var(--warning)';
-            stockEl.style.fontWeight = 'bold';
-        }
-
-        // Edit button
         el.querySelector('.btn-edit').addEventListener('click', () => {
             editingId = product.id;
             document.getElementById('dlgTitle').textContent = 'Edit Product';
@@ -892,7 +561,6 @@
             dlg.showModal();
         });
 
-        // Stock button
         el.querySelector('.btn-stock').addEventListener('click', () => {
             currentProduct = product;
             showStockDialog(product);
@@ -908,7 +576,7 @@
         form.querySelector('[name="brand"]').value = product.brand || '';
         form.querySelector('[name="unit"]').value = product.unit;
         form.querySelector('[name="price"]').value = product.price;
-        form.querySelector('[name="stock_quantity"]').value = product.stock_quantity;
+        form.querySelector('[name="stock_quantity"]').value = product.stock_quantity; // for reference only
         form.querySelector('[name="reorder_point"]').value = product.reorder_point;
         form.querySelector('[name="reorder_quantity"]').value = product.reorder_quantity;
         form.querySelector('[name="inventory_id"]').value = product.inventory_id;
@@ -916,144 +584,150 @@
         form.querySelector('[name="description"]').value = product.description || '';
         form.querySelector('[name="expiry_date"]').value = product.expiry_date || '';
 
-        // Set image option based on what's available
-        if (product.image_data) {
-            selectImageOption('upload');
-            uploadedImageData = product.image_data;
-            const preview = document.getElementById('preview');
-            preview.querySelector('img').src = product.image_data;
-            preview.classList.remove('hidden');
-        } else {
-            selectImageOption('url');
-            form.querySelector('[name="image_url"]').value = product.image_url || '';
-        }
+        // Prefer URL mode; user can switch to Upload if they want to replace
+        selectImageOption('url');
+        form.querySelector('[name="image_url"]').value = product.image_url || '';
+
+        document.getElementById('image').value = '';
+        document.getElementById('preview').classList.add('hidden');
     }
 
-    function saveProduct() {
-        const formData = new FormData(form);
-        const selectedImageOption = document.querySelector('.image-option.selected').dataset.option;
+    /* Save (create/update) mapped to backend */
+    async function saveProductToServer() {
+        // collect minimal fields backend expects
+        const sku = form.querySelector('[name="sku"]').value.trim();
+        const name = form.querySelector('[name="name"]').value.trim();
+        const category = form.querySelector('[name="category"]').value.trim();
+        const unit = form.querySelector('[name="unit"]').value.trim();
+        const price = Number(form.querySelector('[name="price"]').value || 0);
+        const reorderPoint = Number(form.querySelector('[name="reorder_point"]').value || 0);
 
-        const product = {
-            name: formData.get('name'),
-            sku: formData.get('sku'),
-            category: formData.get('category'),
-            brand: formData.get('brand'),
-            unit: formData.get('unit'),
-            price: parseFloat(formData.get('price')),
-            stock_quantity: parseInt(formData.get('stock_quantity')),
-            reorder_point: parseInt(formData.get('reorder_point')),
-            reorder_quantity: parseInt(formData.get('reorder_quantity')),
-            inventory_id: parseInt(formData.get('inventory_id')),
-            active: parseInt(formData.get('active')),
-            description: formData.get('description'),
-            expiry_date: formData.get('expiry_date')
-        };
+        if (!sku || !name || price < 0) { alert('Please fill required fields.'); return; }
 
-        // Handle image based on selected option
-        if (selectedImageOption === 'upload' && uploadedImageData) {
-            product.image_data = uploadedImageData;
-            product.image_url = '';
-        } else {
-            product.image_url = formData.get('image_url');
-            product.image_data = '';
-        }
+        const useUrl = document.querySelector('.image-option.selected')?.dataset.option === 'url';
+        const file = document.getElementById('image').files?.[0];
+        const imageUrl = form.querySelector('[name="image_url"]').value.trim();
 
-        // Check for duplicate SKU (excluding current product when editing)
-        const isDuplicate = products.some(p =>
-            p.sku === product.sku && (!editingId || p.id !== editingId)
-        );
+        let method = editingId ? 'PUT' : 'POST';
+        let url = editingId ? API.update(editingId) : API.create;
 
-        if (isDuplicate) {
-            alert('SKU already exists. Please use a unique SKU.');
-            return;
-        }
-
-        if (editingId) {
-            // Update existing product
-            product.id = editingId;
-            const index = products.findIndex(p => p.id === editingId);
-            if (index !== -1) {
-                products[index] = product;
+        try{
+            let res;
+            if (!useUrl && file) {
+                // multipart
+                const fd = new FormData();
+                fd.append('sku', sku);
+                fd.append('name', name);
+                if (category) fd.append('category', category);
+                if (unit) fd.append('unit', unit);
+                fd.append('price', String(price));
+                fd.append('reorderPoint', String(reorderPoint));
+                fd.append('image', file);
+                res = await fetch(url, { method, headers: { ...authHeaders() }, body: fd });
+            } else {
+                // JSON
+                const body = { sku, name, category, unit, price, reorderPoint, imageUrl: imageUrl || null };
+                res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify(body)
+                });
             }
-        } else {
-            // Add new product
-            product.id = Math.max(...products.map(p => p.id), 0) + 1;
-            products.push(product);
-        }
 
-        // Save to localStorage
-        saveProductsToStorage();
+            if (!res.ok) {
+                const msg = await safeError(res);
+                throw new Error(msg || `Save failed (${res.status})`);
+            }
 
-        dlg.close();
-        renderProducts();
+            dlg.close();
+            loadFromServer();
+        }catch(err){ alert(err.message); }
     }
 
+    /* Stock dialog rendering (uses mapped fields) */
     function showStockDialog(product) {
         document.getElementById('stockProductName').textContent = product.name;
         document.getElementById('stockProductSku').textContent = product.sku;
         document.getElementById('stockProductCategory').textContent = product.category;
-        document.getElementById('currentStock').textContent = product.stock_quantity;
-        document.getElementById('reorderPoint').textContent = product.reorder_point;
 
-        // Set product image if available
         const img = document.getElementById('stockProductImage');
-        if (product.image_data) {
-            img.src = product.image_data;
-            img.style.display = 'block';
-        } else if (product.image_url) {
-            img.src = product.image_url;
-            img.style.display = 'block';
-        } else {
-            img.style.display = 'none';
-        }
+        if (product.image_data) { img.src = product.image_data; img.style.display = 'block'; }
+        else if (product.image_url) { img.src = product.image_url; img.style.display = 'block'; }
+        else { img.style.display = 'none'; }
 
-        // For demo purposes, set arbitrary values for reserved and available
-        document.getElementById('reservedQty').textContent = Math.floor(product.stock_quantity * 0.2);
-        document.getElementById('availableQty').textContent = Math.floor(product.stock_quantity * 0.8);
+        // real values from backend mapping
+        document.getElementById('currentStock').textContent = product._soh;
+        document.getElementById('reservedQty').textContent = product._res;
+        document.getElementById('availableQty').textContent = product._avail;
+        document.getElementById('reorderPoint').textContent = product.reorder_point;
 
         stockDlg.showModal();
     }
 
-    function exportProducts() {
-        const headers = ['ID', 'Name', 'SKU', 'Category', 'Brand', 'Unit', 'Price', 'Stock', 'Reorder Point', 'Reorder Quantity', 'Inventory ID', 'Status'];
-        const csvData = products.map(p => [
-            p.id, p.name, p.sku, p.category, p.brand, p.unit, p.price,
-            p.stock_quantity, p.reorder_point, p.reorder_quantity,
-            p.inventory_id, p.active ? 'Active' : 'Inactive'
-        ]);
+    /* Apply stock -> backend adjust; maps ADD/REMOVE/SET to IN/OUT/ADJUST (SET computed delta) */
+    async function onApplyStockServer(e){
+        e.preventDefault();
+        if (!currentProduct) { stockDlg.close(); return; }
 
-        const csvContent = [headers, ...csvData].map(row =>
-            row.map(field => `"${field}"`).join(',')
-        ).join('\n');
+        const typeSel = document.getElementById('adjustmentType').value;
+        const qtyInput = Number(document.getElementById('adjustmentQty').value || 0);
+        const note = document.getElementById('adjustmentReason').value || 'MANUAL';
 
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
+        if (qtyInput <= 0) { alert('Quantity must be > 0'); return; }
 
-        link.setAttribute('href', url);
-        link.setAttribute('download', 'freshcart-products.csv');
-        link.style.visibility = 'hidden';
+        // Map types
+        let payload = { type: 'IN', qty: qtyInput, note };
+        if (typeSel === 'ADD') payload.type = 'IN';
+        else if (typeSel === 'REMOVE') payload.type = 'OUT';
+        else if (typeSel === 'SET') {
+            // compute delta vs current stock-on-hand (not available)
+            const soh = Number(currentProduct._soh || 0);
+            if (qtyInput === soh) { stockDlg.close(); return; }
+            if (qtyInput > soh) { payload.type = 'IN'; payload.qty = qtyInput - soh; }
+            else { payload.type = 'OUT'; payload.qty = soh - qtyInput; }
+        }
 
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        try{
+            const res = await fetch(API.adjust(currentProduct.id), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                const msg = await safeError(res);
+                throw new Error(msg || `Adjust failed (${res.status})`);
+            }
+            stockDlg.close();
+            loadFromServer();
+        }catch(err){ alert(err.message); }
     }
 
-    function importProducts(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const csvData = event.target.result;
-            // In a real app, you would parse the CSV and update products
-            alert('Import functionality would be implemented here. In a real application, this would parse the CSV file and update the product inventory.');
-        };
-        reader.readAsText(file);
-
-        // Reset file input
-        e.target.value = '';
+    /* Export CSV from backend */
+    async function exportFromServer(){
+        try{
+            const res = await fetch(API.export, { headers: { ...authHeaders() }});
+            if (!res.ok) throw new Error(`Export failed (${res.status})`);
+            const blob = await res.blob();
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `low-stock-${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+        }catch(err){ alert(err.message); }
     }
+
+    /* Helpers */
+    function renderSkeletons(){
+        grid.innerHTML = Array.from({length: itemsPerPage}).map(()=>`
+    <div class="card"><div class="thumb"></div><div class="meta"><div class="muted">Loading…</div></div></div>
+  `).join('');
+        empty.classList.add('hidden');
+    }
+    function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
+    async function safeError(res){
+        try{ const t = await res.text(); try{ const j=JSON.parse(t); return j.error||j.message||t; }catch{ return t; } }
+        catch{ return ''; }
+    }
+
 </script>
 </body>
 </html>

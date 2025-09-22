@@ -1,16 +1,19 @@
 package org.orderingsystem.grocerryorderingsystem.controller.inventory;
 
-public record ProductResp(
-        Long id,
-        String sku,
-        String name,
-        String category,
-        String unit,
-        Double price,
-        Integer reorderPoint,
-        String imageUrl,
-        Boolean active,
-        Integer stockOnHand,
-        Integer reservedQty,
-        Integer availableQty
-) {}
+import lombok.*;
+
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class ProductResp {
+    private Long id;
+    private String sku;
+    private String name;
+    private String category;
+    private String unit;
+    private Double price;
+    private Integer reorderPoint;
+    private String imageUrl;
+    private Boolean active;
+    private Integer stockOnHand;
+    private Integer reservedQty;
+    private Integer availableQty;
+}
