@@ -1,8 +1,10 @@
 package org.orderingsystem.grocerryorderingsystem.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; // <-- added
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,8 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -22,11 +22,34 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/js/**", "/dashboard/**", "/images/**", "/css/**", "/api/auth/**")
-                        .permitAll()
+                        // --- Static/public pages ---
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/catalog-advanced.html",   // <-- page to browse products
+                                "/favicon.ico",
+                                "/assets/**",
+                                "/images/**",
+                                "/css/**",
+                                "/js/**",
+                                "/dashboard/**",
+                                "/api/auth/**"
+                        ).permitAll()
+
+                        // --- Public catalog API (optional; if you use /api/catalog/**) ---
+                        .requestMatchers("/api/catalog/**").permitAll()
+
+                        // --- Allow unauthenticated GET for product browsing only ---
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/inventory/products",
+                                "/api/inventory/products/**"
+                        ).permitAll()
+
+                        // --- Everything else requires auth ---
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(eh -> eh
@@ -46,15 +69,13 @@ public class SecurityConfig {
 
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
-
-
-
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
-    @Bean public PasswordEncoder passwordEncoder(){ return new BCryptPasswordEncoder(); }
-
-    @Bean public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
         return cfg.getAuthenticationManager();
     }
 }
