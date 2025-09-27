@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Track Delivery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4fff6;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2e7d32;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .info {
+            margin: 15px 0;
+            font-size: 16px;
+        }
+        .info strong {
+            color: #2e7d32;
+        }
+        .photo {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .photo img {
+            border-radius: 10px;
+            border: 2px solid #2e7d32;
+            max-width: 100%;
+            height: auto;
+        }
+        .back {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #fff;
+            background: #2e7d32;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .back:hover {
+            background: #256d28;
+        }
+    </style>
+</head>
+<body>
+<h1>Tracking Order <span th:text="${assignment.order.id}"></span></h1>
+
+<div class="container">
+    <p class="info"><strong>Status:</strong> <span th:text="${assignment.status}"></span></p>
+    <p class="info"><strong>Driver:</strong> <span th:text="${assignment.driver.name}"></span></p>
+    <p class="info"><strong>Driver Contact:</strong> <span th:text="${assignment.driver.contact}"></span></p>
+
+    <div th:if="${assignment.photoProof != null}" class="photo">
+        <p><strong>Photo Proof:</strong></p>
+        <img th:src="@{${assignment.photoProof}}" alt="Proof of Delivery"/>
+    </div>
+
+    <a class="back" href="/delivery/list">⬅ Back to Delivery List</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Delivery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f8f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2e7d32;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .order-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .order-details {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .order-details th {
+            text-align: left;
+            background: #2e7d32;
+            color: #fff;
+            padding: 10px;
+            width: 200px;
+        }
+
+        .order-details td {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .assign-form {
+            margin-top: 10px;
+        }
+
+        .assign-form select,
+        .assign-form button {
+            padding: 6px 12px;
+            margin-top: 5px;
+            border-radius: 5px;
+        }
+
+        .assign-form select {
+            border: 1px solid #2e7d32;
+        }
+
+        .assign-form button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .assign-form button:hover {
+            background-color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Assign Delivery</h1>
+
+<div th:each="order : ${readyOrders}" class="order-card">
+    <table class="order-details">
+        <tr>
+            <th>Order ID</th>
+            <td th:text="${order.id}"></td>
+        </tr>
+        <tr>
+            <th>Customer Name</th>
+            <td th:text="${order.customer.name}"></td>
+        </tr>
+        <tr>
+            <th>Customer Number</th>
+            <td th:text="${order.customer.phoneNumber}"></td>
+        </tr>
+        <tr>
+            <th>Address</th>
+            <td th:text="${order.address}"></td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td th:text="${order.status}"></td>
+        </tr>
+        <tr>
+            <th>Assign Driver</th>
+            <td>
+                <form th:action="@{/delivery/assign}" method="post" class="assign-form">
+                    <input type="hidden" name="orderId" th:value="${order.id}" />
+
+                    <select name="driverId" required>
+                        <option value="" disabled selected>Select Driver</option>
+                        <option th:each="driver : ${availableDrivers}"
+                                th:value="${driver.id}"
+                                th:text="${driver.name}"></option>
+                    </select>
+
+                    <button type="submit">Assign</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>

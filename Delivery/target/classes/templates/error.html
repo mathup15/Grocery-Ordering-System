@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <style>
+        body{font-family:Arial;background:#fff8f8;padding:40px;}
+        .wrap{max-width:700px;margin:0 auto;text-align:center;}
+        h1{color:#c62828;}
+        p{color:#333;}
+        pre{background:#f6f6f6;padding:12px;border-radius:6px;overflow:auto;}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Something went wrong!</h1>
+    <p th:if="${message}" th:text="${message}">An unexpected error occurred.</p>
+    <p th:unless="${message}">Please check the server logs for details.</p>
+</div>
+</body>
+</html>
