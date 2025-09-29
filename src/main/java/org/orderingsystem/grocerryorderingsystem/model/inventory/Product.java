@@ -1,5 +1,7 @@
 package org.orderingsystem.grocerryorderingsystem.model.inventory;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -35,9 +37,11 @@ public class Product {
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "inventory_id")
+    @JsonIgnore
     private Inventory inventory;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<StockAdjustment> stockAdjustments;
 
     // Explicit getters (Lombok's @Data should generate these, but adding for clarity)
