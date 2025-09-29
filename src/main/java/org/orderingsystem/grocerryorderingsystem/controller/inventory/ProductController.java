@@ -27,7 +27,8 @@ public class ProductController {
     private final ProductRepository products;
     private final FileStorageService files;
 
-    // ------- LIST -------
+    /* ---------------- LIST ---------------- */
+    @Transactional(readOnly = true)
     @GetMapping("/products")
     public PageResp<ProductResp> list(@RequestParam(defaultValue = "0") int page,
                                       @RequestParam(defaultValue = "12") int size,
@@ -50,10 +51,11 @@ public class ProductController {
             p = products.findAll(pageable);
         }
 
-        // Optional low-stock filter (manual, keeps repo simple)
+        // optional "low stock" filter
         List<Product> source = p.getContent();
-        List<Product> filtered = new ArrayList<>();
+        List<Product> filtered;
         if (Boolean.TRUE.equals(lowOnly)) {
+            filtered = new ArrayList<>();
             for (Product prod : source) {
                 int soh = prod.getInventory() == null || prod.getInventory().getStockOnHand() == null
                         ? 0 : prod.getInventory().getStockOnHand();
@@ -67,31 +69,56 @@ public class ProductController {
             filtered = source;
         }
 
-        var items = filtered.stream().map(ProductController::toResp).toList();
+        var items = filtered.stream().map(Dtos::toResp).toList();
         long total = Boolean.TRUE.equals(lowOnly) ? items.size() : p.getTotalElements();
         return new PageResp<>(items, total);
     }
 
-    // ------- CREATE (JSON or multipart) -------
+    /* ---------------- GET ONE ---------------- */
+    @Transactional(readOnly = true)
+    @GetMapping("/products/{id}")
+    public ProductResp getOne(@PathVariable Long id) {
+        Product p = products.findByIdWithInventory(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        return Dtos.toResp(p);
+    }
+
+    /* ---------------- CREATE (JSON or multipart) ---------------- */
     @PostMapping(value = "/products",
             consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @Transactional
     public ProductResp create(
             @RequestBody(required = false) ProductCreateJson json,
+
+            // form-data (when not sending JSON)
             @RequestParam(required = false) String sku,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String unit,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String description,
             @RequestParam(required = false) Double price,
-            @RequestParam(required = false, defaultValue = "0") Integer reorderPoint,
+            @RequestParam(required = false) Integer reorderPoint,
+            @RequestParam(required = false) Integer reorderQuantity,
+            @RequestParam(required = false) String expiryDate, // yyyy-MM-dd
             @RequestParam(required = false) String imageUrl,
             @RequestPart(value = "image", required = false) MultipartFile image
     ) {
         if (json != null) {
-            sku = json.sku(); name = json.name(); category = json.category(); unit = json.unit();
-            price = json.price(); reorderPoint = json.reorderPoint(); imageUrl = json.imageUrl();
+            sku             = json.sku();
+            name            = json.name();
+            category        = json.category();
+            unit            = json.unit();
+            brand           = json.brand();
+            description     = json.description();
+            price           = json.price();
+            reorderPoint    = json.reorderPoint();
+            reorderQuantity = json.reorderQuantity();
+            expiryDate      = json.expiryDate();
+            imageUrl        = json.imageUrl();
         }
+
         validate(sku, name, price);
         products.findBySku(sku).ifPresent(x -> { throw new IllegalArgumentException("SKU already exists"); });
 
@@ -104,40 +131,61 @@ public class ProductController {
                 .name(name.trim())
                 .category(nz(category))
                 .unit(nz(unit))
+                .brand(nz(brand))
+                .description(nz(description))
                 .price(price)
                 .reorderPoint(reorderPoint == null ? 0 : reorderPoint)
+                .reorderQuantity(reorderQuantity == null ? 0 : reorderQuantity)
                 .imageUrl(finalImageUrl)
                 .active(true)
                 .build();
 
-        // Product owns the relation (inventory_id on products)
-        if (p.getInventory() == null) {
-            p.setInventory(Inventory.builder().stockOnHand(0).reservedQty(0).build());
+        // create inventory and set BOTH sides
+        Inventory inv = Inventory.builder().stockOnHand(0).reservedQty(0).build();
+        if (expiryDate != null && !expiryDate.isBlank()) {
+            inv.setExpiryDate(LocalDate.parse(expiryDate.trim()));
         }
+        inv.setProduct(p);
+        p.setInventory(inv);
 
         p = products.save(p);
-        return toResp(p);
+        return Dtos.toResp(p);
     }
 
-    // ------- UPDATE (JSON or multipart) -------
+    /* ---------------- UPDATE (JSON or multipart) ---------------- */
     @PutMapping(value = "/products/{id}",
             consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     @Transactional
     public ProductResp update(@PathVariable Long id,
                               @RequestBody(required = false) ProductCreateJson json,
+
+                              // form-data fallback
                               @RequestParam(required = false) String sku,
                               @RequestParam(required = false) String name,
                               @RequestParam(required = false) String category,
                               @RequestParam(required = false) String unit,
+                              @RequestParam(required = false) String brand,
+                              @RequestParam(required = false) String description,
                               @RequestParam(required = false) Double price,
                               @RequestParam(required = false) Integer reorderPoint,
+                              @RequestParam(required = false) Integer reorderQuantity,
+                              @RequestParam(required = false) String expiryDate, // yyyy-MM-dd
                               @RequestParam(required = false) String imageUrl,
                               @RequestPart(value = "image", required = false) MultipartFile image) {
 
         if (json != null) {
-            sku = json.sku(); name = json.name(); category = json.category(); unit = json.unit();
-            price = json.price(); reorderPoint = json.reorderPoint(); imageUrl = json.imageUrl();
+            sku             = json.sku();
+            name            = json.name();
+            category        = json.category();
+            unit            = json.unit();
+            brand           = json.brand();
+            description     = json.description();
+            price           = json.price();
+            reorderPoint    = json.reorderPoint();
+            reorderQuantity = json.reorderQuantity();
+            expiryDate      = json.expiryDate();
+            imageUrl        = json.imageUrl();
         }
         validate(sku, name, price);
 
@@ -147,12 +195,18 @@ public class ProductController {
                 .filter(x -> !x.getId().equals(id))
                 .ifPresent(x -> { throw new IllegalArgumentException("SKU already exists"); });
 
+        // required fields
         p.setSku(sku.trim());
         p.setName(name.trim());
-        p.setCategory(nz(category));
-        p.setUnit(nz(unit));
         p.setPrice(price);
-        p.setReorderPoint(reorderPoint == null ? 0 : reorderPoint);
+
+        // optional: only update if provided (prevents blank form resetting to 0/null)
+        if (category != null)      p.setCategory(nz(category));
+        if (unit != null)          p.setUnit(nz(unit));
+        if (brand != null)         p.setBrand(nz(brand));
+        if (description != null)   p.setDescription(nz(description));
+        if (reorderPoint != null)  p.setReorderPoint(reorderPoint);
+        if (reorderQuantity != null) p.setReorderQuantity(reorderQuantity);
 
         if (image != null && !image.isEmpty()) {
             p.setImageUrl(files.save(image));
@@ -161,13 +215,21 @@ public class ProductController {
         }
 
         if (p.getInventory() == null) {
-            p.setInventory(Inventory.builder().stockOnHand(0).reservedQty(0).build());
+            Inventory inv = Inventory.builder().stockOnHand(0).reservedQty(0).build();
+            inv.setProduct(p);
+            p.setInventory(inv);
+        }
+        if (expiryDate != null && !expiryDate.isBlank()) {
+            p.getInventory().setExpiryDate(LocalDate.parse(expiryDate.trim()));
+        }
+        if (p.getInventory().getProduct() == null) {
+            p.getInventory().setProduct(p);
         }
 
-        return toResp(p);
+        return Dtos.toResp(p);
     }
 
-    // ------- EXPORT LOW STOCK (CSV) -------
+    /* ---------------- EXPORT CSV ---------------- */
     @GetMapping("/reports/low-stock")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
     public ResponseEntity<byte[]> exportLowStock() {
@@ -188,7 +250,8 @@ public class ProductController {
                 .body(csv);
     }
 
-    // ------- helpers -------
+    /* ---------------- helpers / DTOs ---------------- */
+
     private static void validate(String sku, String name, Double price){
         if (sku == null || sku.isBlank())  throw new IllegalArgumentException("SKU is required");
         if (name == null || name.isBlank())throw new IllegalArgumentException("Name is required");
@@ -197,33 +260,20 @@ public class ProductController {
     private static String nz(String s){ return (s == null || s.isBlank()) ? null : s.trim(); }
     private static String escape(String s){ return s == null ? "" : "\"" + s.replace("\"","\"\"") + "\""; }
 
-    private static ProductResp toResp(Product p){
-        var inv = p.getInventory();
-        int soh = (inv == null || inv.getStockOnHand() == null) ? 0 : inv.getStockOnHand();
-        int res = (inv == null || inv.getReservedQty() == null) ? 0 : inv.getReservedQty();
-        int avail = Math.max(0, soh - res);
-        return ProductResp.builder()
-                .id(p.getId())
-                .sku(p.getSku())
-                .name(p.getName())
-                .category(p.getCategory())
-                .unit(p.getUnit())
-                .price(p.getPrice())
-                .reorderPoint(p.getReorderPoint())
-                .imageUrl(p.getImageUrl())
-                .active(p.getActive() != null ? p.getActive() : Boolean.TRUE)
-                .stockOnHand(soh)
-                .reservedQty(res)
-                .availableQty(avail)
-                .build();
-    }
-
-    // JSON DTO (when not uploading a file)
-    public record ProductCreateJson(
-            String sku, String name, String category, String unit,
-            Double price, Integer reorderPoint, String imageUrl
-    ){}
-
-    // Page wrapper
     public record PageResp<T>(List<T> items, long total){}
+
+    /** JSON body for create/update when not using multipart. */
+    public record ProductCreateJson(
+            String sku,
+            String name,
+            String category,
+            String unit,
+            String brand,
+            String description,
+            Double price,
+            Integer reorderPoint,
+            Integer reorderQuantity,
+            String expiryDate, // yyyy-MM-dd
+            String imageUrl
+    ) {}
 }

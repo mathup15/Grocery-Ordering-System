@@ -1,49 +1,39 @@
 package org.orderingsystem.grocerryorderingsystem.model.inventory;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "stock_adjustments")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class StockAdjustment {
+
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Long id;
 
-   @ManyToOne(fetch = FetchType.LAZY)
+   // Many adjustments belong to one product
+   @ManyToOne(fetch = FetchType.LAZY, optional = false)
    @JoinColumn(name = "product_id", nullable = false)
    private Product product;
 
    @Enumerated(EnumType.STRING)
-   @Column(nullable = false)
-   private AdjustmentType adjustmentType;
+   @Column(name = "adjustment_type", nullable = false, length = 10)
+   private AdjustmentType adjustmentType; // ADD, REMOVE, SET
 
    @Column(nullable = false)
    private Integer quantity;
 
+   @Column(length = 255)
    private String reason;
 
-   @Column(nullable = false)
-   private Integer previousStock;
+   // Auto timestamp; no setter required
+   @CreationTimestamp
+   @Column(name = "created_at", updatable = false)
+   private LocalDateTime createdAt;
 
-   @Column(nullable = false)
-   private Integer newStock;
-
-   @Column(nullable = false)
-   private LocalDateTime adjustedAt;
-
-   @Column(nullable = false)
-   private String adjustedBy;
-
-   public enum AdjustmentType {
-      ADD, REMOVE, SET
-   }
+   public enum AdjustmentType { ADD, REMOVE, SET }
 }

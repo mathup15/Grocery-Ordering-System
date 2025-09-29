@@ -9,7 +9,9 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.orderingsystem.grocerryorderingsystem.controller.catalog.CatalogDtos.*;
 
@@ -47,7 +49,8 @@ public class CatalogController {
         };
         Pageable pageable = PageRequest.of(page, size, s);
 
-        Specification<Product> spec = Specification
+        // First get the product IDs with pagination and filtering
+        Specification<Product> idSpec = Specification
                 .where(ProductSpecs.activeTrue())
                 .and(ProductSpecs.q(q))
                 .and(ProductSpecs.category(category))
@@ -55,36 +58,93 @@ public class CatalogController {
                 .and(ProductSpecs.priceMax(maxPrice))
                 .and(ProductSpecs.inStockOnly(inStock));
 
-        Page<Product> p = products.findAll(spec, pageable);
+        Page<Product> idPage = products.findAll(idSpec, pageable);
 
-        List<ProductCardView> items = p.getContent().stream().map(this::toCard).toList();
-        return new PageView<>(items, p.getTotalElements());
+        // Then fetch the actual products with their inventory
+        List<Long> productIds = idPage.getContent().stream()
+                .map(Product::getId)
+                .collect(Collectors.toList());
+
+        List<Product> productsWithInventory;
+        if (!productIds.isEmpty()) {
+            // Fetch products with inventory using the IDs
+            productsWithInventory = products.findAllById(productIds).stream()
+                    .map(product -> products.findByIdWithInventory(product.getId()).orElse(product))
+                    .collect(Collectors.toList());
+        } else {
+            productsWithInventory = Collections.emptyList();
+        }
+
+        List<ProductCardView> items = productsWithInventory.stream().map(this::toCard).toList();
+        return new PageView<>(items, idPage.getTotalElements());
     }
 
     // GET /api/catalog/products/{id}
     @GetMapping("/products/{id}")
     public ProductDetailView detail(@PathVariable Long id) {
-        Product p = products.findById(id).orElseThrow();
+        // Use the new repository method that eagerly fetches inventory
+        Product p = products.findByIdWithInventory(id).orElseThrow(() ->
+                new RuntimeException("Product not found with id: " + id));
         return toDetail(p);
     }
 
-    // ---- mapping helpers ----
+    // TEMPORARY: Debug endpoint to check inventory data
+    @GetMapping("/debug/products/{id}")
+    public String debugProduct(@PathVariable Long id) {
+        Product p = products.findByIdWithInventory(id).orElse(null);
+        if (p == null) {
+            return "Product not found";
+        }
+
+        return String.format("Product: %s, Inventory: %s, StockOnHand: %d, ReservedQty: %d, TransientStock: %d",
+                p.getName(),
+                p.getInventory() != null ? "EXISTS" : "NULL",
+                p.getInventory() != null ? p.getInventory().getStockOnHand() : -1,
+                p.getInventory() != null ? p.getInventory().getReservedQty() : -1,
+                p.getStockQuantity() != null ? p.getStockQuantity() : -999
+        );
+    }
+
+    // ---- UPDATED mapping helpers with fallback to transient methods ----
     private ProductCardView toCard(Product p) {
-        int soh = getSafe(p.getInventory(), true);
-        int res = getSafe(p.getInventory(), false);
-        int avail = Math.max(0, soh - res);
+        int avail;
+        Boolean inStock;
+
+        if (p.getInventory() != null) {
+            // Use inventory data if available
+            int soh = getSafe(p.getInventory(), true);
+            int res = getSafe(p.getInventory(), false);
+            avail = Math.max(0, soh - res);
+            inStock = avail > 0;
+        } else {
+            // Fallback to transient methods if inventory is null
+            avail = p.getAvailableStock() != null ? p.getAvailableStock() : 0;
+            inStock = p.getInStock() != null ? p.getInStock() : false;
+        }
+
         return new ProductCardView(
                 p.getId(), p.getSku(), p.getName(),
                 p.getCategory(), p.getUnit(),
                 p.getPrice(), p.getImageUrl(),
-                avail, avail > 0
+                avail, inStock
         );
     }
 
     private ProductDetailView toDetail(Product p) {
-        int soh = getSafe(p.getInventory(), true);
-        int res = getSafe(p.getInventory(), false);
-        int avail = Math.max(0, soh - res);
+        int soh, res, avail;
+
+        if (p.getInventory() != null) {
+            // Use inventory data if available
+            soh = getSafe(p.getInventory(), true);
+            res = getSafe(p.getInventory(), false);
+            avail = Math.max(0, soh - res);
+        } else {
+            // Fallback to transient methods if inventory is null
+            soh = p.getStockQuantity() != null ? p.getStockQuantity() : 0;
+            res = 0; // Transient method doesn't provide reserved quantity
+            avail = p.getAvailableStock() != null ? p.getAvailableStock() : 0;
+        }
+
         return new ProductDetailView(
                 p.getId(), p.getSku(), p.getName(),
                 p.getCategory(), p.getUnit(),

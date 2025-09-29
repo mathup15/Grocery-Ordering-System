@@ -46,4 +46,16 @@ public class ProductSpecs {
             return cb.greaterThan(cb.diff(soh, res), 0);
         };
     }
+
+    /**
+     * NEW METHOD: Always fetch inventory relationship to avoid LazyLoadingException
+     */
+    public static Specification<Product> fetchInventory() {
+        return (root, query, cb) -> {
+            if (query.getResultType() == Product.class) {
+                root.fetch("inventory", JoinType.LEFT);
+            }
+            return cb.conjunction();
+        };
+    }
 }

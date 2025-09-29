@@ -1,6 +1,7 @@
 package org.orderingsystem.grocerryorderingsystem.controller.inventory;
 
 import lombok.RequiredArgsConstructor;
+import org.orderingsystem.grocerryorderingsystem.model.inventory.Inventory;
 import org.orderingsystem.grocerryorderingsystem.model.inventory.Product;
 import org.orderingsystem.grocerryorderingsystem.model.inventory.StockAdjustment;
 import org.orderingsystem.grocerryorderingsystem.repository.inventory.ProductRepository;
@@ -10,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/inventory/stock")
@@ -18,25 +18,30 @@ import java.util.Map;
 public class StockController {
 
     private final StockService stockService;
-    private final ProductRepository productRepository;
+    private final ProductRepository products;
 
     @PostMapping("/{productId}/adjust")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','STAFF')")
-    public ResponseEntity<?> adjustStock(
+    public ResponseEntity<StockUpdateResp> adjustStock(
             @PathVariable Long productId,
-            @RequestBody StockAdjustmentRequest request) {
+            @RequestBody StockAdjustmentRequest request
+    ) {
+        Product product = products.findByIdWithInventory(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        try {
-            Product product = productRepository.findById(productId)
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        Product saved = stockService.adjustStock(
+                product,
+                request.adjustmentType(),
+                request.quantity(),
+                request.reason()
+        );
 
-            stockService.adjustStock(product, request.adjustmentType(),
-                    request.quantity(), request.reason());
+        Inventory inv = saved.getInventory();
+        int soh = inv != null && inv.getStockOnHand() != null ? inv.getStockOnHand() : 0;
+        int res = inv != null && inv.getReservedQty() != null ? inv.getReservedQty() : 0;
+        int avail = Math.max(0, soh - res);
 
-            return ResponseEntity.ok().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return ResponseEntity.ok(new StockUpdateResp(soh, res, avail));
     }
 
     @GetMapping("/{productId}/history")
@@ -49,5 +54,11 @@ public class StockController {
             String adjustmentType, // ADD, REMOVE, SET
             Integer quantity,
             String reason
+    ) {}
+
+    public record StockUpdateResp(
+            Integer stockOnHand,
+            Integer reservedQty,
+            Integer availableQty
     ) {}
 }

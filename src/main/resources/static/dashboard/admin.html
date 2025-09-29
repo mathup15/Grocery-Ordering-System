@@ -1,26 +1,668 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FreshCartLanka • Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50:"#ecfdf5",100:"#d1fae5",200:"#a7f3d0",300:"#6ee7b7",
+                            400:"#34d399",500:"#10b981",600:"#059669",700:"#047857",
+                            800:"#065f46",900:"#064e3b"
+                        }
+                    },
+                    boxShadow:{soft:"0 10px 30px rgba(2,6,23,.06)"},
+                    borderRadius:{xl2:"1.25rem"}
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        .btn{ @apply inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow-soft;}
+        .btn-brand{ @apply bg-brand-600 text-white hover:bg-brand-700;}
+        .btn-ghost{ @apply bg-white text-slate-700 hover:bg-slate-50 border border-slate-200;}
+        .chip{ @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;}
+        .ok{ @apply bg-green-100 text-green-700}
+        .warn{ @apply bg-yellow-100 text-yellow-700}
+        .bad{ @apply bg-rose-100 text-rose-700}
+        .card{ @apply bg-white rounded-2xl shadow-soft border border-slate-100;}
+        .nav-link{ @apply flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-brand-50 hover:text-brand-800;}
+        .nav-link.active{ @apply bg-brand-100 text-brand-900;}
+        .field{ @apply grid gap-1}
+        .field label{ @apply text-xs text-slate-500}
+        .field input,.field select,.field textarea{ @apply rounded-xl border border-slate-200 px-3 py-2 outline-none focus:ring-2 focus:ring-brand-200}
+        dialog::backdrop{background:rgba(2,6,23,.45)}
+    </style>
 </head>
-<body class="min-h-screen bg-slate-50">
+<body class="bg-slate-50 text-slate-800">
 <script src="/js/app.js"></script>
 <script>Auth.requireRole(["ADMIN"]);</script>
 
-<div class="max-w-5xl mx-auto p-6">
-    <header class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-slate-800">Admin Dashboard</h1>
-        <button onclick="Auth.logout()" class="px-3 py-2 rounded bg-red-500 text-white">Logout</button>
-    </header>
+<!-- Layout -->
+<div class="min-h-screen grid grid-cols-1 lg:grid-cols-[280px_1fr]">
 
-    <section class="mt-6 grid md:grid-cols-4 gap-4">
-        <div class="rounded-xl bg-white p-5 shadow"><h3 class="font-semibold">Users & Roles</h3><p class="text-sm text-gray-600">Manage access.</p></div>
-        <div class="rounded-xl bg-white p-5 shadow"><h3 class="font-semibold">Products</h3><p class="text-sm text-gray-600">Create/Update items.</p></div>
-        <div class="rounded-xl bg-white p-5 shadow"><h3 class="font-semibold">Orders</h3><p class="text-sm text-gray-600">Monitor order flow.</p></div>
-        <div class="rounded-xl bg-white p-5 shadow"><h3 class="font-semibold">Reports</h3><p class="text-sm text-gray-600">Sales & trends.</p></div>
-    </section>
+    <!-- Sidebar -->
+    <aside class="hidden lg:flex flex-col gap-4 p-4 bg-white border-r border-slate-100">
+        <div class="flex items-center gap-3 px-2">
+            <div class="h-10 w-10 rounded-2xl bg-brand-600 grid place-content-center text-white font-bold">FC</div>
+            <div>
+                <p class="font-semibold">FreshCartLanka</p>
+                <p class="text-xs text-slate-500">Admin Console</p>
+            </div>
+        </div>
+        <nav id="sidebar" class="mt-2 grid gap-1">
+            <a href="#overview"  class="nav-link"><i data-lucide="layout-dashboard"></i> Overview</a>
+            <a href="#users"     class="nav-link"><i data-lucide="users"></i> Users & Roles</a>
+            <a href="/dashboard/customer.html"  class="nav-link"><i data-lucide="package"></i> Products</a>
+            <a href="/dashboard/inventory.html" class="nav-link"><i data-lucide="boxes"></i> Inventory</a>
+            <a href="#orders"    class="nav-link"><i data-lucide="shopping-cart"></i> Orders</a>
+            <a href="#delivery"  class="nav-link"><i data-lucide="truck"></i> Delivery</a>
+            <a href="#reports"   class="nav-link"><i data-lucide="line-chart"></i> Reports</a>
+            <a href="#coupons"   class="nav-link"><i data-lucide="ticket"></i> Coupons</a>
+            <a href="#vendors"   class="nav-link"><i data-lucide="store"></i> Vendors</a>
+            <a href="#audit"     class="nav-link"><i data-lucide="shield"></i> Audit Log</a>
+            <a href="#settings"  class="nav-link"><i data-lucide="settings"></i> Settings</a>
+        </nav>
+        <div class="mt-auto p-3 rounded-xl bg-brand-50 text-brand-900">
+            <p class="text-sm font-semibold">Tip</p>
+            <p class="text-xs">Use search on each page to filter instantly. Bulk actions appear after selecting rows.</p>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="p-4 lg:p-6 max-w-7xl mx-auto w-full">
+        <header class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2 lg:hidden">
+                <button class="btn btn-ghost"><i data-lucide="panel-left-open"></i> Menu</button>
+            </div>
+            <div class="relative flex-1 max-w-xl">
+                <input id="globalSearch" class="w-full rounded-2xl border border-slate-200 pl-10 pr-3 py-2 focus:ring-2 focus:ring-brand-200" placeholder="Search users, orders, products..." />
+                <i data-lucide="search" class="absolute left-3 top-2.5 h-5 w-5 text-slate-400"></i>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="btnSync" class="btn btn-ghost"><i data-lucide="refresh-cw"></i> Sync</button>
+                <button onclick="Auth.logout()" class="btn btn-brand"><i data-lucide="log-out"></i><a href="/index.html" >Logout</a></button>
+            </div>
+        </header>
+
+        <section id="page" class="mt-6 grid gap-6"></section>
+    </main>
 </div>
+
+<!-- Modal -->
+<dialog id="modal" class="rounded-2xl p-0 w-[95vw] max-w-2xl">
+    <form method="dialog" class="p-4 flex items-center justify-between border-b">
+        <h3 id="modalTitle" class="font-semibold">Modal</h3>
+        <button class="btn btn-ghost"><i data-lucide="x"></i> Close</button>
+    </form>
+    <div id="modalBody" class="p-4"></div>
+    <div class="p-4 border-t flex items-center justify-end gap-2">
+        <button class="btn btn-ghost" onclick="document.getElementById('modal').close()">Cancel</button>
+        <button id="modalPrimary" class="btn btn-brand" type="button">Save</button>
+    </div>
+</dialog>
+
+<script>
+    /* ===== Utilities ===== */
+    window.addEventListener("DOMContentLoaded", () => lucide.createIcons());
+    const $=(s,el=document)=>el.querySelector(s);
+    const $$=(s,el=document)=>[...el.querySelectorAll(s)];
+    function toast(msg,type="ok"){const t=document.createElement("div");t.className=`fixed right-4 top-4 z-50 px-3 py-2 rounded-xl text-sm text-white ${type==="err"?"bg-rose-600":"bg-slate-900"}`;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2400);}
+    async function api(path,{method="GET",body,params}={}){const url=new URL(path,location.origin);if(params)Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v));const res=await fetch(url,{method,headers:{"Content-Type":"application/json","Authorization":"Bearer "+(Auth.getToken?.()||"")},body:body?JSON.stringify(body):undefined});if(!res.ok){throw new Error((await res.text().catch(()=>res.statusText))||res.statusText)}return res.status===204?null:res.json();}
+
+    /* ===== Router ===== */
+    const routes={overview,users,products,inventory,orders,delivery,reports,coupons,vendors,audit,settings};
+    function setActive(){const key=(location.hash||"#overview").slice(1); $$("#sidebar .nav-link").forEach(a=>a.classList.toggle("active", a.getAttribute("href")==="#"+key));}
+    async function render(){setActive(); const key=(location.hash||"#overview").slice(1); (routes[key]||overview)($("#page"));}
+    window.addEventListener("hashchange",render); window.addEventListener("DOMContentLoaded",render);
+
+    /* ===== Shared parts ===== */
+    function cardStat({title,value,delta,icon}){return `
+  <div class="card p-4">
+    <div class="flex items-center justify-between">
+      <p class="text-slate-500 text-xs">${title}</p>
+      <i data-lucide="${icon||'bar-chart-3'}" class="h-5 w-5 text-brand-600"></i>
+    </div>
+    <p class="mt-2 text-2xl font-semibold">${value}</p>
+    <p class="text-xs ${delta>=0?'text-green-600':'text-rose-600'} mt-1">${delta>=0?'▲':'▼'} ${Math.abs(delta)}% vs last week</p>
+  </div>`;}
+    function table({cols,rows,selectable=false,actions=()=>""}){const head=cols.map(c=>`<th class="px-3 py-2 text-left text-xs text-slate-500">${c}</th>`).join("");const body=rows.map(r=>{const tds=r.map(v=>`<td class="px-3 py-2 text-sm">${v}</td>`).join("");const sel=selectable?`<td class="px-3"><input type="checkbox" class="rowSel"></td>`:"";return `<tr class="border-t">${sel}${tds}<td class="px-3 py-2">${actions(r)}</td></tr>`;}).join("");const selHead=selectable?`<th class="px-3"><input type="checkbox" id="selAll"></th>`:"";return `<div class="card overflow-hidden"><table class="w-full text-sm"><thead class="bg-slate-50 border-b"><tr>${selHead}${head}<th class="px-3 py-2 text-xs text-slate-500">Actions</th></tr></thead><tbody>${body||`<tr><td colspan="${cols.length+(selectable?2:1)}" class="px-3 py-6 text-center text-sm text-slate-500">No data</td></tr>`}</tbody></table></div>`;}
+    function openModal(title, bodyHTML, onPrimary){$("#modalTitle").textContent=title; $("#modalBody").innerHTML=bodyHTML; $("#modalPrimary").onclick=async()=>{try{await onPrimary?.(); $("#modal").close(); toast("Saved"); render();}catch(e){toast(e.message,"err");}}; $("#modal").showModal(); lucide.createIcons();}
+
+    /* ===== Pages ===== */
+    async function overview(el){
+        const s = await api("/api/admin/overview").catch(()=>({users:1280,products:342,ordersToday:64,revenueToday:156000,deltaUsers:4,deltaOrders:8}));
+        el.innerHTML = `
+    <div class="grid md:grid-cols-4 gap-4">
+      ${cardStat({title:"Active Users", value:s.users, delta:s.deltaUsers, icon:"users"})}
+      ${cardStat({title:"Products", value:s.products, delta:2, icon:"package"})}
+      ${cardStat({title:"Orders Today", value:s.ordersToday, delta:s.deltaOrders, icon:"shopping-cart"})}
+      ${cardStat({title:"Revenue (LKR)", value:s.revenueToday.toLocaleString(), delta:5, icon:"banknote"})}
+    </div>
+    <div class="grid lg:grid-cols-3 gap-4">
+      <div class="card p-4 lg:col-span-2">
+        <div class="flex items-center justify-between">
+          <h3 class="font-semibold">Sales (Last 7 days)</h3>
+          <select id="salesRange" class="rounded-xl border border-slate-200 text-sm px-2 py-1">
+            <option value="7">7 days</option><option value="30">30 days</option><option value="90">90 days</option>
+          </select>
+        </div>
+        <canvas id="salesChart" class="mt-4"></canvas>
+      </div>
+      <div class="card p-4">
+        <h3 class="font-semibold">Low Stock</h3>
+        <div id="lowStock" class="mt-3 grid gap-2 text-sm"></div>
+      </div>
+    </div>`;
+        lucide.createIcons();
+
+        const ch=new Chart($("#salesChart"),{type:"line",data:{labels:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],datasets:[{label:"Sales (LKR)",data:[15,22,18,30,26,40,35]}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}});
+        $("#salesRange").addEventListener("change", async e=>{try{const d=await api("/api/reports/sales",{params:{days:e.target.value}}); ch.data.labels=d.labels||ch.data.labels; ch.data.datasets[0].data=d.values||ch.data.datasets[0].data; ch.update();}catch(_){}});
+
+        try{
+            const low = await api("/api/inventory/low-stock");
+            $("#lowStock").innerHTML = (low.items||low||[]).slice(0,6).map(x=>`
+      <div class="flex items-center justify-between border rounded-xl px-3 py-2">
+        <span>${x.name} <span class="text-xs text-slate-500">(${x.sku||''})</span></span>
+        <span class="chip ${x.qty===0?'bad':'warn'}">${x.qty} left</span>
+      </div>`).join("") || `<p class="text-slate-500">All good!</p>`;
+        }catch(_){}
+    }
+
+    async function users(el){
+        el.innerHTML = `
+    <div class="flex items-center justify-between">
+      <div><h2 class="text-xl font-semibold">Users & Roles</h2><p class="text-sm text-slate-500">Invite, assign roles, reset passwords</p></div>
+      <div class="flex items-center gap-2">
+        <input id="uQuery" class="border rounded-xl px-3 py-2" placeholder="Search users..." />
+        <button id="btnInvite" class="btn btn-brand"><i data-lucide="user-plus"></i> Invite</button>
+      </div>
+    </div>
+    <div id="usersTable" class="mt-4"></div>`;
+        lucide.createIcons();
+
+        async function load(q=""){
+            const data = await api("/api/users",{params:{q,page:0,size:25}});
+            const rows = (data.content||data||[]).map(u=>[
+                `<div class="flex items-center gap-2"><div class="h-8 w-8 rounded-full bg-brand-100 grid place-content-center text-brand-700 text-xs">${(u.name||u.email||"?").slice(0,2).toUpperCase()}</div><div><div class="font-medium">${u.name||u.email}</div><div class="text-xs text-slate-500">${u.email}</div></div></div>`,
+                (u.role||u.roles?.join(", ")||"USER"),
+                `<span class="chip ${u.active?'ok':'bad'}">${u.active?'Active':'Disabled'}</span>`,
+                new Date(u.createdAt||u.created_at||Date.now()).toLocaleDateString()
+            ]);
+            $("#usersTable").innerHTML = table({cols:["User","Role","Status","Joined"], rows, selectable:true, actions:()=>`<button class="btn btn-ghost text-xs" data-action="edit">Edit</button><button class="btn btn-ghost text-xs text-rose-600" data-action="disable">Disable</button>`});
+
+            $("#usersTable").addEventListener("click", async (e)=>{
+                const btn=e.target.closest("button"); if(!btn) return;
+                const tr=e.target.closest("tr"); const idx=[...tr.parentNode.children].indexOf(tr);
+                const user=(data.content||data)[idx];
+                if(btn.dataset.action==="edit"){
+                    openModal("Edit User", `
+          <div class="grid gap-3">
+            <div class="field"><label>Name</label><input id="fName" value="${user.name||""}"></div>
+            <div class="field"><label>Email</label><input id="fEmail" value="${user.email||""}" disabled></div>
+            <div class="field"><label>Role</label><select id="fRole"><option>ADMIN</option><option>MANAGER</option><option>STAFF</option><option selected>USER</option></select></div>
+            <div class="field"><label>Status</label><select id="fStatus"><option value="true">Active</option><option value="false">Disabled</option></select></div>
+          </div>`,
+                        async ()=>{await api(`/api/users/${user.id}`,{method:"PUT",body:{name:$("#fName").value,role:$("#fRole").value,active:$("#fStatus").value==="true"}});}
+                    );
+                }
+                if(btn.dataset.action==="disable"){
+                    await api(`/api/users/${user.id}/status`,{method:"PATCH",body:{active:false}}); toast("User disabled"); render();
+                }
+            });
+        }
+        $("#uQuery").addEventListener("input", e=>load(e.target.value));
+        await load();
+    }
+
+    async function products(el){
+        el.innerHTML = `
+    <div class="flex items-center justify-between">
+      <div><h2 class="text-xl font-semibold">Products</h2><p class="text-sm text-slate-500">Create, update, categorize</p></div>
+      <div class="flex items-center gap-2">
+        <input id="pQuery" class="border rounded-xl px-3 py-2" placeholder="Search products..." />
+        <button id="btnNewProduct" class="btn btn-brand"><i data-lucide="plus"></i> New</button>
+      </div>
+    </div>
+    <div id="productsTable" class="mt-4"></div>`;
+        lucide.createIcons();
+
+        async function load(q=""){
+            const data=await api("/api/products",{params:{q,page:0,size:25}});
+            const rows=(data.content||data||[]).map(p=>[
+                `<div class="flex items-center gap-3"><img src="${p.imageUrl||'https://placehold.co/64x64?text=FC'}" class="h-10 w-10 rounded-lg object-cover"/><div><div class="font-medium">${p.name}</div><div class="text-xs text-slate-500">${p.sku}</div></div></div>`,
+                p.category||"-",(p.price||0).toFixed(2),
+                p.inventory?.onHand ?? p.qty ?? 0
+            ]);
+            $("#productsTable").innerHTML = table({cols:["Product","Category","Price (LKR)","On hand"], rows, selectable:true, actions:()=>`<button class="btn btn-ghost text-xs" data-action="edit">Edit</button><button class="btn btn-ghost text-xs text-rose-600" data-action="delete">Delete</button>`});
+
+            $("#productsTable").addEventListener("click", async e=>{
+                const btn=e.target.closest("button"); if(!btn) return;
+                const tr=e.target.closest("tr"); const idx=[...tr.parentNode.children].indexOf(tr);
+                const prod=(data.content||data)[idx];
+                if(btn.dataset.action==="edit"){
+                    openModal("Edit product", `
+          <div class="grid gap-3">
+            <div class="field"><label>Name</label><input id="prName" value="${prod.name||""}"></div>
+            <div class="field"><label>SKU</label><input id="prSku" value="${prod.sku||""}" disabled></div>
+            <div class="field"><label>Category</label><input id="prCat" value="${prod.category||""}"></div>
+            <div class="field"><label>Price (LKR)</label><input id="prPrice" type="number" step="0.01" value="${prod.price||0}"></div>
+            <div class="field"><label>Image URL</label><input id="prImg" value="${prod.imageUrl||""}"></div>
+          </div>`,
+                        async ()=>{await api(`/api/products/${prod.id}`,{method:"PUT",body:{name:$("#prName").value,category:$("#prCat").value,price:+$("#prPrice").value,imageUrl:$("#prImg").value}});}
+                    );
+                }
+                if(btn.dataset.action==="delete"){await api(`/api/products/${prod.id}`,{method:"DELETE"}); toast("Deleted"); render();}
+            });
+        }
+        $("#pQuery").addEventListener("input", e=>load(e.target.value));
+        $("#btnNewProduct").addEventListener("click", ()=>{
+            openModal("New product", `
+      <div class="grid gap-3">
+        <div class="field"><label>Name</label><input id="npName" required></div>
+        <div class="field"><label>SKU</label><input id="npSku" required></div>
+        <div class="field"><label>Category</label><input id="npCat"></div>
+        <div class="field"><label>Price (LKR)</label><input id="npPrice" type="number" step="0.01"></div>
+        <div class="field"><label>Image URL</label><input id="npImg"></div>
+      </div>`,
+                async ()=>{await api("/api/products",{method:"POST",body:{name:$("#npName").value,sku:$("#npSku").value,category:$("#npCat").value,price:+$("#npPrice").value,imageUrl:$("#npImg").value}});}
+            );
+        });
+        await load();
+    }
+
+    async function inventory(el){
+        el.innerHTML = `
+    <div class="flex items-center justify-between">
+      <div><h2 class="text-xl font-semibold">Inventory</h2><p class="text-sm text-slate-500">Stock adjustments & thresholds</p></div>
+      <button id="btnAdj" class="btn btn-brand"><i data-lucide="plus-square"></i> Adjust Stock</button>
+    </div>
+    <div id="invTable" class="mt-4"></div>`;
+        lucide.createIcons();
+
+        const data = await api("/api/inventory");
+        const rows = (data.items||data||[]).map(x=>[
+            x.product||x.name, x.sku, x.onHand??0, x.reorderPoint??0,
+            (x.onHand??0) <= (x.reorderPoint??0) ? `<span class="chip warn">Reorder</span>`:`<span class="chip ok">OK</span>`
+        ]);
+        $("#invTable").innerHTML = table({cols:["Product","SKU","On hand","Reorder @","Status"],rows,actions:()=>`<button class="btn btn-ghost text-xs" data-action="history">History</button>`});
+
+        $("#btnAdj").addEventListener("click", ()=>{
+            openModal("Stock adjustment", `
+      <div class="grid gap-3">
+        <div class="field"><label>SKU</label><input id="saSku" placeholder="e.g., PRD-1001"></div>
+        <div class="field"><label>Quantity (+/-)</label><input id="saQty" type="number" value="1"></div>
+        <div class="field"><label>Reason</label><input id="saReason" placeholder="Purchase, Damage, Correction..."></div>
+      </div>`,
+                async ()=>{await api("/api/inventory/adjust",{method:"POST",body:{sku:$("#saSku").value,qty:+$("#saQty").value,reason:$("#saReason").value}});}
+            );
+        });
+    }
+
+    async function orders(el){
+        el.innerHTML = `
+    <div class="flex items-center justify-between">
+      <div><h2 class="text-xl font-semibold">Orders</h2><p class="text-sm text-slate-500">Monitor, assign delivery, update statuses</p></div>
+      <div class="flex items-center gap-2">
+        <select id="oStatus" class="border rounded-xl px-2 py-2">
+          <option value="">All</option><option>PENDING</option><option>PAID</option><option>SHIPPED</option><option>OUT_FOR_DELIVERY</option><option>DELIVERED</option><option>CANCELLED</option>
+        </select>
+        <input id="oQuery" class="border rounded-xl px-3 py-2" placeholder="Search order ID or customer..." />
+      </div>
+    </div>
+    <div id="ordersTable" class="mt-4"></div>`;
+        lucide.createIcons();
+
+        async function load(){
+            const data=await api("/api/orders",{params:{q:$("#oQuery").value,status:$("#oStatus").value,page:0,size:25}});
+            const rows=(data.content||data||[]).map(o=>[
+                `<div class="font-medium">${o.code||o.id}</div>`,
+                o.customer?.name || o.customerName || "-",
+                (o.total||0).toFixed(2),
+                `<span class="chip ${({"PENDING":"warn","PAID":"ok","SHIPPED":"ok","OUT_FOR_DELIVERY":"warn","DELIVERED":"ok","CANCELLED":"bad"})[o.status]||""}">${o.status}</span>`,
+                (o.delivery?.personName || o.deliveryPerson || "-") +
+                (o.delivery?.eta ? `<div class="text-xs text-slate-500">ETA: ${new Date(o.delivery.eta).toLocaleString()}</div>` : ""),
+                new Date(o.createdAt||o.date||Date.now()).toLocaleString()
+            ]);
+            $("#ordersTable").innerHTML = table({
+                cols:["Order","Customer","Total (LKR)","Status","Delivery","Date"],
+                rows,
+                selectable:true,
+                actions:()=>`
+        <button class="btn btn-ghost text-xs" data-action="view">View</button>
+        <button class="btn btn-ghost text-xs" data-action="assign">Assign</button>
+        <button class="btn btn-ghost text-xs" data-action="status">Update Status</button>
+        <button class="btn btn-ghost text-xs text-rose-600" data-action="cancel">Cancel</button>`
+            });
+
+            $("#ordersTable").addEventListener("click", async e=>{
+                const btn=e.target.closest("button"); if(!btn) return;
+                const tr=e.target.closest("tr"); const idx=[...tr.parentNode.children].indexOf(tr);
+                const ord=(data.content||data)[idx];
+
+                if(btn.dataset.action==="view"){
+                    openModal(`Order ${ord.code||ord.id}`, `<pre class="text-xs bg-slate-50 p-3 rounded-xl overflow-auto">${JSON.stringify(ord,null,2)}</pre>`);
+                }
+
+                if(btn.dataset.action==="assign"){
+                    const people = await api("/api/delivery/people").catch(()=>[]);
+                    const options = (people||[]).map(p=>`<option value="${p.id}">${p.name} (${p.phone||'N/A'})</option>`).join("");
+                    openModal(`Assign delivery • ${ord.code||ord.id}`, `
+          <div class="grid gap-3">
+            <div class="field"><label>Delivery person</label><select id="dlvPerson">${options||'<option disabled>No people found</option>'}</select></div>
+            <div class="field"><label>ETA (date & time)</label><input id="dlvEta" type="datetime-local"></div>
+            <div class="field"><label>Note</label><input id="dlvNote" placeholder="Optional note to rider"></div>
+          </div>`,
+                        async ()=>{
+                            await api(`/api/orders/${ord.id}/assign-delivery`,{
+                                method:"POST",
+                                body:{personId:$("#dlvPerson").value, eta:$("#dlvEta").value||null, note:$("#dlvNote").value||null}
+                            });
+                        }
+                    );
+                }
+
+                if(btn.dataset.action==="status"){
+                    openModal(`Update status • ${ord.code||ord.id}`, `
+          <div class="grid gap-3">
+            <div class="field"><label>Order status</label>
+              <select id="oNewStatus">
+                <option>PENDING</option><option>PAID</option><option>SHIPPED</option>
+                <option>OUT_FOR_DELIVERY</option><option>DELIVERED</option><option>CANCELLED</option>
+              </select>
+            </div>
+            <div class="field"><label>Tracking note</label><input id="trkNote" placeholder="e.g., Packed, rider picked up"></div>
+          </div>`,
+                        async ()=>{
+                            await api(`/api/orders/${ord.id}/status`,{
+                                method:"PATCH",
+                                body:{ status: $("#oNewStatus").value, note: $("#trkNote").value || null }
+                            });
+                        }
+                    );
+                }
+
+                if(btn.dataset.action==="cancel"){
+                    await api(`/api/orders/${ord.id}/cancel`,{method:"POST"}); toast("Cancelled"); render();
+                }
+            });
+        }
+        $("#oQuery").addEventListener("input", load);
+        $("#oStatus").addEventListener("change", load);
+        await load();
+    }
+
+    async function delivery(el){
+        el.innerHTML = `
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-semibold">Delivery</h2>
+        <p class="text-sm text-slate-500">Assign riders and track order delivery status</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <select id="dStatus" class="border rounded-xl px-2 py-2">
+          <option value="">All</option>
+          <option>PENDING</option><option>PAID</option><option>SHIPPED</option>
+          <option>OUT_FOR_DELIVERY</option><option>DELIVERED</option><option>CANCELLED</option>
+        </select>
+        <input id="dQuery" class="border rounded-xl px-3 py-2" placeholder="Search order or rider..." />
+      </div>
+    </div>
+    <div id="dTable" class="mt-4"></div>
+  `;
+        lucide.createIcons();
+
+        async function load(){
+            const data = await api("/api/orders",{params:{q:$("#dQuery").value,status:$("#dStatus").value,page:0,size:25}});
+            const list = (data.content||data||[]);
+            const rows = list.map(o=>[
+                `<div class="font-medium">${o.code||o.id}</div>`,
+                o.customer?.name || o.customerName || "-",
+                `<span class="chip ${({"PENDING":"warn","PAID":"ok","SHIPPED":"ok","OUT_FOR_DELIVERY":"warn","DELIVERED":"ok","CANCELLED":"bad"})[o.status]||""}">${o.status}</span>`,
+                o.delivery?.personName || o.deliveryPerson || "-",
+                o.delivery?.phone || "-",
+                o.delivery?.eta ? new Date(o.delivery.eta).toLocaleString() : "-"
+            ]);
+
+            $("#dTable").innerHTML = table({
+                cols:["Order","Customer","Status","Rider","Phone","ETA"],
+                rows,
+                actions:()=>`
+        <button class="btn btn-ghost text-xs" data-action="assign">Assign</button>
+        <button class="btn btn-ghost text-xs" data-action="status">Update Status</button>`
+            });
+
+            $("#dTable").addEventListener("click", async (e)=>{
+                const btn = e.target.closest("button"); if(!btn) return;
+                const tr = e.target.closest("tr"); const idx = [...tr.parentNode.children].indexOf(tr);
+                const ord = list[idx];
+
+                if(btn.dataset.action==="assign"){
+                    const people = await api("/api/delivery/people").catch(()=>[]);
+                    const options = (people||[]).map(p=>`<option value="${p.id}">${p.name} (${p.phone||'N/A'})</option>`).join("");
+                    openModal(`Assign delivery • ${ord.code||ord.id}`, `
+          <div class="grid gap-3">
+            <div class="field"><label>Delivery person</label><select id="dlvPerson">${options||'<option disabled>No people found</option>'}</select></div>
+            <div class="field"><label>ETA (date & time)</label><input id="dlvEta" type="datetime-local"></div>
+            <div class="field"><label>Note</label><input id="dlvNote" placeholder="Optional note"></div>
+          </div>`,
+                        async ()=>{
+                            await api(`/api/orders/${ord.id}/assign-delivery`,{
+                                method:"POST",
+                                body:{personId:$("#dlvPerson").value, eta:$("#dlvEta").value||null, note:$("#dlvNote").value||null}
+                            });
+                        }
+                    );
+                }
+
+                if(btn.dataset.action==="status"){
+                    openModal(`Update status • ${ord.code||ord.id}`, `
+          <div class="grid gap-3">
+            <div class="field"><label>Order status</label>
+              <select id="oNewStatus">
+                <option>PENDING</option><option>PAID</option><option>SHIPPED</option>
+                <option>OUT_FOR_DELIVERY</option><option>DELIVERED</option><option>CANCELLED</option>
+              </select>
+            </div>
+            <div class="field"><label>Tracking note</label><input id="trkNote" placeholder="e.g., Rider picked up"></div>
+          </div>`,
+                        async ()=>{
+                            await api(`/api/orders/${ord.id}/status`,{
+                                method:"PATCH",
+                                body:{ status: $("#oNewStatus").value, note: $("#trkNote").value || null }
+                            });
+                        }
+                    );
+                }
+            });
+        }
+
+        $("#dQuery").addEventListener("input", load);
+        $("#dStatus").addEventListener("change", load);
+        await load();
+    }
+
+    async function reports(el){
+        el.innerHTML=`
+    <div class="flex items-center justify-between">
+      <div><h2 class="text-xl font-semibold">Reports</h2><p class="text-sm text-slate-500">Sales, top products, customers</p></div>
+      <div class="flex items-center gap-2">
+        <input type="date" id="rFrom" class="border rounded-xl px-3 py-2"/>
+        <input type="date" id="rTo"   class="border rounded-xl px-3 py-2"/>
+        <button id="btnRun" class="btn btn-brand"><i data-lucide="play"></i> Run</button>
+      </div>
+    </div>
+    <div class="grid lg:grid-cols-2 gap-4">
+      <div class="card p-4"><h3 class="font-semibold">Revenue by day</h3><canvas id="repA" class="mt-3"></canvas></div>
+      <div class="card p-4"><h3 class="font-semibold">Top categories</h3><canvas id="repB" class="mt-3"></canvas></div>
+      <div class="card p-4 lg:col-span-2"><h3 class="font-semibold">Export</h3>
+        <div class="mt-3 flex items-center gap-2">
+          <button id="btnCSV" class="btn btn-ghost"><i data-lucide="download"></i> CSV</button>
+          <button id="btnPDF" class="btn btn-ghost"><i data-lucide="file-text"></i> PDF</button>
+        </div>
+      </div>
+    </div>`;
+        lucide.createIcons();
+        const chA=new Chart($("#repA"),{type:"bar",data:{labels:[],datasets:[{label:"Revenue (LKR)",data:[]}]},options:{responsive:true}});
+        const chB=new Chart($("#repB"),{type:"doughnut",data:{labels:[],datasets:[{data:[]}]},options:{responsive:true}});
+        async function run(){try{const d=await api("/api/reports/summary",{params:{from:$("#rFrom").value,to:$("#rTo").value}}); chA.data.labels=d.revenue?.labels||["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]; chA.data.datasets[0].data=d.revenue?.values||[10,20,15,25,30,28,26]; chA.update(); chB.data.labels=d.categories?.labels||["Fruits","Veg","Dairy","Bakery"]; chB.data.datasets[0].data=d.categories?.values||[30,25,20,15]; chB.update();}catch(_){toast("Could not load reports","err");}}
+        $("#btnRun").addEventListener("click",run);
+        $("#btnCSV").addEventListener("click",()=>location.href="/api/reports/export?format=csv");
+        $("#btnPDF").addEventListener("click",()=>location.href="/api/reports/export?format=pdf");
+        await run();
+    }
+
+    async function coupons(el){
+        el.innerHTML=`
+    <div class="flex items-center justify-between">
+      <div><h2 class="text-xl font-semibold">Coupons</h2><p class="text-sm text-slate-500">Promotions & discounts</p></div>
+      <button id="btnNewCoupon" class="btn btn-brand"><i data-lucide="ticket"></i> New Coupon</button>
+    </div>
+    <div id="cpTable" class="mt-4"></div>`;
+        lucide.createIcons();
+
+        async function load(){
+            const data=await api("/api/coupons");
+            const rows=(data||[]).map(c=>[
+                `<span class="font-mono">${c.code}</span>`, c.type, c.value,
+                `${new Date(c.startsAt).toLocaleDateString()} – ${new Date(c.expiresAt).toLocaleDateString()}`,
+                c.active?'<span class="chip ok">Active</span>':'<span class="chip bad">Inactive</span>'
+            ]);
+            $("#cpTable").innerHTML=table({cols:["Code","Type","Value","Window","Status"],rows,actions:()=>`<button class="btn btn-ghost text-xs" data-action="toggle">Toggle</button>`});
+            $("#cpTable").addEventListener("click", async e=>{
+                const btn=e.target.closest("button"); if(!btn) return;
+                const idx=[...e.target.closest("tr").parentNode.children].indexOf(e.target.closest("tr"));
+                const x=data[idx]; if(btn.dataset.action==="toggle"){await api(`/api/coupons/${x.id}/toggle`,{method:"PATCH"}); render();}
+            });
+        }
+
+        $("#btnNewCoupon").addEventListener("click",()=>{
+            openModal("Create coupon", `
+      <div class="grid gap-3">
+        <div class="field"><label>Code</label><input id="ccCode" class="font-mono" placeholder="SAVE10"></div>
+        <div class="field"><label>Type</label><select id="ccType"><option value="PERCENT">PERCENT</option><option value="AMOUNT">AMOUNT</option></select></div>
+        <div class="field"><label>Value</label><input id="ccValue" type="number" step="0.01" value="10"></div>
+        <div class="field"><label>Starts</label><input id="ccFrom" type="date"></div>
+        <div class="field"><label>Expires</label><input id="ccTo" type="date"></div>
+      </div>`,
+                async ()=>{await api("/api/coupons",{method:"POST",body:{code:$("#ccCode").value,type:$("#ccType").value,value:+$("#ccValue").value,startsAt:$("#ccFrom").value,expiresAt:$("#ccTo").value}});}
+            );
+        });
+
+        await load();
+    }
+
+    async function vendors(el){
+        el.innerHTML=`
+    <div class="flex items-center justify-between">
+      <div><h2 class="text-xl font-semibold">Vendors</h2><p class="text-sm text-slate-500">Suppliers & contacts</p></div>
+      <button id="btnNewVendor" class="btn btn-brand"><i data-lucide="plus"></i> New Vendor</button>
+    </div>
+    <div id="vTable" class="mt-4"></div>`;
+        lucide.createIcons();
+
+        async function load(){
+            const data=await api("/api/vendors");
+            const rows=(data||[]).map(v=>[v.name, v.email||"-", v.phone||"-", v.category||"-"]);
+            $("#vTable").innerHTML=table({cols:["Vendor","Email","Phone","Category"],rows,actions:()=>`<button class="btn btn-ghost text-xs" data-action="edit">Edit</button>`});
+            $("#vTable").addEventListener("click", e=>{
+                const btn=e.target.closest("button"); if(!btn) return;
+                const idx=[...e.target.closest("tr").parentNode.children].indexOf(e.target.closest("tr"));
+                const x=data[idx];
+                openModal("Edit vendor", `
+        <div class="grid gap-3">
+          <div class="field"><label>Name</label><input id="vn" value="${x.name||""}"></div>
+          <div class="field"><label>Email</label><input id="ve" value="${x.email||""}"></div>
+          <div class="field"><label>Phone</label><input id="vp" value="${x.phone||""}"></div>
+          <div class="field"><label>Category</label><input id="vc" value="${x.category||""}"></div>
+        </div>`,
+                    async ()=>{await api(`/api/vendors/${x.id}`,{method:"PUT",body:{name:$("#vn").value,email:$("#ve").value,phone:$("#vp").value,category:$("#vc").value}});}
+                );
+            });
+        }
+
+        $("#btnNewVendor").addEventListener("click",()=>{
+            openModal("New vendor", `
+      <div class="grid gap-3">
+        <div class="field"><label>Name</label><input id="nvn"></div>
+        <div class="field"><label>Email</label><input id="nve"></div>
+        <div class="field"><label>Phone</label><input id="nvp"></div>
+        <div class="field"><label>Category</label><input id="nvc"></div>
+      </div>`,
+                async ()=>{await api("/api/vendors",{method:"POST",body:{name:$("#nvn").value,email:$("#nve").value,phone:$("#nvp").value,category:$("#nvc").value}});}
+            );
+        });
+
+        await load();
+    }
+
+    async function audit(el){
+        el.innerHTML=`
+    <div class="flex items-center justify-between">
+      <div><h2 class="text-xl font-semibold">Audit Log</h2><p class="text-sm text-slate-500">Security events & critical changes</p></div>
+      <select id="aLevel" class="border rounded-xl px-2 py-2"><option value="">All</option><option>INFO</option><option>WARN</option><option>ERROR</option></select>
+    </div>
+    <div id="aTable" class="mt-4"></div>`;
+        lucide.createIcons();
+
+        async function load(){
+            const data=await api("/api/audit",{params:{level:$("#aLevel").value,size:50}});
+            const rows=(data||[]).map(x=>[
+                `<span class="chip ${x.level==='ERROR'?'bad':x.level==='WARN'?'warn':'ok'}">${x.level}</span>`,
+                x.actor||"-", x.action||x.event||"-", new Date(x.at||x.time||Date.now()).toLocaleString()
+            ]);
+            $("#aTable").innerHTML=table({cols:["Level","Actor","Event","Time"],rows,actions:()=>`<button class="btn btn-ghost text-xs" data-action="view">View</button>`});
+            $("#aTable").addEventListener("click",(e)=>{const tr=e.target.closest("tr"); if(!tr) return; const idx=[...tr.parentNode.children].indexOf(tr); const item=data[idx]; openModal("Audit event", `<pre class="text-xs bg-slate-50 p-3 rounded-xl overflow-auto">${JSON.stringify(item,null,2)}</pre>`);});
+        }
+        $("#aLevel").addEventListener("change",load);
+        await load();
+    }
+
+    async function settings(el){
+        el.innerHTML=`
+    <h2 class="text-xl font-semibold">Settings</h2>
+    <div class="grid lg:grid-cols-2 gap-4 mt-4">
+      <div class="card p-4">
+        <h3 class="font-semibold">General</h3>
+        <div class="grid gap-3 mt-3">
+          <div class="field"><label>Store name</label><input id="stName" placeholder="FreshCartLanka"></div>
+          <div class="field"><label>Currency</label><input id="stCur" value="LKR"></div>
+          <div class="field"><label>Timezone</label><input id="stTz" value="Asia/Colombo"></div>
+          <button id="btnSaveGeneral" class="btn btn-brand mt-2">Save</button>
+        </div>
+      </div>
+      <div class="card p-4">
+        <h3 class="font-semibold">Security</h3>
+        <div class="grid gap-3 mt-3">
+          <div class="field"><label>Require MFA for admins</label><select id="stMfa"><option value="true">Enabled</option><option value="false">Disabled</option></select></div>
+          <div class="field"><label>Password min length</label><input id="stPwdLen" type="number" value="8"></div>
+          <button id="btnSaveSec" class="btn btn-brand mt-2">Save</button>
+        </div>
+      </div>
+    </div>`;
+        $("#btnSaveGeneral").addEventListener("click", async ()=>{await api("/api/settings/general",{method:"PUT",body:{name:$("#stName").value,currency:$("#stCur").value,timezone:$("#stTz").value}}); toast("General settings updated");});
+        $("#btnSaveSec").addEventListener("click", async ()=>{await api("/api/settings/security",{method:"PUT",body:{mfaRequired:$("#stMfa").value==="true",passwordMin:+$("#stPwdLen").value}}); toast("Security settings updated");});
+    }
+
+    /* ===== Global search router ===== */
+    $("#globalSearch").addEventListener("keydown",(e)=>{
+        if(e.key!=="Enter") return;
+        const q=e.target.value.trim();
+        if(q.startsWith("ORD-")){location.hash="#orders"; setTimeout(()=>$("#oQuery").value=q,10);}
+        else if(q.includes("@")){location.hash="#users"; setTimeout(()=>$("#uQuery").value=q,10);}
+        else {location.hash="#products"; setTimeout(()=>$("#pQuery").value=q,10);}
+        setTimeout(render,20);
+    });
+
+    /* ===== Manual sync ===== */
+    $("#btnSync").addEventListener("click", async ()=>{try{await api("/api/admin/sync",{method:"POST"}); toast("Sync started");}catch(_){toast("Sync failed","err");}});
+</script>
 </body>
 </html>

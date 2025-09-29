@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>FreshCartLanka • Access</title>  <!-- Changed here -->
+    <title>FreshCartLanka • Access</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-[#fafafa]">
@@ -11,7 +11,7 @@
     <header class="flex items-center justify-between">
         <div class="flex items-center gap-3">
             <div class="h-10 w-10 rounded-xl bg-emerald-600 text-white grid place-content-center text-2xl font-extrabold shadow">🛒</div>
-            <div class="text-2xl font-extrabold">FreshCartLanka</div>  <!-- Changed here -->
+            <div class="text-2xl font-extrabold">FreshCartLanka</div>
         </div>
     </header>
 
@@ -26,10 +26,14 @@
             <!-- Sign in -->
             <form id="formSignIn" class="mt-6 grid gap-4" novalidate>
                 <div>
-                    <input id="si-username" name="username" placeholder="User ID or Email" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
+                    <input id="si-username" name="username" placeholder="User ID or Email"
+                           autocomplete="username" autocapitalize="none" spellcheck="false"
+                           class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600" required/>
                 </div>
                 <div class="relative">
-                    <input id="si-password" name="password" type="password" placeholder="Password" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 pr-24 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
+                    <input id="si-password" name="password" type="password" placeholder="Password"
+                           autocomplete="current-password"
+                           class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 pr-24 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600" required/>
                     <button type="button" id="togglePwd" class="absolute right-2 top-2.5 rounded-xl px-3 py-1.5 text-xs font-semibold bg-gray-200 hover:bg-gray-300">Show</button>
                 </div>
                 <div class="flex items-center justify-between text-sm">
@@ -47,20 +51,42 @@
 
             <!-- Divider -->
             <div class="my-6 flex items-center gap-3 text-xs text-gray-400">
-                <div class="h-px flex-1 bg-gray-200"></div> <span>New to FreshCartMart?</span> <div class="h-px flex-1 bg-gray-200"></div>
+                <div class="h-px flex-1 bg-gray-200"></div>
+                <span>New to FreshCartLanka?</span>
+                <div class="h-px flex-1 bg-gray-200"></div>
             </div>
 
             <!-- Customer sign up -->
             <form id="formSignUp" class="grid gap-4" novalidate>
                 <div class="grid md:grid-cols-2 gap-3">
-                    <input id="su-fullname" placeholder="Full name" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
-                    <input id="su-phone" placeholder="Phone" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
+                    <input id="su-fullname" placeholder="Full name"
+                           autocomplete="name"
+                           class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600" required/>
+
+                    <input id="su-phone" placeholder="Phone"
+                           inputmode="numeric" pattern="\d{10}" maxlength="10"
+                           title="Enter exactly 10 digits"
+                           autocomplete="tel"
+                           class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600" required/>
                 </div>
-                <input id="su-username" placeholder="Email / username" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
+
+                <input id="su-username" placeholder="Email / username"
+                       autocomplete="email" autocapitalize="none" spellcheck="false"
+                       class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600" required/>
+
                 <div class="grid md:grid-cols-2 gap-3">
-                    <input id="su-password" type="password" placeholder="Password (min 6)" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
-                    <input id="su-confirm" type="password" placeholder="Confirm password" class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600"/>
+                    <input id="su-password" type="password"
+                           placeholder="Password (min 8, 1 uppercase & 1 symbol)"
+                           pattern="(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}"
+                           title="At least 8 characters, with one uppercase letter and one symbol"
+                           autocomplete="new-password"
+                           class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600" required/>
+
+                    <input id="su-confirm" type="password" placeholder="Confirm password"
+                           autocomplete="new-password"
+                           class="w-full rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 focus:border-emerald-600" required/>
                 </div>
+
                 <button class="inline-flex items-center justify-center gap-2 rounded-2xl bg-gray-900 px-5 py-3 text-white font-semibold shadow hover:opacity-90 w-full">
                     Create customer account
                 </button>
@@ -69,7 +95,7 @@
             </form>
         </div>
 
-        <!-- right side promo kept as is -->
+        <!-- right side promo -->
         <aside class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#eff7f2] to-[#e9ffef] border border-gray-100">
             <div class="absolute right-8 top-8 text-[9rem] md:text-[12rem] leading-none font-black text-emerald-200/50 select-none hidden lg:block">
                 GROCERY

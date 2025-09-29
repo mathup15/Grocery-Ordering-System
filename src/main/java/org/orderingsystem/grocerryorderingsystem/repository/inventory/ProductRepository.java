@@ -17,15 +17,19 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     Page<Product> findByCategoryIgnoreCase(String category, Pageable pageable);
 
-    // Distinct active categories for filters
     @Query("select distinct p.category from Product p where p.active = true and p.category is not null order by p.category asc")
     List<String> findActiveCategories();
 
-    // Optional: fast check for “available > 0”
     @Query("""
            select p from Product p
-           join p.inventory i
+           left join fetch p.inventory i
            where (coalesce(i.stockOnHand,0) - coalesce(i.reservedQty,0)) > 0
            """)
     List<Product> findAvailableAny();
+
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.inventory i WHERE p.id = :id")
+    Optional<Product> findByIdWithInventory(@Param("id") Long id);
+
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.inventory i WHERE p.id IN :ids")
+    List<Product> findAllByIdWithInventory(@Param("ids") List<Long> ids);
 }

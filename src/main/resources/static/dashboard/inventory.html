@@ -5,122 +5,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>FreshCartLanka • Inventory</title>
     <style>
-        :root {
-            --primary: #10b981;
-            --primary-dark: #059669;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-500: #6b7280;
-            --gray-700: #374151;
-            --gray-900: #111827;
-            --radius: 8px;
-            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        :root{
+            --primary:#10b981;--primary-dark:#059669;--danger:#ef4444;--warning:#f59e0b;
+            --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;
+            --gray-500:#6b7280;--gray-700:#374151;--gray-900:#111827;
+            --radius:10px;--shadow:0 1px 3px rgba(0,0,0,.08),0 8px 24px rgba(2,6,23,.06)
         }
+        *{box-sizing:border-box;margin:0;padding:0;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial}
+        body{background:var(--gray-50);color:var(--gray-900);line-height:1.5}
+        .hidden{display:none!important}
 
-        * { margin: 0; padding: 0; box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+        /* Top bar */
+        .topbar{position:sticky;top:0;z-index:10;background:#fff;box-shadow:var(--shadow);
+            display:flex;justify-content:space-between;align-items:center;padding:14px 20px}
+        .brand{display:flex;align-items:center;gap:12px}
+        .logo{width:40px;height:40px;border-radius:12px;background:var(--primary);color:#fff;
+            display:grid;place-items:center;font-weight:800}
+        h1{font-size:18px;font-weight:700}
+        .actions{display:flex;gap:10px}
+        .btn{border:1px solid transparent;border-radius:10px;padding:10px 14px;font-weight:600;
+            font-size:14px;cursor:pointer;transition:.18s all ease}
+        .btn.primary{background:var(--primary);color:#fff}
+        .btn.primary:hover{background:var(--primary-dark)}
+        .btn.ghost{background:transparent;border-color:var(--gray-300);color:var(--gray-700)}
+        .btn.ghost:hover{background:var(--gray-100)}
+        .btn.small{padding:6px 10px;font-size:12px}
+        .tag{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700}
+        .tag.danger{background:#fee2e2;color:#991b1b}
+        .tag.warn{background:#fef3c7;color:#92400e}
 
-        body { background-color: #f9fafb; color: var(--gray-900); line-height: 1.5; }
-        .hidden { display: none !important; }
+        /* Filters */
+        .filters{background:#fff;box-shadow:var(--shadow);border-radius:12px;margin:16px;padding:16px;
+            display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+        .filters input,.filters select{padding:10px;border:1px solid var(--gray-300);border-radius:10px;background:#fff}
+        #q{flex:1;min-width:220px}
+        .check{display:flex;align-items:center;gap:8px;white-space:nowrap}
 
-        /* Header Styles */
-        .topbar { display: flex; justify-content: space-between; align-items: center;
-            padding: 1rem 1.5rem; background: white; box-shadow: var(--shadow);
-            position: sticky; top: 0; z-index: 10; }
+        main{padding:0 16px 24px}
+        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-bottom:22px}
+        .card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:var(--shadow);position:relative;transition:transform .18s}
+        .card:hover{transform:translateY(-2px)}
+        .badge{position:absolute;top:10px;left:10px}
+        .thumb{height:170px;background:var(--gray-100);display:grid;place-items:center;overflow:hidden}
+        .thumb img{width:100%;height:100%;object-fit:cover}
+        .meta{padding:14px}
+        .meta h3{font-size:18px;margin-bottom:4px}
+        .muted{color:var(--gray-500);font-size:13px;margin:2px 0}
+        .row{display:flex;justify-content:space-between;align-items:center}
+        .price{font-weight:800}
+        .empty{text-align:center;color:var(--gray-500);padding:40px}
+        .pager{display:flex;justify-content:space-between;align-items:center}
 
-        .brand { display: flex; align-items: center; gap: 0.75rem; }
-        .logo { display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem;
-            background: var(--primary); color: white; font-weight: bold; border-radius: var(--radius); }
-        h1 { font-size: 1.25rem; font-weight: 600; }
-        .actions { display: flex; gap: 0.75rem; }
+        /* dialog */
+        dialog{border:none;border-radius:14px;box-shadow:0 8px 40px rgba(2,6,23,.2);padding:0;width:95%;max-width:760px}
+        dialog::backdrop{background:rgba(2,6,23,.45)}
+        .dlg-title{padding:18px 18px 0}
+        .dlg-title h3{font-size:20px;font-weight:800}
+        .form{padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        .col2{grid-column:1/span 2}
+        label{font-weight:600;font-size:13px;display:block;margin-bottom:6px}
+        input,select,textarea{width:100%;border:1px solid var(--gray-300);border-radius:10px;padding:10px;font-size:14px;background:#fff}
+        .hint{font-size:12px;color:var(--gray-500);margin-top:4px}
+        .error{font-size:12px;color:#b91c1c;margin-top:6px}
+        .image-options{display:flex;gap:12px;margin-bottom:8px}
+        .image-option{flex:1;border:1px solid var(--gray-300);border-radius:12px;text-align:center;padding:10px;cursor:pointer}
+        .image-option.selected{border-color:var(--primary);background:rgba(16,185,129,.08)}
+        .preview{margin-top:6px;display:flex;align-items:center;gap:8px}
+        .preview img{width:60px;height:60px;object-fit:cover;border-radius:8px}
+        .dlg-actions{display:flex;justify-content:flex-end;gap:8px;padding:0 18px 18px}
 
-        /* Button Styles */
-        .btn { padding: 0.5rem 1rem; border-radius: var(--radius); border: 1px solid transparent;
-            font-weight: 500; cursor: pointer; transition: all 0.2s; font-size: 0.875rem; }
-        .btn.primary { background: var(--primary); color: white; }
-        .btn.primary:hover { background: var(--primary-dark); }
-        .btn.ghost { background: transparent; border-color: var(--gray-300); color: var(--gray-700); }
-        .btn.ghost:hover { background: var(--gray-100); }
-        .btn.danger { background: var(--danger); color: white; }
-        .btn.small { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
+        /* Stock dialog */
+        .stock-info{padding:18px;border-bottom:1px solid var(--gray-200)}
+        .product-info{display:flex;gap:12px;margin-bottom:12px}
+        .product-img{width:62px;height:62px;border-radius:12px;object-fit:cover}
+        .stock-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
+        .stat{background:#fff;border:1px solid var(--gray-200);border-radius:12px;padding:12px}
+        .stat .stat-label{color:var(--gray-500);font-size:12px}
+        .stat .stat-value{font-weight:800;font-size:18px}
+        .stock-controls{padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-        /* Filter Styles */
-        .filters { display: flex; gap: 1rem; padding: 1.5rem; background: white; margin: 1rem;
-            border-radius: var(--radius); box-shadow: var(--shadow); flex-wrap: wrap; align-items: center; }
-        .filters input, .filters select { padding: 0.5rem; border: 1px solid var(--gray-300);
-            border-radius: var(--radius); background: white; }
-        #q { flex: 1; min-width: 200px; }
-        .check { display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
-
-        /* Main Content */
-        main { padding: 0 1.5rem 2rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem; margin-bottom: 2rem; }
-        .card { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
-            transition: transform 0.2s; }
-        .card:hover { transform: translateY(-2px); }
-        .thumb { height: 160px; overflow: hidden; background: var(--gray-100); display: flex; align-items: center; justify-content: center; }
-        .thumb img { width: 100%; height: 100%; object-fit: cover; }
-        .meta { padding: 1rem; }
-        .meta h3 { font-size: 1.125rem; margin-bottom: 0.25rem; }
-        .muted { color: var(--gray-500); font-size: 0.875rem; margin-bottom: 1rem; }
-        .row { display: flex; justify-content: space-between; align-items: center; }
-        .price { font-weight: 600; font-size: 1.125rem; margin-bottom: 0.25rem; }
-        .gap { gap: 0.5rem; }
-        .empty { text-align: center; padding: 3rem; color: var(--gray-500); }
-        .pager { display: flex; justify-content: space-between; align-items: center; }
-
-        /* Dialog Styles */
-        dialog { border: none; border-radius: var(--radius); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            padding: 0; width: 90%; max-width: 700px; }
-        dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
-        .dlg-title { padding: 1.5rem 1.5rem 0; }
-        .dlg-title h3 { font-size: 1.25rem; font-weight: 600; }
-        .form { padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .col2 { grid-column: 1 / span 2; }
-        label { display: block; font-weight: 500; margin-bottom: 0.5rem; }
-        input, select, textarea { width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300);
-            border-radius: var(--radius); font-size: 1rem; }
-        .hint { font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem; }
-        .preview { margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
-        .preview img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
-        .dlg-actions { padding: 0 1.5rem 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; }
-
-        /* Stock Dialog Styles */
-        .stock-info { padding: 1.5rem; border-bottom: 1px solid var(--gray-200); }
-        .product-info { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-        .product-img { width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius); }
-        .stock-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-        .stat { display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.875rem; color: var(--gray-500); }
-        .stat-value { font-weight: 600; font-size: 1.125rem; }
-        .stock-controls { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
-
-        /* Image upload styles */
-        .image-options { display: flex; gap: 1rem; margin-bottom: 1rem; }
-        .image-option { flex: 1; padding: 1rem; border: 1px solid var(--gray-300);
-            border-radius: var(--radius); cursor: pointer; text-align: center; }
-        .image-option.selected { border-color: var(--primary); background-color: rgba(16, 185, 129, 0.1); }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .filters { flex-direction: column; align-items: stretch; }
-            .form { grid-template-columns: 1fr; }
-            .col2 { grid-column: 1; }
-            .stock-stats { grid-template-columns: 1fr; }
-            .image-options { flex-direction: column; }
+        @media (max-width:768px){
+            .filters{flex-direction:column;align-items:stretch}
+            .form{grid-template-columns:1fr}
+            .col2{grid-column:1}
+            .stock-stats{grid-template-columns:1fr}
+            .stock-controls{grid-template-columns:1fr}
+            .image-options{flex-direction:column}
         }
     </style>
 </head>
 <body>
 <header class="topbar">
-    <div class="brand">
-        <span class="logo">FC</span>
-        <h1>FreshCart • Inventory</h1>
-    </div>
+    <div class="brand"><span class="logo">FC</span><h1>FreshCart • Inventory</h1></div>
     <div class="actions">
         <button id="btnExport" class="btn ghost">Export</button>
         <button id="btnImport" class="btn ghost">Import</button>
@@ -137,6 +113,8 @@
         <option value="Produce">Produce</option>
         <option value="Bakery">Bakery</option>
         <option value="Beverages">Beverages</option>
+        <option value="Frozen">Frozen</option>
+        <option value="Snacks">Snacks</option>
     </select>
     <select id="sort">
         <option value="name">Name</option>
@@ -166,27 +144,88 @@
     <form id="form" method="dialog" enctype="multipart/form-data">
         <div class="dlg-title"><h3 id="dlgTitle">New Product</h3></div>
         <div class="grid form">
-            <label> Name * <input name="name" required/> </label>
-            <label> SKU * <input name="sku" required/> </label>
-            <label> Category * <input name="category" required/> </label>
-            <label> Brand <input name="brand"/> </label>
-            <label> Unit * <input name="unit" placeholder="kg, pack, bottle" required/> </label>
-            <label> Price (LKR) * <input name="price" type="number" min="0" step="0.01" required/> </label>
-            <label> Stock Quantity * <input name="stock_quantity" type="number" min="0" step="1" value="0" required/> </label>
-            <label> Reorder Point * <input name="reorder_point" type="number" min="0" step="1" value="10" required/> </label>
-            <label> Reorder Quantity * <input name="reorder_quantity" type="number" min="0" step="1" value="50" required/> </label>
-            <label> Inventory ID * <input name="inventory_id" type="number" min="1" value="1" required/> </label>
-            <label> Status *
+            <div>
+                <label>Name *</label>
+                <input name="name" required/>
+                <div class="error" data-err="name"></div>
+            </div>
+            <div>
+                <label>SKU *</label>
+                <input name="sku" required placeholder="E.g. RICE_001"/>
+                <div class="error" data-err="sku"></div>
+            </div>
+
+            <div>
+                <label>Category *</label>
+                <select name="category" required>
+                    <option value="">Select category</option>
+                    <option>Grocery</option><option>Dairy</option><option>Produce</option>
+                    <option>Bakery</option><option>Beverages</option><option>Frozen</option>
+                    <option>Snacks</option>
+                </select>
+                <div class="error" data-err="category"></div>
+            </div>
+
+            <div>
+                <label>Brand</label>
+                <input name="brand"/>
+            </div>
+
+            <div>
+                <label>Unit *</label>
+                <select name="unit" required>
+                    <option value="">Select unit</option>
+                    <option>each</option><option>kg</option><option>g</option>
+                    <option>pack</option><option>box</option><option>bottle</option>
+                    <option>liter</option><option>ml</option><option>dozen</option>
+                </select>
+                <div class="error" data-err="unit"></div>
+            </div>
+
+            <div>
+                <label>Price (LKR) *</label>
+                <input name="price" type="number" min="0" step="0.01" required/>
+                <div class="error" data-err="price"></div>
+            </div>
+
+            <!-- Editable stock -->
+            <div>
+                <label>Stock Quantity *</label>
+                <input name="stock_quantity" type="number" min="0" step="1" value="0" required/>
+                <div class="hint">This will update the actual on-hand stock.</div>
+            </div>
+            <div>
+                <label>Reorder Point *</label>
+                <input name="reorder_point" type="number" min="0" step="1" value="10" required/>
+                <div class="error" data-err="reorder_point"></div>
+            </div>
+            <div>
+                <label>Reorder Quantity *</label>
+                <input name="reorder_quantity" type="number" min="0" step="1" value="50" required/>
+            </div>
+            <div>
+                <label>Inventory ID *</label>
+                <input name="inventory_id" type="number" min="1" value="1" required/>
+            </div>
+
+            <div class="col2">
+                <label>Status *</label>
                 <select name="active" required>
                     <option value="1" selected>Active</option>
                     <option value="0">Inactive</option>
                 </select>
-            </label>
-            <div class="col2">
-                <label> Description <textarea name="description" rows="3"></textarea> </label>
             </div>
+
             <div class="col2">
-                <label> Expiry Date <input name="expiry_date" type="date"/> </label>
+                <label>Description</label>
+                <textarea name="description" rows="3"></textarea>
+            </div>
+
+            <div class="col2">
+                <label>Expiry Date</label>
+                <input name="expiry_date" type="date"/>
+                <div class="hint">Used only on the front-end to show “Expired / Expiring soon”.</div>
+                <div class="error" data-err="expiry"></div>
             </div>
 
             <div class="col2">
@@ -203,20 +242,24 @@
                 </div>
 
                 <div id="urlSection">
-                    <label> Image URL <input name="image_url" type="url" placeholder="https://example.com/image.jpg"/> </label>
+                    <label>Image URL</label>
+                    <input name="image_url" type="url" placeholder="https://example.com/image.jpg"/>
+                    <div class="error" data-err="image_url"></div>
                 </div>
 
                 <div id="uploadSection" class="hidden">
-                    <label> Image (upload file)
-                        <input id="image" name="image" type="file" accept=".jpg,.jpeg,.png,.gif,.webp"/>
-                    </label>
+                    <label>Image (upload file)</label>
+                    <input id="image" name="image" type="file" accept=".jpg,.jpeg,.png,.gif,.webp"/>
                     <div id="preview" class="preview hidden">
                         <img alt="preview"/><button id="clearImg" type="button" class="btn ghost small">Clear</button>
                     </div>
                     <p class="hint">Max 5MB. jpg, jpeg, png, gif, webp.</p>
+                    <div class="error" data-err="image_file"></div>
                 </div>
             </div>
         </div>
+        <!-- cache previous on-hand to compute delta -->
+        <input type="hidden" name="prev_soh" />
         <div class="dlg-actions">
             <button class="btn ghost" value="cancel">Cancel</button>
             <button class="btn primary" type="submit" value="save">Save</button>
@@ -235,48 +278,34 @@
                     <h4 id="stockProductName"></h4>
                     <p class="muted" id="stockProductSku"></p>
                     <p class="muted" id="stockProductCategory"></p>
+                    <p class="muted" id="stockExpiry"></p>
                 </div>
             </div>
 
             <div class="stock-stats">
-                <div class="stat">
-                    <span class="stat-label">Current Stock:</span>
-                    <span class="stat-value" id="currentStock">0</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-label">Reserved:</span>
-                    <span class="stat-value" id="reservedQty">0</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-label">Available:</span>
-                    <span class="stat-value" id="availableQty">0</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-label">Reorder Point:</span>
-                    <span class="stat-value" id="reorderPoint">0</span>
-                </div>
+                <div class="stat"><div class="stat-label">Current Stock (SOH)</div><div class="stat-value" id="currentStock">0</div></div>
+                <div class="stat"><div class="stat-label">Reserved</div><div class="stat-value" id="reservedQty">0</div></div>
+                <div class="stat"><div class="stat-label">Available</div><div class="stat-value" id="availableQty">0</div></div>
             </div>
         </div>
 
         <div class="stock-controls">
-            <label>
-                Adjustment Type
+            <div>
+                <label>Adjustment Type</label>
                 <select id="adjustmentType" required>
                     <option value="ADD">Add Stock</option>
                     <option value="REMOVE">Remove Stock</option>
                     <option value="SET">Set Stock</option>
                 </select>
-            </label>
-
-            <label>
-                Quantity
+            </div>
+            <div>
+                <label>Quantity</label>
                 <input id="adjustmentQty" type="number" min="1" value="1" required/>
-            </label>
-
-            <label>
-                Reason
+            </div>
+            <div class="col2">
+                <label>Reason</label>
                 <input id="adjustmentReason" type="text" placeholder="Restock, Sale, Damage, etc." required/>
-            </label>
+            </div>
         </div>
 
         <div class="dlg-actions">
@@ -287,8 +316,10 @@
 </dialog>
 
 <input id="csv" type="file" accept=".csv" class="hidden"/>
+
 <template id="tpl">
     <div class="card">
+        <span class="badge hidden"></span>
         <div class="thumb"><img/></div>
         <div class="meta">
             <h3></h3>
@@ -298,7 +329,7 @@
                     <div class="price"></div>
                     <div class="muted"><span class="stock"></span> in stock</div>
                 </div>
-                <div class="row gap">
+                <div class="row" style="gap:.5rem">
                     <button class="btn ghost btn-edit">Edit</button>
                     <button class="btn primary btn-stock">Stock</button>
                 </div>
@@ -308,24 +339,17 @@
 </template>
 
 <script>
-    /* ===== ONLY MAPPING LOGIC CHANGED BELOW (UI/CSS kept exactly) ===== */
-
-    /* --- Auth header from your login token --- */
-    function authHeaders(){
-        const t = localStorage.getItem('auth.token');
-        return t ? { Authorization: `Bearer ${t}` } : {};
-    }
-
-    /* --- API endpoints (match your Spring controller) --- */
+    /* ===================== Auth + API ===================== */
+    function authHeaders(){ const t = localStorage.getItem('auth.token'); return t ? { Authorization: `Bearer ${t}` } : {}; }
     const API = {
         list: "/api/inventory/products",
         create: "/api/inventory/products",
         update: id => `/api/inventory/products/${id}`,
         export: "/api/inventory/reports/low-stock",
-        adjust: id => `/api/inventory/stock/${id}/adjust`,
+        adjust: id => `/api/inventory/stock/${id}/adjust`
     };
 
-    /* DOM elements (unchanged) */
+    /* ===================== DOM ===================== */
     const dlg = document.getElementById('dlg');
     const form = document.getElementById('form');
     const stockDlg = document.getElementById('stockDlg');
@@ -346,388 +370,460 @@
     const uploadSection = document.getElementById('uploadSection');
     const imageOptions = document.querySelectorAll('.image-option');
 
-    /* State (front-end pagination mirrors server pagination) */
+    /* ===================== State ===================== */
     let currentPage = 1;
-    const itemsPerPage = 6;
+    const itemsPerPage = 8;
     let editingId = null;
     let currentProduct = null;
     let uploadedImageData = null;
+    let products = [];
+    let serverTotal = 0;
+    let serverRaw = [];
 
-    /* Data from server */
-    let products = [];       // current page items mapped for UI
-    let serverTotal = 0;     // total items count on server
-    let serverRaw = [];      // raw objects from server (for edit/stock)
+    /* ===== Expiry store (client-side) ===== */
+    function getExpiryStore(){ try{ return JSON.parse(localStorage.getItem('product_expiries')||'{}'); }catch{ return {}; } }
+    function setExpiryStore(m){ localStorage.setItem('product_expiries', JSON.stringify(m)); }
+    function setProductExpiry(id, iso){ const m = getExpiryStore(); if(!iso){ delete m[id]; } else { m[id]=iso; } setExpiryStore(m); }
+    function getProductExpiry(id){ return getExpiryStore()[id] || null; }
 
-    /* Initialize */
-    document.addEventListener('DOMContentLoaded', init);
-
-    function init() {
+    /* ===================== Boot ===================== */
+    document.addEventListener('DOMContentLoaded', () => {
         renderSkeletons();
-        setupEventListeners();
-        loadFromServer(); // initial fetch
-    }
+        setupEvents();
+        loadFromServer();
+    });
 
-    function setupEventListeners() {
-        // Add product
+    function setupEvents(){
         btnAdd.addEventListener('click', () => {
             editingId = null;
             form.reset();
+            document.querySelectorAll('.error').forEach(e=>e.textContent='');
             document.getElementById('dlgTitle').textContent = 'New Product';
             selectImageOption('url');
             uploadedImageData = null;
+            // ensure clean stock state for new product
+            form.querySelector('[name="stock_quantity"]').value = 0;
+            form.querySelector('[name="prev_soh"]').value = 0;
             dlg.showModal();
         });
 
-        // Save product -> backend
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            saveProductToServer();
+            const valid = validateForm();
+            if(!valid.ok) return;
+            await saveProductToServer(valid.cleaned);
         });
 
-        // Filters -> refetch from server
-        q.addEventListener('input', debounce(() => { currentPage = 1; loadFromServer(); }, 300));
-        cat.addEventListener('change', () => { currentPage = 1; loadFromServer(); });
-        sort.addEventListener('change', () => { currentPage = 1; loadFromServer(); });
-        lowOnly.addEventListener('change', () => { currentPage = 1; loadFromServer(); });
+        q.addEventListener('input', debounce(()=>{ currentPage=1; loadFromServer(); },300));
+        cat.addEventListener('change', ()=>{ currentPage=1; loadFromServer(); });
+        sort.addEventListener('change', ()=>{ currentPage=1; loadFromServer(); });
+        lowOnly.addEventListener('change', ()=>{ currentPage=1; loadFromServer(); });
 
-        // Pagination -> fetch next/prev page
-        prevBtn.addEventListener('click', () => {
-            if (currentPage > 1) { currentPage--; loadFromServer(); }
-        });
-        nextBtn.addEventListener('click', () => {
-            const totalPages = Math.max(1, Math.ceil(serverTotal / itemsPerPage));
-            if (currentPage < totalPages) { currentPage++; loadFromServer(); }
-        });
+        prevBtn.addEventListener('click', ()=>{ if(currentPage>1){ currentPage--; loadFromServer(); } });
+        nextBtn.addEventListener('click', ()=>{ const totalPages=Math.max(1,Math.ceil(serverTotal/itemsPerPage)); if(currentPage<totalPages){ currentPage++; loadFromServer(); } });
 
-        // Export/Import
         btnExport.addEventListener('click', exportFromServer);
-        btnImport.addEventListener('click', () => document.getElementById('csv').click());
-        document.getElementById('csv').addEventListener('change', () => {
-            alert('Import placeholder — hook to /api/inventory/csv/import if needed.');
-        });
+        btnImport.addEventListener('click', ()=> document.getElementById('csv').click());
+        document.getElementById('csv').addEventListener('change', ()=> alert('Hook /api/inventory/csv/import if needed.')) ;
 
-        // Image option selection
-        imageOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                selectImageOption(option.dataset.option);
-            });
-        });
+        imageOptions.forEach(option => option.addEventListener('click', ()=> selectImageOption(option.dataset.option)));
 
-        // Image upload preview
-        document.getElementById('image').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    uploadedImageData = event.target.result;
-                    const preview = document.getElementById('preview');
-                    preview.querySelector('img').src = uploadedImageData;
-                    preview.classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
+        document.getElementById('image').addEventListener('change', e=>{
+            const f=e.target.files[0]; if(!f) return;
+            const reader=new FileReader();
+            reader.onload=(ev)=>{
+                uploadedImageData=ev.target.result;
+                const prev=document.getElementById('preview');
+                prev.querySelector('img').src=uploadedImageData;
+                prev.classList.remove('hidden');
+            };
+            reader.readAsDataURL(f);
         });
-
-        // Clear image
-        document.getElementById('clearImg').addEventListener('click', function() {
-            document.getElementById('image').value = '';
+        document.getElementById('clearImg').addEventListener('click', ()=>{
+            document.getElementById('image').value='';
             document.getElementById('preview').classList.add('hidden');
-            uploadedImageData = null;
+            uploadedImageData=null;
         });
 
-        // Stock form -> backend
         document.getElementById('stockForm').addEventListener('submit', onApplyStockServer);
     }
 
-    /* Image option UI */
-    function selectImageOption(option) {
-        imageOptions.forEach(opt => opt.classList.toggle('selected', opt.dataset.option === option));
-        if (option === 'url') { urlSection.classList.remove('hidden'); uploadSection.classList.add('hidden'); }
+    /* ===================== UI Helpers ===================== */
+    function selectImageOption(option){
+        imageOptions.forEach(opt=>opt.classList.toggle('selected', opt.dataset.option===option));
+        if(option==='url'){ urlSection.classList.remove('hidden'); uploadSection.classList.add('hidden'); }
         else { urlSection.classList.add('hidden'); uploadSection.classList.remove('hidden'); }
     }
+    function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
 
-    /* Normalize sort value for backend */
-    function mapSortValue() {
-        const v = sort.value || 'name';
-        if (v === 'new') return 'new';  // mapped in backend to id DESC
-        if (v === 'price') return 'price';
-        // backend may not support "stock" sort; fallback to name
-        return 'name';
-    }
+    /* ===================== Load & Map ===================== */
+    function mapSortValue(){ const v=sort.value||'name'; if(v==='new') return 'new'; if(v==='price') return 'price'; return 'name'; }
 
-    /* Load from server */
     async function loadFromServer(){
         try{
             renderSkeletons();
             const url = new URL(API.list, location.origin);
-            url.searchParams.set('page', String(currentPage - 1));
+            url.searchParams.set('page', String(currentPage-1));
             url.searchParams.set('size', String(itemsPerPage));
-            if (q.value.trim()) url.searchParams.set('q', q.value.trim());
-            if (cat.value) url.searchParams.set('category', cat.value);
+            if(q.value.trim()) url.searchParams.set('q', q.value.trim());
+            if(cat.value) url.searchParams.set('category', cat.value);
             url.searchParams.set('sort', mapSortValue());
-            if (lowOnly.checked) url.searchParams.set('lowOnly', 'true');
+            if(lowOnly.checked) url.searchParams.set('lowOnly','true');
 
-            const res = await fetch(url, { headers: { ...authHeaders() } });
-            if (!res.ok) throw new Error(`Load failed (${res.status})`);
+            const res = await fetch(url, { headers:{...authHeaders()} });
+            if(!res.ok) throw new Error(`Load failed (${res.status})`);
             const data = await res.json();
-
             const items = data.items || data.content || [];
             serverTotal = Number(data.total || data.totalElements || items.length) || 0;
             serverRaw = items;
-
-            // map to view objects expected by your template
             products = items.map(toViewProduct);
-
-            renderProductsServer();
+            renderProducts();
         }catch(err){
             grid.innerHTML = `<div class="muted">Error loading products: ${err.message}</div>`;
             empty.classList.add('hidden');
-            // (optional) keep UI usable if backend down – leave as is
         }
     }
 
-    /* Map backend ProductResp -> view model used by this page */
+    // >>>>>>>>>> IMPORTANT: include inventoryId when mapping
     function toViewProduct(p){
-        const soh = Number(p.stockOnHand ?? 0);
-        const res = Number(p.reservedQty ?? 0);
+        const soh = Number(p.stockOnHand ?? p.inventory?.stockOnHand ?? 0);
+        const res = Number(p.reservedQty ?? p.inventory?.reservedQty ?? 0);
         const avail = Number(p.availableQty ?? Math.max(0, soh - res));
+        const expiryISO = getProductExpiry(p.id);
         return {
             id: p.id,
-            name: p.name,
-            sku: p.sku,
-            category: p.category || '',
-            brand: '', // not provided by backend
-            unit: p.unit || '',
-            price: Number(p.price || 0),
-            stock_quantity: avail,
-            reorder_point: Number(p.reorderPoint || 0),
-            reorder_quantity: 0,
-            inventory_id: 0,
-            active: p.active ? 1 : 0,
-            description: '',
-            image_url: p.imageUrl || '',
-            image_data: '',
-            // keep raw stock numbers for stock dialog math
-            _soh: soh,
-            _res: res,
-            _avail: avail
+            inventoryId: p.inventoryId ?? p.inventory?.id ?? null, // <-- used for stock adjust
+            name:p.name, sku:p.sku, category:p.category||'', unit:p.unit||'',
+            price: Number(p.price || 0), image_url: p.imageUrl || '', image_data:'',
+            active: p.active ? 1 : 0, reorder_point:Number(p.reorderPoint||0),
+            _soh:soh, _res:res, _avail:avail, expiryISO
         };
     }
 
-    /* Render grid using server page */
-    function renderProductsServer(){
-        grid.innerHTML = '';
-        if (products.length === 0) {
-            empty.classList.remove('hidden');
-            count.textContent = 'Showing 0 products';
-        } else {
-            empty.classList.add('hidden');
-            products.forEach(product => { grid.appendChild(createProductElement(product)); });
-            const start = (currentPage - 1) * itemsPerPage + 1;
-            const end = Math.min(start + products.length - 1, serverTotal);
-            count.textContent = `Showing ${start}-${end} of ${serverTotal} products`;
-        }
-        const totalPages = Math.max(1, Math.ceil(serverTotal / itemsPerPage));
-        prevBtn.disabled = currentPage <= 1;
-        nextBtn.disabled = currentPage >= totalPages;
+    /* ===================== Render ===================== */
+    function renderSkeletons(){
+        grid.innerHTML = Array.from({length: itemsPerPage}).map(()=>`
+      <div class="card"><div class="thumb"></div><div class="meta"><div class="muted">Loading…</div></div></div>
+    `).join('');
+        empty.classList.add('hidden');
     }
 
-    /* Card creation (unchanged, uses mapped view fields) */
-    function createProductElement(product) {
+    function renderProducts(){
+        grid.innerHTML = '';
+        if(products.length===0){
+            empty.classList.remove('hidden');
+            count.textContent='Showing 0 products';
+        }else{
+            empty.classList.add('hidden');
+            products.forEach(p=> grid.appendChild(createCard(p)));
+            const start=(currentPage-1)*itemsPerPage+1;
+            const end=Math.min(start+products.length-1, serverTotal);
+            count.textContent=`Showing ${start}-${end} of ${serverTotal} products`;
+        }
+        const totalPages=Math.max(1,Math.ceil(serverTotal/itemsPerPage));
+        prevBtn.disabled=currentPage<=1;
+        nextBtn.disabled=currentPage>=totalPages;
+    }
+
+    function expiryBadgeText(iso){
+        if(!iso) return null;
+        const today = new Date(); today.setHours(0,0,0,0);
+        const d = new Date(iso);
+        if(isNaN(d)) return null;
+        const diffDays = Math.floor((d - today)/86400000);
+        if(diffDays < 0) return {text:`Expired (${d.toLocaleDateString()})`, type:'danger'};
+        if(diffDays <= 7) return {text:`Exp in ${diffDays}d`, type:'warn'};
+        return null;
+    }
+
+    function createCard(p){
         const el = tpl.content.cloneNode(true);
-        const card = el.querySelector('.card');
-        card.dataset.id = product.id;
+        const card = el.querySelector('.card'); card.dataset.id=p.id;
+
+        const badge = el.querySelector('.badge');
+        const b = expiryBadgeText(p.expiryISO);
+        if(b){ badge.className = `badge tag ${b.type==='danger'?'danger':'warn'}`; badge.textContent=b.text; badge.classList.remove('hidden'); }
 
         const img = el.querySelector('.thumb img');
-        if (product.image_data) img.src = product.image_data;
-        else if (product.image_url) img.src = product.image_url;
-        else img.src = 'https://via.placeholder.com/300x150?text=No+Image';
-        img.alt = product.name;
+        img.src = p.image_url || 'https://via.placeholder.com/300x150?text=No+Image';
+        img.alt = p.name;
 
-        el.querySelector('h3').textContent = product.name;
-        el.querySelector('.sku').textContent = product.sku;
-        el.querySelector('.cat').textContent = product.category;
-        el.querySelector('.price').textContent = `LKR ${product.price.toFixed(2)}`;
+        el.querySelector('h3').textContent = p.name;
+        el.querySelector('.sku').textContent = p.sku;
+        el.querySelector('.cat').textContent = p.category;
+        el.querySelector('.price').textContent = `LKR ${p.price.toFixed(2)}`;
 
         const stockEl = el.querySelector('.stock');
-        stockEl.textContent = product.stock_quantity;
-        if (product.stock_quantity === 0) { stockEl.style.color = 'var(--danger)'; stockEl.style.fontWeight = 'bold'; }
-        else if (product.stock_quantity <= product.reorder_point) { stockEl.style.color = 'var(--warning)'; stockEl.style.fontWeight = 'bold'; }
+        stockEl.textContent = p._avail;
+        if (p._avail === 0) { stockEl.style.color='var(--danger)'; stockEl.style.fontWeight='bold'; }
+        else if (p._avail <= p.reorder_point) { stockEl.style.color='var(--warning)'; stockEl.style.fontWeight='bold'; }
 
-        el.querySelector('.btn-edit').addEventListener('click', () => {
-            editingId = product.id;
-            document.getElementById('dlgTitle').textContent = 'Edit Product';
-            fillForm(product);
+        el.querySelector('.btn-edit').addEventListener('click', ()=>{
+            editingId = p.id;
+            document.getElementById('dlgTitle').textContent='Edit Product';
+            fillForm(p);
             dlg.showModal();
         });
 
-        el.querySelector('.btn-stock').addEventListener('click', () => {
-            currentProduct = product;
-            showStockDialog(product);
+        el.querySelector('.btn-stock').addEventListener('click', ()=>{
+            currentProduct = p;
+            showStockDialog(p);
         });
 
         return el;
     }
 
-    function fillForm(product) {
-        form.querySelector('[name="name"]').value = product.name;
-        form.querySelector('[name="sku"]').value = product.sku;
-        form.querySelector('[name="category"]').value = product.category;
-        form.querySelector('[name="brand"]').value = product.brand || '';
-        form.querySelector('[name="unit"]').value = product.unit;
-        form.querySelector('[name="price"]').value = product.price;
-        form.querySelector('[name="stock_quantity"]').value = product.stock_quantity; // for reference only
-        form.querySelector('[name="reorder_point"]').value = product.reorder_point;
-        form.querySelector('[name="reorder_quantity"]').value = product.reorder_quantity;
-        form.querySelector('[name="inventory_id"]').value = product.inventory_id;
-        form.querySelector('[name="active"]').value = product.active;
-        form.querySelector('[name="description"]').value = product.description || '';
-        form.querySelector('[name="expiry_date"]').value = product.expiry_date || '';
+    function fillForm(p){
+        form.querySelector('[name="name"]').value = p.name;
+        form.querySelector('[name="sku"]').value = p.sku;
+        form.querySelector('[name="category"]').value = p.category || '';
+        form.querySelector('[name="brand"]').value = '';
+        form.querySelector('[name="unit"]').value = p.unit || '';
+        form.querySelector('[name="price"]').value = p.price;
+        // use on-hand for editing, not available
+        form.querySelector('[name="stock_quantity"]').value = Number(p._soh || 0);
+        form.querySelector('[name="prev_soh"]').value = Number(p._soh || 0);
+        form.querySelector('[name="reorder_point"]').value = p.reorder_point || 0;
+        form.querySelector('[name="reorder_quantity"]').value = 0;
+        form.querySelector('[name="inventory_id"]').value = p.inventoryId ?? 1;
+        form.querySelector('[name="active"]').value = String(p.active?1:0);
+        form.querySelector('[name="description"]').value = '';
+        form.querySelector('[name="expiry_date"]').value = p.expiryISO ? p.expiryISO.slice(0,10) : '';
 
-        // Prefer URL mode; user can switch to Upload if they want to replace
+        document.querySelectorAll('.error').forEach(e=>e.textContent='');
         selectImageOption('url');
-        form.querySelector('[name="image_url"]').value = product.image_url || '';
-
-        document.getElementById('image').value = '';
+        form.querySelector('[name="image_url"]').value = p.image_url || '';
+        document.getElementById('image').value='';
         document.getElementById('preview').classList.add('hidden');
     }
 
-    /* Save (create/update) mapped to backend */
-    async function saveProductToServer() {
-        // collect minimal fields backend expects
-        const sku = form.querySelector('[name="sku"]').value.trim();
-        const name = form.querySelector('[name="name"]').value.trim();
-        const category = form.querySelector('[name="category"]').value.trim();
-        const unit = form.querySelector('[name="unit"]').value.trim();
-        const price = Number(form.querySelector('[name="price"]').value || 0);
-        const reorderPoint = Number(form.querySelector('[name="reorder_point"]').value || 0);
+    /* ===================== Validation ===================== */
+    function setErr(name,msg){ const el=form.querySelector(`[data-err="${name}"]`); if(el) el.textContent=msg||''; }
+    function clearErrs(){ document.querySelectorAll('.error').forEach(e=>e.textContent=''); }
 
-        if (!sku || !name || price < 0) { alert('Please fill required fields.'); return; }
+    function validateForm(){
+        clearErrs();
+        const cleaned = {};
+        const name = form.name.value.trim();
+        const sku = form.sku.value.trim();
+        const category = form.category.value.trim();
+        const unit = form.unit.value.trim();
+        const price = Number(form.price.value);
+        const stockQty = Number(form.stock_quantity.value || 0);
+        const prevSoh = Number(form.prev_soh.value || 0);
+        const rpoint = Number(form.reorder_point.value || 0);
+        const expiry = form.expiry_date.value ? new Date(form.expiry_date.value) : null;
+        const imgMode = document.querySelector('.image-option.selected')?.dataset.option || 'url';
+        const url = form.image_url.value.trim();
+        const file = document.getElementById('image').files[0];
 
-        const useUrl = document.querySelector('.image-option.selected')?.dataset.option === 'url';
-        const file = document.getElementById('image').files?.[0];
-        const imageUrl = form.querySelector('[name="image_url"]').value.trim();
+        let ok=true;
 
-        let method = editingId ? 'PUT' : 'POST';
-        let url = editingId ? API.update(editingId) : API.create;
+        if(!name || name.length<2){ setErr('name','Enter a valid name (min 2 chars)'); ok=false; }
+        const skuOk = /^[A-Z0-9][A-Z0-9\-_]{1,31}$/.test(sku);
+        if(!skuOk){ setErr('sku', 'Use A–Z, 0–9, dash or underscore (max 32). Example: RICE_001'); ok=false; }
+        if(!category){ setErr('category','Pick a category'); ok=false; }
+        if(!unit){ setErr('unit','Pick a unit'); ok=false; }
+        if(!(price>=0)){ setErr('price','Price must be ≥ 0'); ok=false; }
+        if(!(rpoint>=0)){ setErr('reorder_point','Reorder point must be ≥ 0'); ok=false; }
+        if(!(stockQty>=0)){ setErr('stock_quantity','Stock must be ≥ 0'); ok=false; }
 
+        if(expiry && isNaN(expiry.getTime())){ setErr('expiry','Invalid date'); ok=false; }
+
+        if(imgMode==='url'){
+            if(url && !/^https?:\/\/.+/i.test(url)){ setErr('image_url','Enter a valid http(s) URL'); ok=false; }
+        }else{
+            if(file){
+                const okType = /image\/(png|jpeg|gif|webp)/.test(file.type);
+                if(!okType){ setErr('image_file','Invalid image type'); ok=false; }
+                if(file.size > 5*1024*1024){ setErr('image_file','Image must be ≤ 5MB'); ok=false; }
+            }
+        }
+
+        cleaned.sku=sku; cleaned.name=name; cleaned.category=category; cleaned.unit=unit;
+        cleaned.price=price; cleaned.reorderPoint=rpoint;
+        cleaned.imageMode=imgMode; cleaned.imageUrl=url||null; cleaned.file=file||null;
+        cleaned.expiryISO = expiry ? new Date(expiry.getTime()-expiry.getTimezoneOffset()*60000).toISOString() : null;
+
+        cleaned.stockQty = stockQty;
+        cleaned.prevSoh  = prevSoh;
+
+        return { ok, cleaned };
+    }
+
+    /* ===================== Save (Create/Update) ===================== */
+    async function saveProductToServer(clean){
+        const method = editingId ? 'PUT' : 'POST';
+        const url = editingId ? API.update(editingId) : API.create;
         try{
             let res;
-            if (!useUrl && file) {
-                // multipart
+            if(clean.imageMode==='upload' && clean.file){
                 const fd = new FormData();
-                fd.append('sku', sku);
-                fd.append('name', name);
-                if (category) fd.append('category', category);
-                if (unit) fd.append('unit', unit);
-                fd.append('price', String(price));
-                fd.append('reorderPoint', String(reorderPoint));
-                fd.append('image', file);
-                res = await fetch(url, { method, headers: { ...authHeaders() }, body: fd });
-            } else {
-                // JSON
-                const body = { sku, name, category, unit, price, reorderPoint, imageUrl: imageUrl || null };
-                res = await fetch(url, {
-                    method,
-                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
-                    body: JSON.stringify(body)
-                });
+                fd.append('sku', clean.sku);
+                fd.append('name', clean.name);
+                if(clean.category) fd.append('category', clean.category);
+                if(clean.unit) fd.append('unit', clean.unit);
+                fd.append('price', String(clean.price));
+                fd.append('reorderPoint', String(clean.reorderPoint));
+                fd.append('image', clean.file);
+                res = await fetch(url, { method, headers:{...authHeaders()}, body: fd });
+            }else{
+                const body = { sku:clean.sku, name:clean.name, category:clean.category, unit:clean.unit,
+                    price:clean.price, reorderPoint:clean.reorderPoint, imageUrl: clean.imageUrl };
+                res = await fetch(url, { method, headers:{'Content-Type':'application/json', ...authHeaders()}, body: JSON.stringify(body) });
             }
-
-            if (!res.ok) {
+            if(!res.ok){
                 const msg = await safeError(res);
                 throw new Error(msg || `Save failed (${res.status})`);
             }
 
+            // capture id from response (or fallback to editingId)
+            let saved = null;
+            try { saved = await res.json(); } catch { /* some servers return 204 */ }
+            const savedId = (saved && saved.id) ? saved.id : (editingId || null);
+            if(savedId !== null) setProductExpiry(savedId, clean.expiryISO);
+
+            // --- adjust stock to match the typed quantity (using ADD/REMOVE/SET) ---
+            if (savedId !== null) {
+                const target = Number(clean.stockQty||0);
+                const prev   = Number(clean.prevSoh||0);
+
+                // Choose the correct {id} for /stock/{id}/adjust: prefer inventoryId
+                const existing = products.find(x=>x.id===savedId) || {};
+                const adjIdPrimary = existing.inventoryId ?? saved?.inventoryId ?? null;
+                const adjIdFallback = savedId; // try product id if inventory id unavailable/invalid
+
+                let payload = null;
+                if (!editingId) {
+                    payload = { adjustmentType:'SET', quantity: target, reason:'EDIT_FORM_SET_INITIAL' };
+                } else if (target !== prev) {
+                    if (target > prev) payload = { adjustmentType:'ADD',    quantity: target - prev, reason:'EDIT_FORM_ADJUST' };
+                    else               payload = { adjustmentType:'REMOVE', quantity: prev - target, reason:'EDIT_FORM_ADJUST' };
+                }
+
+                if (payload) {
+                    // Try schema A with primary id
+                    let ok = false;
+                    if (adjIdPrimary != null) {
+                        let r = await fetch(API.adjust(adjIdPrimary), {
+                            method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()},
+                            body: JSON.stringify(payload)
+                        });
+                        if (!r.ok) {
+                            // fallback to schema B (type/qty/note)
+                            const alt = { type: payload.adjustmentType, qty: payload.quantity, note: payload.reason };
+                            r = await fetch(API.adjust(adjIdPrimary), {
+                                method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()},
+                                body: JSON.stringify(alt)
+                            });
+                        }
+                        ok = r.ok;
+                    }
+                    // If still not ok, try product id as fallback
+                    if (!ok && adjIdFallback != null && adjIdFallback !== adjIdPrimary) {
+                        let r2 = await fetch(API.adjust(adjIdFallback), {
+                            method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()},
+                            body: JSON.stringify(payload)
+                        });
+                        if (!r2.ok) {
+                            const alt2 = { type: payload.adjustmentType, qty: payload.quantity, note: payload.reason };
+                            r2 = await fetch(API.adjust(adjIdFallback), {
+                                method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()},
+                                body: JSON.stringify(alt2)
+                            });
+                        }
+                        if (!r2.ok) console.warn('Stock adjust failed:', await safeError(r2));
+                    }
+                }
+            }
+
             dlg.close();
-            loadFromServer();
+            await loadFromServer();
         }catch(err){ alert(err.message); }
     }
 
-    /* Stock dialog rendering (uses mapped fields) */
-    function showStockDialog(product) {
-        document.getElementById('stockProductName').textContent = product.name;
-        document.getElementById('stockProductSku').textContent = product.sku;
-        document.getElementById('stockProductCategory').textContent = product.category;
+    async function safeError(res){
+        try{ const t = await res.text(); try{ const j=JSON.parse(t); return j.error||j.message||t; }catch{ return t; } }
+        catch{ return ''; }
+    }
+
+    /* ===================== Stock dialog ===================== */
+    function showStockDialog(p){
+        document.getElementById('stockProductName').textContent = p.name;
+        document.getElementById('stockProductSku').textContent = p.sku;
+        document.getElementById('stockProductCategory').textContent = `${p.category} • ${p.unit||''}`.trim();
+        const iso = p.expiryISO;
+        const info = expiryBadgeText(iso);
+        document.getElementById('stockExpiry').textContent = iso ? (info ? info.text : `Expiry: ${new Date(iso).toLocaleDateString()}`) : 'No expiry set';
 
         const img = document.getElementById('stockProductImage');
-        if (product.image_data) { img.src = product.image_data; img.style.display = 'block'; }
-        else if (product.image_url) { img.src = product.image_url; img.style.display = 'block'; }
-        else { img.style.display = 'none'; }
+        if (p.image_url) { img.src=p.image_url; img.style.display='block'; } else { img.style.display='none'; }
 
-        // real values from backend mapping
-        document.getElementById('currentStock').textContent = product._soh;
-        document.getElementById('reservedQty').textContent = product._res;
-        document.getElementById('availableQty').textContent = product._avail;
-        document.getElementById('reorderPoint').textContent = product.reorder_point;
+        document.getElementById('currentStock').textContent = p._soh;
+        document.getElementById('reservedQty').textContent = p._res;
+        document.getElementById('availableQty').textContent = p._avail;
 
         stockDlg.showModal();
     }
 
-    /* Apply stock -> backend adjust; maps ADD/REMOVE/SET to IN/OUT/ADJUST (SET computed delta) */
     async function onApplyStockServer(e){
         e.preventDefault();
-        if (!currentProduct) { stockDlg.close(); return; }
-
-        const typeSel = document.getElementById('adjustmentType').value;
+        if(!currentProduct){ stockDlg.close(); return; }
+        const typeSel = document.getElementById('adjustmentType').value; // ADD / REMOVE / SET
         const qtyInput = Number(document.getElementById('adjustmentQty').value || 0);
         const note = document.getElementById('adjustmentReason').value || 'MANUAL';
+        if(qtyInput<=0){ alert('Quantity must be > 0'); return; }
 
-        if (qtyInput <= 0) { alert('Quantity must be > 0'); return; }
+        // choose inventoryId if available, else product id
+        const adjIdPrimary = currentProduct.inventoryId ?? null;
+        const adjIdFallback = currentProduct.id;
 
-        // Map types
-        let payload = { type: 'IN', qty: qtyInput, note };
-        if (typeSel === 'ADD') payload.type = 'IN';
-        else if (typeSel === 'REMOVE') payload.type = 'OUT';
-        else if (typeSel === 'SET') {
-            // compute delta vs current stock-on-hand (not available)
-            const soh = Number(currentProduct._soh || 0);
-            if (qtyInput === soh) { stockDlg.close(); return; }
-            if (qtyInput > soh) { payload.type = 'IN'; payload.qty = qtyInput - soh; }
-            else { payload.type = 'OUT'; payload.qty = soh - qtyInput; }
-        }
+        // Build payload (schema A)
+        const payloadA = { adjustmentType: typeSel, quantity: qtyInput, reason: note };
+        const payloadB = { type: typeSel, qty: qtyInput, note: note }; // schema B fallback
 
         try{
-            const res = await fetch(API.adjust(currentProduct.id), {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...authHeaders() },
-                body: JSON.stringify(payload)
-            });
-            if (!res.ok) {
-                const msg = await safeError(res);
-                throw new Error(msg || `Adjust failed (${res.status})`);
+            let ok = false;
+            if (adjIdPrimary != null) {
+                let res = await fetch(API.adjust(adjIdPrimary), {
+                    method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body: JSON.stringify(payloadA)
+                });
+                if (!res.ok) {
+                    res = await fetch(API.adjust(adjIdPrimary), {
+                        method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body: JSON.stringify(payloadB)
+                    });
+                }
+                ok = res.ok;
+                if (!ok) console.warn('Primary adjust failed on inventoryId');
+            }
+            if (!ok && adjIdFallback != null && adjIdFallback !== adjIdPrimary) {
+                let res2 = await fetch(API.adjust(adjIdFallback), {
+                    method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body: JSON.stringify(payloadA)
+                });
+                if (!res2.ok) {
+                    res2 = await fetch(API.adjust(adjIdFallback), {
+                        method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body: JSON.stringify(payloadB)
+                    });
+                }
+                if (!res2.ok) { const msg=await safeError(res2); throw new Error(msg||`Adjust failed (${res2.status})`); }
             }
             stockDlg.close();
             loadFromServer();
         }catch(err){ alert(err.message); }
     }
 
-    /* Export CSV from backend */
+    /* ===================== Export ===================== */
     async function exportFromServer(){
         try{
-            const res = await fetch(API.export, { headers: { ...authHeaders() }});
-            if (!res.ok) throw new Error(`Export failed (${res.status})`);
+            const res = await fetch(API.export, { headers:{...authHeaders()} });
+            if(!res.ok) throw new Error(`Export failed (${res.status})`);
             const blob = await res.blob();
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `low-stock-${new Date().toISOString().slice(0,10)}.csv`;
+            const a=document.createElement('a');
+            a.href=URL.createObjectURL(blob);
+            a.download=`low-stock-${new Date().toISOString().slice(0,10)}.csv`;
             a.click();
         }catch(err){ alert(err.message); }
     }
-
-    /* Helpers */
-    function renderSkeletons(){
-        grid.innerHTML = Array.from({length: itemsPerPage}).map(()=>`
-    <div class="card"><div class="thumb"></div><div class="meta"><div class="muted">Loading…</div></div></div>
-  `).join('');
-        empty.classList.add('hidden');
-    }
-    function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
-    async function safeError(res){
-        try{ const t = await res.text(); try{ const j=JSON.parse(t); return j.error||j.message||t; }catch{ return t; } }
-        catch{ return ''; }
-    }
-
 </script>
 </body>
 </html>
