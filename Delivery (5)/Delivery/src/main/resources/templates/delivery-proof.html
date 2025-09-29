@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Upload Proof</title>
+</head>
+<body>
+<h2>Upload Delivery Proof</h2>
+
+<form th:action="@{/deliveries/update}" method="post" enctype="multipart/form-data">
+    <!-- Delivery Assignment ID -->
+    <input type="hidden" name="assignmentId" value="1"/>
+
+    <!-- Status -->
+    <label>Status: </label>
+    <select name="status">
+        <option value="DELIVERED">DELIVERED</option>
+        <option value="FAILED">FAILED</option>
+    </select>
+    <br><br>
+
+    <!-- Photo Upload -->
+    <label>Upload Proof: </label>
+    <input type="file" name="photoProof"/>
+    <br><br>
+
+    <button type="submit">Submit</button>
+</form>
+</body>
+</html>
