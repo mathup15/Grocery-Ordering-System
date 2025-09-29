@@ -13,24 +13,111 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="header-bg text-white shadow-lg">
+    <header class="bg-white shadow-sm border-b">
+        <!-- Top Bar -->
+        <div class="bg-green-600 text-white py-2">
+            <div class="max-w-7xl mx-auto px-4 flex justify-between items-center text-sm">
+                <div class="flex items-center gap-4">
+                    <span>Free delivery on orders over LKR 2,500</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div id="userSection" class="hidden flex items-center gap-4">
+                        <button onclick="showProfile()" class="hover:underline flex items-center">
+                            <i class="fas fa-user mr-1"></i><span id="userNameHeader">Account</span>
+                        </button>
+                        <button id="logoutBtn" class="hover:underline">
+                            Sign out
+                        </button>
+                    </div>
+                    <div id="authSection" class="flex items-center gap-4">
+                        <button onclick="showLoginModal()" class="hover:underline">
+                            Sign in
+                        </button>
+                        <button onclick="showRegisterModal()" class="hover:underline">
+                            Create account
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Header -->
         <div class="max-w-7xl mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <button id="categoryToggle" class="bg-white/20 hover:bg-white/30 p-2 rounded-lg">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="h-10 w-10 rounded-xl bg-white text-green-600 grid place-content-center text-xl font-bold shadow-lg">
+                <!-- Logo -->
+                <button onclick="window.app ? window.app.showSection('home') : showSectionFallback('home')" class="flex items-center gap-2 text-green-600 hover:opacity-80">
+                    <div class="h-10 w-10 rounded-full bg-green-600 text-white grid place-content-center text-xl font-bold">
                         <i class="fas fa-leaf"></i>
                     </div>
-                    <h1 class="text-2xl font-bold text-white">FreshMart</h1>
+                    <span class="text-2xl font-bold">FreshMart</span>
+                </button>
+                
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-2xl mx-8">
+                    <div class="relative">
+                        <input type="text" id="headerSearch" placeholder="What can we help you find?" 
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none">
+                        <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-green-600">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="flex items-center gap-6">
-                    <button id="viewCartBtn" class="relative bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors">
-                        <i class="fas fa-shopping-cart mr-1"></i>Cart
-                        <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                
+                <!-- Wishlist & Cart -->
+                <div class="flex items-center gap-4">
+                    <button id="viewWishlistBtn" onclick="window.app ? window.app.showSection('wishlist') : (showSectionFallback('wishlist'), setTimeout(renderWishlistSimple, 100))" class="flex items-center gap-2 text-gray-700 hover:text-green-600">
+                        <div class="relative">
+                            <i class="fas fa-heart text-2xl"></i>
+                            <span id="wishlistCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                        </div>
+                        <span class="hidden md:block">Wishlist</span>
+                    </button>
+                    
+                    <button id="trackOrderBtn" class="flex items-center gap-2 text-gray-700 hover:text-green-600">
+                        <i class="fas fa-truck text-2xl"></i>
+                        <span class="hidden md:block">Track Order</span>
+                    </button>
+                    
+                    <button id="viewCartBtn" onclick="window.app ? window.app.showSection('cart') : showCartSimple()" class="flex items-center gap-2 text-gray-700 hover:text-green-600">
+                        <div class="relative">
+                            <i class="fas fa-shopping-cart text-2xl"></i>
+                            <span id="cartCount" class="absolute -top-2 -right-2 bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                        </div>
+                        <span class="hidden md:block">Cart</span>
                     </button>
                 </div>
+            </div>
+        </div>
+        
+        <!-- Navigation Menu -->
+        <div class="border-t bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4">
+                <nav class="flex items-center gap-8 py-3">
+                    <button onclick="filterCategory('vegetables')" class="text-gray-700 hover:text-green-600 font-medium">
+                        Vegetables
+                    </button>
+                    <button onclick="filterCategory('fruits')" class="text-gray-700 hover:text-green-600 font-medium">
+                        Fruits
+                    </button>
+                    <button onclick="filterCategory('dairy')" class="text-gray-700 hover:text-green-600 font-medium">
+                        Dairy
+                    </button>
+                    <button onclick="filterCategory('meat')" class="text-gray-700 hover:text-green-600 font-medium">
+                        Meat & Poultry
+                    </button>
+                    <button onclick="filterCategory('bakery')" class="text-gray-700 hover:text-green-600 font-medium">
+                        Bakery
+                    </button>
+                    <button onclick="filterCategory('beverages')" class="text-gray-700 hover:text-green-600 font-medium">
+                        Beverages
+                    </button>
+                    <button onclick="filterCategory('snacks')" class="text-gray-700 hover:text-green-600 font-medium">
+                        Snacks
+                    </button>
+                    <button onclick="showAllProducts()" class="text-green-600 font-medium">
+                        All Products
+                    </button>
+                </nav>
             </div>
         </div>
     </header>
@@ -85,8 +172,97 @@
 
     <!-- Main Content -->
     <main>
+        <!-- Homepage Section -->
+        <section id="homeSection" class="main-content">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-green-600 to-green-700 text-white py-12">
+                <div class="max-w-7xl mx-auto px-4 flex items-center">
+                    <div class="flex-1">
+                        <h1 class="text-4xl font-bold mb-4">Fresh groceries delivered</h1>
+                        <p class="text-xl mb-6">Same-day delivery • Fresh produce • Best prices</p>
+                        <button onclick="showAllProducts()" class="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100">
+                            Shop now
+                        </button>
+                    </div>
+                    <div class="hidden md:block">
+                        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=400" alt="Fresh groceries" class="rounded-lg">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deals Section -->
+            <div class="bg-white py-8">
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Today's deals</h2>
+                        <button onclick="showAllProducts()" class="text-red-600 hover:underline">See all deals</button>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="dealsGrid">
+                        <!-- Deals will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories Grid -->
+            <div class="bg-gray-50 py-8">
+                <div class="max-w-7xl mx-auto px-4">
+                    <h2 class="text-2xl font-bold mb-6">Shop by category</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+                        <div onclick="filterCategory('vegetables')" class="bg-white rounded-lg p-4 text-center cursor-pointer hover:shadow-md">
+                            <i class="fas fa-carrot text-3xl text-orange-500 mb-2"></i>
+                            <p class="text-sm font-medium">Vegetables</p>
+                        </div>
+                        <div onclick="filterCategory('fruits')" class="bg-white rounded-lg p-4 text-center cursor-pointer hover:shadow-md">
+                            <i class="fas fa-apple-alt text-3xl text-red-500 mb-2"></i>
+                            <p class="text-sm font-medium">Fruits</p>
+                        </div>
+                        <div onclick="filterCategory('dairy')" class="bg-white rounded-lg p-4 text-center cursor-pointer hover:shadow-md">
+                            <i class="fas fa-cheese text-3xl text-yellow-500 mb-2"></i>
+                            <p class="text-sm font-medium">Dairy</p>
+                        </div>
+                        <div onclick="filterCategory('meat')" class="bg-white rounded-lg p-4 text-center cursor-pointer hover:shadow-md">
+                            <i class="fas fa-drumstick-bite text-3xl text-red-600 mb-2"></i>
+                            <p class="text-sm font-medium">Meat</p>
+                        </div>
+                        <div onclick="filterCategory('bakery')" class="bg-white rounded-lg p-4 text-center cursor-pointer hover:shadow-md">
+                            <i class="fas fa-bread-slice text-3xl text-amber-600 mb-2"></i>
+                            <p class="text-sm font-medium">Bakery</p>
+                        </div>
+                        <div onclick="filterCategory('beverages')" class="bg-white rounded-lg p-4 text-center cursor-pointer hover:shadow-md">
+                            <i class="fas fa-coffee text-3xl text-brown-500 mb-2"></i>
+                            <p class="text-sm font-medium">Beverages</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Products -->
+            <div class="bg-white py-8">
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Popular right now</h2>
+                        <button onclick="showAllProducts()" class="text-red-600 hover:underline">Shop all</button>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="featuredGrid">
+                        <!-- Featured products will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Promotional Banner -->
+            <div class="bg-green-600 text-white py-12">
+                <div class="max-w-7xl mx-auto px-4 text-center">
+                    <h2 class="text-3xl font-bold mb-4">Free delivery on orders over LKR 2,500</h2>
+                    <p class="text-xl mb-6">Fresh groceries delivered to your door</p>
+                    <button onclick="showAllProducts()" class="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100">
+                        Start shopping
+                    </button>
+                </div>
+            </div>
+        </section>
+
         <!-- Product Listing Section -->
-        <section id="productsSection" class="main-content max-w-7xl mx-auto px-4 py-8">
+        <section id="productsSection" class="main-content max-w-7xl mx-auto px-4 py-8 hidden">
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-bold mb-2 text-green-800">Fresh Groceries</h2>
                 <p class="text-green-600 text-lg">Select from our premium selection of fresh produce</p>
@@ -101,8 +277,94 @@
                 </div>
             </div>
 
-            <!-- Products Grid -->
-            <div id="productsGrid" class="products-grid grid gap-6"></div>
+            <div class="grid lg:grid-cols-4 gap-6">
+                <!-- Filters Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-green-100 sticky top-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold">Filters</h3>
+                            <button onclick="app.clearFilters()" class="text-sm text-green-600 hover:text-green-700">Clear All</button>
+                        </div>
+                        
+                        <!-- Price Range -->
+                        <div class="mb-6">
+                            <h4 class="font-medium mb-3">Price Range</h4>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">LKR 0</span>
+                                    <span class="text-sm">LKR 3000+</span>
+                                </div>
+                                <input type="range" id="priceRange" min="0" max="3000" value="3000" class="w-full">
+                                <div class="text-center text-sm text-gray-600">
+                                    Up to LKR <span id="priceValue">3000</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Brand Filter -->
+                        <div class="mb-6">
+                            <h4 class="font-medium mb-3">Brand</h4>
+                            <div class="space-y-2" id="brandFilters"></div>
+                        </div>
+                        
+                        <!-- Availability -->
+                        <div class="mb-6">
+                            <h4 class="font-medium mb-3">Availability</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="availability-filter" value="in-stock" checked>
+                                    <span class="ml-2 text-sm">In Stock</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="availability-filter" value="low-stock" checked>
+                                    <span class="ml-2 text-sm">Low Stock</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="availability-filter" value="out-of-stock">
+                                    <span class="ml-2 text-sm">Out of Stock</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Dietary Preferences -->
+                        <div class="mb-6">
+                            <h4 class="font-medium mb-3">Dietary</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="dietary-filter" value="organic">
+                                    <span class="ml-2 text-sm">Organic</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="dietary-filter" value="gluten-free">
+                                    <span class="ml-2 text-sm">Gluten-Free</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="dietary-filter" value="vegan">
+                                    <span class="ml-2 text-sm">Vegan</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="dietary-filter" value="vegetarian">
+                                    <span class="ml-2 text-sm">Vegetarian</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Products Grid -->
+                <div class="lg:col-span-3">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-600" id="productCount">Showing all products</span>
+                        <select id="sortBy" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="name">Sort by Name</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="stock">Stock Level</option>
+                        </select>
+                    </div>
+                    <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+            </div>
         </section>
 
         <!-- Shopping Cart Section -->
@@ -161,7 +423,7 @@
                             </div>
                         </div>
 
-                        <button id="proceedToCheckout" class="btn btn-primary w-full">
+                        <button id="proceedToCheckout" onclick="window.app ? '' : proceedToCheckoutSimple()" class="btn btn-primary w-full">
                             <i class="fas fa-credit-card mr-2"></i>Proceed to Checkout
                         </button>
                     </div>
@@ -229,7 +491,16 @@
                         </div>
                     </div>
 
-                    <div class="mb-6">
+                    <!-- Saved Addresses -->
+                    <div id="savedAddressesSection" class="mb-6 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Saved Addresses</label>
+                        <div id="savedAddressList" class="space-y-2 mb-4"></div>
+                        <button type="button" onclick="toggleAddressInput()" class="text-green-600 hover:text-green-700 text-sm">
+                            <i class="fas fa-plus mr-1"></i>Use different address
+                        </button>
+                    </div>
+
+                    <div id="manualAddressSection" class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Location & Map</label>
                         
                         <!-- Address Search -->
@@ -402,12 +673,1312 @@
                 </div>
             </div>
         </section>
+
+        <!-- Profile Section -->
+        <section id="profileSection" class="max-w-7xl mx-auto px-4 py-8 hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold mb-2 text-green-800">My Account</h2>
+                <p class="text-green-600 text-lg">Manage your profile and preferences</p>
+            </div>
+
+            <div class="grid lg:grid-cols-4 gap-8">
+                <!-- Profile Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-md p-6">
+                        <div class="text-center mb-6">
+                            <div class="h-20 w-20 rounded-full bg-green-100 text-green-600 grid place-content-center text-2xl font-bold mx-auto mb-3">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h3 id="profileUserName" class="text-xl font-semibold text-gray-800">Loading...</h3>
+                            <p id="profileUserEmail" class="text-gray-600">Loading...</p>
+                        </div>
+                        
+                        <nav class="space-y-2">
+                            <button onclick="showProfileTab('info')" class="profile-tab w-full text-left px-4 py-3 text-green-600 bg-green-50 rounded-lg flex items-center">
+                                <i class="fas fa-user mr-3"></i>Profile Info
+                            </button>
+                            <button onclick="showProfileTab('addresses')" class="profile-tab w-full text-left px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg flex items-center">
+                                <i class="fas fa-map-marker-alt mr-3"></i>Addresses
+                            </button>
+                            <button onclick="showProfileTab('orders')" class="profile-tab w-full text-left px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg flex items-center">
+                                <i class="fas fa-shopping-bag mr-3"></i>Order History
+                            </button>
+                        </nav>
+                        
+                        <button onclick="app.showSection('products')" class="w-full mt-6 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200">
+                            <i class="fas fa-arrow-left mr-2"></i>Back to Shopping
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Profile Content -->
+                <div class="lg:col-span-3">
+                    <!-- Profile Info Tab -->
+                    <div id="profileInfoTab" class="profile-content bg-white rounded-2xl shadow-md p-6">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6">Profile Information</h3>
+                        
+                        <form id="profileUpdateForm" class="space-y-6">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                                    <input type="text" id="profileFirstName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                                    <input type="text" id="profileLastName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                <input type="email" id="profileEmail" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                <input type="tel" id="profilePhone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            </div>
+                            
+                            <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700">
+                                Update Profile
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Addresses Tab -->
+                    <div id="profileAddressesTab" class="profile-content bg-white rounded-2xl shadow-md p-6 hidden">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-2xl font-bold text-gray-800">Saved Addresses</h3>
+                            <button onclick="showAddAddressForm()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                <i class="fas fa-plus mr-2"></i>Add Address
+                            </button>
+                        </div>
+                        
+                        <div id="profileAddressList" class="space-y-4">
+                            <p class="text-gray-500 text-center py-8">No addresses saved yet.</p>
+                        </div>
+                        
+                        <!-- Add Address Form -->
+                        <div id="addAddressForm" class="hidden mt-6 p-6 border border-gray-200 rounded-lg">
+                            <h4 class="text-lg font-semibold mb-4">Add New Address</h4>
+                            <form id="addressForm" class="space-y-4">
+                                <div>
+                                    <input type="text" id="addressLabel" placeholder="Address Label (e.g., Home, Office)" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500">
+                                </div>
+                                
+                                <!-- Location Selection Options -->
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Location Method</label>
+                                    <div class="flex gap-2 mb-4">
+                                        <button type="button" onclick="useCurrentLocationForAddress()" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+                                            <i class="fas fa-location-arrow mr-2"></i>Use My Location
+                                        </button>
+                                        <button type="button" onclick="selectOnMapForAddress()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                                            <i class="fas fa-map-marker-alt mr-2"></i>Select on Map
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Map for Address Selection -->
+                                    <div id="addressMapContainer" class="hidden mb-4">
+                                        <div id="addressMap" class="w-full h-48 rounded-lg border border-gray-300"></div>
+                                        <div id="addressLocationInfo" class="hidden mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                            <div class="flex items-center text-green-700">
+                                                <i class="fas fa-map-marker-alt mr-2"></i>
+                                                <span id="addressSelectedLocation" class="text-sm font-medium"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <input type="text" id="addressStreet" placeholder="Street Address" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500">
+                                </div>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <select id="addressProvince" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" required>
+                                        <option value="">Province</option>
+                                        <option value="western">Western</option>
+                                        <option value="central">Central</option>
+                                        <option value="southern">Southern</option>
+                                        <option value="northern">Northern</option>
+                                        <option value="eastern">Eastern</option>
+                                        <option value="north-western">North Western</option>
+                                        <option value="north-central">North Central</option>
+                                        <option value="uva">Uva</option>
+                                        <option value="sabaragamuwa">Sabaragamuwa</option>
+                                    </select>
+                                    <select id="addressDistrict" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" required disabled>
+                                        <option value="">District</option>
+                                    </select>
+                                    <select id="addressCity" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" required disabled>
+                                        <option value="">City</option>
+                                    </select>
+                                </div>
+                                <div class="flex gap-4">
+                                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                        Save Address
+                                    </button>
+                                    <button type="button" onclick="hideAddAddressForm()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Orders Tab -->
+                    <div id="profileOrdersTab" class="profile-content bg-white rounded-2xl shadow-md p-6 hidden">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6">Order History</h3>
+                        
+                        <div id="profileOrderList" class="space-y-4">
+                            <p class="text-gray-500 text-center py-8">No orders yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Detail Section -->
+        <section id="productDetailSection" class="max-w-7xl mx-auto px-4 py-8 hidden">
+            <div class="mb-6">
+                <button onclick="window.app ? window.app.goBack() : goBackToProducts()" class="text-green-600 hover:text-green-700 flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Products
+                </button>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-8 mb-12">
+                <!-- Image Gallery -->
+                <div class="bg-white rounded-2xl p-6">
+                    <div class="mb-4">
+                        <img id="productDetailImage" src="" alt="" class="w-full h-96 object-cover rounded-lg mb-4">
+                    </div>
+                    <div id="imageGallery" class="flex gap-2 overflow-x-auto"></div>
+                </div>
+                
+                <!-- Product Info -->
+                <div class="bg-white rounded-2xl p-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span id="productBrand" class="text-sm bg-gray-100 px-2 py-1 rounded"></span>
+                        <span id="stockBadge" class="text-sm px-2 py-1 rounded"></span>
+                    </div>
+                    
+                    <h1 id="productDetailName" class="text-3xl font-bold text-gray-800 mb-4"></h1>
+                    <p id="productDetailDescription" class="text-gray-600 mb-4"></p>
+                    
+                    <!-- Dietary Tags -->
+                    <div id="dietaryTags" class="flex flex-wrap gap-2 mb-6"></div>
+                    
+                    <!-- Stock Info -->
+                    <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium">Stock Level</span>
+                            <span id="stockCount" class="text-sm font-semibold"></span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="stockBar" class="bg-green-500 h-2 rounded-full"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-3xl font-bold text-green-600 mb-6" id="productDetailPrice"></div>
+                    
+                    <div class="flex items-center gap-4 mb-6">
+                        <button onclick="app.decreaseQuantity()" class="bg-gray-200 hover:bg-gray-300 w-10 h-10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <span id="productQuantity" class="text-xl font-semibold">1</span>
+                        <button onclick="app.increaseQuantity()" class="bg-gray-200 hover:bg-gray-300 w-10 h-10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex gap-4 mb-6">
+                        <button id="addToCartDetailBtn" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg text-lg font-semibold flex-1">
+                            <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                        </button>
+                        <button id="wishlistBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-3 rounded-lg">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Product Rating -->
+                    <div class="border-t pt-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">Reviews & Ratings</h3>
+                            <div class="flex items-center gap-2">
+                                <div class="flex text-yellow-400" id="productRating"></div>
+                                <span id="ratingCount" class="text-gray-600">(0 reviews)</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="window.app ? window.app.showReviewForm() : showReviewForm()" class="text-green-600 hover:text-green-700 mb-4">
+                            <i class="fas fa-plus mr-1"></i>Write a Review
+                        </button>
+                        
+                        <div id="reviewsList" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Related Products -->
+            <div class="bg-white rounded-2xl p-6 mb-8">
+                <h3 class="text-2xl font-bold mb-6">You might also like</h3>
+                <div id="relatedProducts" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+            </div>
+            
+            <!-- Review Form Modal -->
+            <div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+                <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+                    <h3 class="text-xl font-semibold mb-4">Write a Review</h3>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Rating</label>
+                        <div class="flex gap-1" id="ratingStars">
+                            <i class="fas fa-star text-gray-300 cursor-pointer" data-rating="1"></i>
+                            <i class="fas fa-star text-gray-300 cursor-pointer" data-rating="2"></i>
+                            <i class="fas fa-star text-gray-300 cursor-pointer" data-rating="3"></i>
+                            <i class="fas fa-star text-gray-300 cursor-pointer" data-rating="4"></i>
+                            <i class="fas fa-star text-gray-300 cursor-pointer" data-rating="5"></i>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Review</label>
+                        <textarea id="reviewText" rows="4" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" placeholder="Share your experience..."></textarea>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="window.app ? window.app.submitReview() : submitReview()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Submit</button>
+                        <button onclick="window.app ? window.app.closeReviewForm() : closeReviewForm()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wishlist Section -->
+        <section id="wishlistSection" class="max-w-7xl mx-auto px-4 py-8 hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold mb-2 text-green-800">My Wishlist</h2>
+                <p class="text-green-600 text-lg">Items you've saved for later</p>
+            </div>
+            
+            <div id="wishlistGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
+            
+            <div id="emptyWishlist" class="text-center py-12">
+                <div class="text-6xl mb-4 opacity-60 text-red-500"><i class="fas fa-heart"></i></div>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">Your wishlist is empty</h3>
+                <p class="text-gray-500 mb-6">Save items you love for later!</p>
+                <button onclick="window.app ? window.app.showSection('products') : showSectionFallback('products')" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+                    <i class="fas fa-shopping-bag mr-2"></i>Browse Products
+                </button>
+            </div>
+        </section>
+
+        <!-- Order Tracking Section -->
+        <section id="orderTrackingSection" class="max-w-4xl mx-auto px-4 py-8 hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold mb-2 text-green-800">Track Your Order</h2>
+                <p class="text-green-600 text-lg">Real-time delivery updates</p>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <input type="text" id="orderTrackingInput" placeholder="Enter order number (e.g., FM-123456)" class="flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500">
+                    <button onclick="app.trackOrder()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+                        <i class="fas fa-search mr-2"></i>Track
+                    </button>
+                </div>
+            </div>
+            
+            <div id="orderTrackingResult" class="hidden bg-white rounded-2xl shadow-md p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-xl font-semibold" id="trackedOrderNumber"></h3>
+                        <p class="text-gray-600" id="trackedOrderDate"></p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-green-600" id="trackedOrderTotal"></div>
+                        <div class="text-sm text-gray-500">Total Amount</div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4" id="orderStatusSteps">
+                    <div class="flex items-center gap-4 order-step" data-step="confirmed">
+                        <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center">
+                            <i class="fas fa-check text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium">Order Confirmed</div>
+                            <div class="text-sm text-gray-500">Your order has been received</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-4 order-step" data-step="preparing">
+                        <div class="w-8 h-8 rounded-full bg-yellow-500 text-white flex items-center justify-center">
+                            <i class="fas fa-clock text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium">Preparing Order</div>
+                            <div class="text-sm text-gray-500">We're getting your items ready</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-4 order-step" data-step="shipped">
+                        <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center">
+                            <i class="fas fa-truck text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-500">Out for Delivery</div>
+                            <div class="text-sm text-gray-400">Your order is on the way</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-4 order-step" data-step="delivered">
+                        <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center">
+                            <i class="fas fa-home text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-500">Delivered</div>
+                            <div class="text-sm text-gray-400">Order delivered successfully</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" onclick="app.showSection('home')" class="text-gray-300 hover:text-white">Home</a></li>
+                        <li><a href="#" onclick="app.showSection('products')" class="text-gray-300 hover:text-white">Catalogue & Deals</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Utility bill payments</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Track my order</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Categories</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" onclick="app.filterByCategory('')" class="text-gray-300 hover:text-white">Grocery</a></li>
+                        <li><a href="#" onclick="app.filterByCategory('beverages')" class="text-gray-300 hover:text-white">Beverages</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Household</a></li>
+                        <li><a href="#" onclick="app.filterByCategory('vegetables')" class="text-gray-300 hover:text-white">Vegetables</a></li>
+                        <li><a href="#" onclick="app.filterByCategory('fruits')" class="text-gray-300 hover:text-white">Fruits</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Useful Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white">Privacy Notice</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">FAQ</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Terms and Conditions</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Customer Service</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white">Contact us</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">About us</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Stores</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Delivery grid</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-gray-400">&copy; 2024 FreshMart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modals -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Welcome Back</h2>
+                <p class="text-gray-600">Sign in to your account</p>
+            </div>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <input type="email" id="loginEmail" placeholder="Email" required class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500">
+                </div>
+                <div>
+                    <input type="password" id="loginPassword" placeholder="Password" required class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500">
+                </div>
+                <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">
+                    Sign In
+                </button>
+            </form>
+            <div class="mt-4 text-center">
+                <button onclick="switchToRegister()" class="text-green-600 hover:text-green-700">Don't have an account? Sign up</button>
+            </div>
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Create Account</h2>
+                <p class="text-gray-600">Join us for fresh groceries</p>
+            </div>
+            <form id="registerForm" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="firstName" placeholder="First Name" required class="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500">
+                    <input type="text" id="lastName" placeholder="Last Name" required class="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500">
+                </div>
+                <input type="email" id="registerEmail" placeholder="Email" required class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500">
+                <input type="tel" id="registerPhone" placeholder="Phone" required class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500">
+                <input type="password" id="registerPassword" placeholder="Password" required class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500">
+                <input type="password" id="confirmPassword" placeholder="Confirm Password" required class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500">
+                <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">
+                    Create Account
+                </button>
+            </form>
+            <div class="mt-4 text-center">
+                <button onclick="switchToLogin()" class="text-green-600 hover:text-green-700">Already have an account? Sign in</button>
+            </div>
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize basic functionality first
+        console.log('Loading FreshMart application...');
+        
+
+        
+        // Navigation functions
+        function filterCategory(category) {
+            currentFallbackCategory = category;
+            if (window.app && window.app.filterByCategory) {
+                window.app.filterByCategory(category);
+            } else {
+                showSectionFallback('products');
+                setTimeout(() => {
+                    const grid = document.getElementById('productsGrid');
+                    if (grid && window.products) {
+                        const filtered = category ? window.products.filter(p => p.category === category) : window.products;
+                        grid.innerHTML = filtered.map(product => `
+                            <div class="bg-white rounded-lg p-4 shadow-md border">
+                                <img src="${product.image}" alt="${product.name}" class="w-full h-32 object-cover rounded mb-3 cursor-pointer hover:opacity-80" onclick="openProduct('${product.id}')">
+                                <h3 class="font-semibold mb-2">${product.name}</h3>
+                                <p class="text-green-600 font-bold">LKR ${product.price.toLocaleString()}</p>
+                                <button onclick="addToCartSimple('${product.id}')" class="bg-green-600 text-white px-3 py-2 rounded mt-2 hover:bg-green-700 w-full">
+                                    <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                                </button>
+                            </div>
+                        `).join('');
+                    }
+                }, 100);
+            }
+        }
+        
+        function showAllProducts() {
+            if (window.app && window.app.showSection) {
+                window.app.showSection('products');
+            } else {
+                showSectionFallback('products');
+                // Load all products
+                setTimeout(() => {
+                    const grid = document.getElementById('productsGrid');
+                    if (grid && window.products) {
+                        grid.innerHTML = window.products.map(product => `
+                            <div class="bg-white rounded-lg p-4 shadow-md border">
+                                <img src="${product.image}" alt="${product.name}" class="w-full h-32 object-cover rounded mb-3 cursor-pointer hover:opacity-80" onclick="openProduct('${product.id}')">
+                                <h3 class="font-semibold mb-2">${product.name}</h3>
+                                <p class="text-green-600 font-bold">LKR ${product.price.toLocaleString()}</p>
+                                <button onclick="addToCartSimple('${product.id}')" class="bg-green-600 text-white px-3 py-2 rounded mt-2 hover:bg-green-700 w-full">
+                                    <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                                </button>
+                            </div>
+                        `).join('');
+                    }
+                }, 100);
+            }
+        }
+        
+        function showProfile() {
+            if (window.authManager && window.authManager.isLoggedIn()) {
+                if (window.app && window.app.showSection) {
+                    window.app.showSection('profile');
+                } else {
+                    showSectionFallback('profile');
+                    loadProfileData();
+                }
+            } else {
+                showLoginModal();
+            }
+        }
+        
+        function loadProfileData() {
+            if (window.authManager && window.authManager.isLoggedIn()) {
+                const user = window.authManager.getCurrentUser();
+                document.getElementById('profileUserName').textContent = `${user.firstName} ${user.lastName}`;
+                document.getElementById('profileUserEmail').textContent = user.email;
+                document.getElementById('profileFirstName').value = user.firstName || '';
+                document.getElementById('profileLastName').value = user.lastName || '';
+                document.getElementById('profileEmail').value = user.email || '';
+                document.getElementById('profilePhone').value = user.phone || '';
+            }
+        }
+        
+        function showProfileTab(tab) {
+            document.querySelectorAll('.profile-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.querySelectorAll('.profile-tab').forEach(tabBtn => {
+                tabBtn.className = 'profile-tab w-full text-left px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg flex items-center';
+            });
+            document.getElementById(`profile${tab.charAt(0).toUpperCase() + tab.slice(1)}Tab`).classList.remove('hidden');
+            event.target.className = 'profile-tab w-full text-left px-4 py-3 text-green-600 bg-green-50 rounded-lg flex items-center';
+        }
+        
+        function openProduct(productId) {
+            if (window.app && window.app.showProductDetail) {
+                window.app.showProductDetail(productId);
+            } else {
+                const product = window.products.find(p => p.id === productId);
+                if (product) {
+                    showProductDetailFallback(product);
+                }
+            }
+        }
+        
+        function showProductDetailFallback(product) {
+            // Populate product detail section
+            document.getElementById('productDetailImage').src = product.image;
+            document.getElementById('productDetailName').textContent = product.name;
+            document.getElementById('productDetailDescription').textContent = product.description;
+            document.getElementById('productDetailPrice').textContent = `LKR ${product.price.toLocaleString()}`;
+            document.getElementById('productBrand').textContent = product.brand || 'FreshMart';
+            document.getElementById('productQuantity').textContent = '1';
+            
+            // Stock info
+            const stock = product.stock || 20;
+            document.getElementById('stockCount').textContent = `${stock} units available`;
+            document.getElementById('stockBar').style.width = `${Math.min((stock / 50) * 100, 100)}%`;
+            
+            const stockBadge = document.getElementById('stockBadge');
+            if (stock > 10) {
+                stockBadge.textContent = 'IN STOCK';
+                stockBadge.className = 'text-sm px-2 py-1 rounded bg-green-500 text-white';
+            } else if (stock > 0) {
+                stockBadge.textContent = 'LOW STOCK';
+                stockBadge.className = 'text-sm px-2 py-1 rounded bg-yellow-500 text-white';
+            } else {
+                stockBadge.textContent = 'OUT OF STOCK';
+                stockBadge.className = 'text-sm px-2 py-1 rounded bg-red-500 text-white';
+            }
+            
+            // Dietary tags
+            const dietaryTags = document.getElementById('dietaryTags');
+            const dietary = product.dietary || ['fresh'];
+            dietaryTags.innerHTML = dietary.map(tag => 
+                `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">${tag}</span>`
+            ).join('');
+            
+            // Setup buttons
+            setupProductDetailButtons(product);
+            
+            // Load reviews
+            loadProductReviews(product.id);
+            
+            // Show section
+            showSectionFallback('productDetail');
+        }
+        
+        function setupProductDetailButtons(product) {
+            // Wishlist button
+            const wishlistBtn = document.getElementById('wishlistBtn');
+            const isInWishlist = checkWishlist(product.id);
+            wishlistBtn.innerHTML = isInWishlist ? '<i class="fas fa-heart text-red-500"></i>' : '<i class="far fa-heart"></i>';
+            wishlistBtn.onclick = () => toggleWishlistSimple(product);
+            
+            // Add to cart button
+            const addBtn = document.getElementById('addToCartDetailBtn');
+            if (product.stock === 0) {
+                addBtn.innerHTML = '<i class="fas fa-times mr-2"></i>Out of Stock';
+                addBtn.className = 'bg-gray-400 cursor-not-allowed text-white px-8 py-3 rounded-lg text-lg font-semibold flex-1';
+                addBtn.disabled = true;
+            } else {
+                addBtn.innerHTML = '<i class="fas fa-cart-plus mr-2"></i>Add to Cart';
+                addBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg text-lg font-semibold flex-1';
+                addBtn.disabled = false;
+                addBtn.onclick = () => addToCartFromDetail(product);
+            }
+            
+            // Quantity buttons
+            document.querySelector('[onclick="app.decreaseQuantity()"]').onclick = decreaseQuantity;
+            document.querySelector('[onclick="app.increaseQuantity()"]').onclick = increaseQuantity;
+        }
+        
+        let currentQuantity = 1;
+        
+        function increaseQuantity() {
+            currentQuantity++;
+            document.getElementById('productQuantity').textContent = currentQuantity;
+        }
+        
+        function decreaseQuantity() {
+            if (currentQuantity > 1) {
+                currentQuantity--;
+                document.getElementById('productQuantity').textContent = currentQuantity;
+            }
+        }
+        
+        function addToCartFromDetail(product) {
+            for (let i = 0; i < currentQuantity; i++) {
+                addToCartSimple(product.id);
+            }
+            
+            const button = document.getElementById('addToCartDetailBtn');
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check mr-2"></i>Added to Cart';
+            button.classList.add('bg-green-700');
+            
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.classList.remove('bg-green-700');
+            }, 1500);
+        }
+        
+        function checkWishlist(productId) {
+            const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            return wishlist.some(item => item.id === productId);
+        }
+        
+        function toggleWishlistSimple(product) {
+            let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            const isInWishlist = wishlist.some(item => item.id === product.id);
+            
+            if (isInWishlist) {
+                wishlist = wishlist.filter(item => item.id !== product.id);
+                alert('Removed from wishlist');
+            } else {
+                wishlist.push(product);
+                alert('Added to wishlist');
+            }
+            
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            
+            // Update button
+            const wishlistBtn = document.getElementById('wishlistBtn');
+            wishlistBtn.innerHTML = !isInWishlist ? '<i class="fas fa-heart text-red-500"></i>' : '<i class="far fa-heart"></i>';
+        }
+        
+        function loadProductReviews(productId) {
+            const reviews = JSON.parse(localStorage.getItem('productReviews') || '{}')[productId] || [];
+            const avgRating = reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : 0;
+            
+            // Update rating display
+            const ratingContainer = document.getElementById('productRating');
+            ratingContainer.innerHTML = Array(5).fill().map((_, i) => 
+                `<i class="fas fa-star ${i < Math.round(avgRating) ? 'text-yellow-400' : 'text-gray-300'}"></i>`
+            ).join('');
+            
+            document.getElementById('ratingCount').textContent = `(${reviews.length} reviews)`;
+            
+            // Render reviews
+            const reviewsList = document.getElementById('reviewsList');
+            if (reviews.length === 0) {
+                reviewsList.innerHTML = '<p class="text-gray-500 text-center py-4">No reviews yet. Be the first to review!</p>';
+            } else {
+                reviewsList.innerHTML = reviews.map(review => `
+                    <div class="border-b pb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="font-medium">${review.author}</span>
+                                <div class="flex text-yellow-400 text-sm">
+                                    ${Array(5).fill().map((_, i) => 
+                                        `<i class="fas fa-star ${i < review.rating ? '' : 'text-gray-300'}"></i>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            <span class="text-sm text-gray-500">${review.date}</span>
+                        </div>
+                        <p class="text-gray-700">${review.text}</p>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function showReviewForm() {
+            if (!window.authManager || !window.authManager.isLoggedIn()) {
+                alert('Please login to write a review');
+                showLoginModal();
+                return;
+            }
+            document.getElementById('reviewModal').classList.remove('hidden');
+            currentRating = 0;
+            updateRatingStars();
+        }
+        
+        function closeReviewForm() {
+            document.getElementById('reviewModal').classList.add('hidden');
+            document.getElementById('reviewText').value = '';
+            currentRating = 0;
+            updateRatingStars();
+        }
+        
+        let currentRating = 0;
+        
+        function updateRatingStars() {
+            document.querySelectorAll('#ratingStars i').forEach((star, index) => {
+                star.className = `fas fa-star cursor-pointer ${
+                    index < currentRating ? 'text-yellow-400' : 'text-gray-300'
+                }`;
+            });
+        }
+        
+        function submitReview() {
+            if (currentRating === 0) {
+                alert('Please select a rating');
+                return;
+            }
+            
+            const reviewText = document.getElementById('reviewText').value.trim();
+            if (!reviewText) {
+                alert('Please write a review');
+                return;
+            }
+            
+            const user = window.authManager ? window.authManager.getCurrentUser() : { firstName: 'Anonymous' };
+            const productId = getCurrentProductId();
+            
+            const review = {
+                id: Date.now(),
+                rating: currentRating,
+                text: reviewText,
+                author: user.firstName || 'Anonymous',
+                date: new Date().toLocaleDateString()
+            };
+            
+            // Save review
+            let reviews = JSON.parse(localStorage.getItem('productReviews') || '{}');
+            if (!reviews[productId]) reviews[productId] = [];
+            reviews[productId].push(review);
+            localStorage.setItem('productReviews', JSON.stringify(reviews));
+            
+            closeReviewForm();
+            loadProductReviews(productId);
+            alert('Review submitted successfully!');
+        }
+        
+        function getCurrentProductId() {
+            return document.getElementById('productDetailName').textContent;
+        }
+        
+        function goBackToProducts() {
+            showSectionFallback('products');
+        }
+        
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
+        
+        function showRegisterModal() {
+            document.getElementById('registerModal').classList.remove('hidden');
+        }
+        
+        function closeAuthModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('registerModal').classList.add('hidden');
+        }
+        
+        function switchToRegister() {
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('registerModal').classList.remove('hidden');
+        }
+        
+        function switchToLogin() {
+            document.getElementById('registerModal').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
+        
+        function addToCartSimple(productId) {
+            if (window.app && window.app.addToCart) {
+                window.app.addToCart(productId);
+            } else {
+                // Simple cart functionality
+                const product = window.products.find(p => p.id === productId);
+                if (product) {
+                    let cart = JSON.parse(localStorage.getItem('simpleCart') || '[]');
+                    const existingItem = cart.find(item => item.id === productId);
+                    
+                    if (existingItem) {
+                        existingItem.quantity += 1;
+                    } else {
+                        cart.push({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image,
+                            quantity: 1
+                        });
+                    }
+                    
+                    localStorage.setItem('simpleCart', JSON.stringify(cart));
+                    updateCartCount();
+                    
+                    // Show feedback
+                    const button = event.target;
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check mr-2"></i>Added!';
+                    button.classList.add('bg-green-700');
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.classList.remove('bg-green-700');
+                    }, 1000);
+                }
+            }
+        }
+        
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('simpleCart') || '[]');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const cartCountElement = document.getElementById('cartCount');
+            if (cartCountElement) {
+                cartCountElement.textContent = totalItems;
+            }
+        }
+        
+        function showCartSimple() {
+            const cart = JSON.parse(localStorage.getItem('simpleCart') || '[]');
+            
+            if (cart.length === 0) {
+                alert('Your cart is empty! Add some items first.');
+                return;
+            }
+            
+            showSectionFallback('cart');
+            updateCartDisplay();
+        }
+        
+        function updateCartDisplay() {
+            const cart = JSON.parse(localStorage.getItem('simpleCart') || '[]');
+            const cartItems = document.getElementById('cartItems');
+            const emptyCart = document.getElementById('emptyCart');
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '';
+                emptyCart.classList.remove('hidden');
+                updateCartTotals();
+                return;
+            }
+            
+            emptyCart.classList.add('hidden');
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item bg-white rounded-xl p-4 shadow-sm border border-green-100">
+                    <div class="flex items-center gap-4">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-800">${item.name}</h4>
+                            <p class="text-green-600 font-semibold">LKR ${item.price.toLocaleString()}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200" onclick="updateCartQuantity('${item.id}', ${item.quantity - 1})">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span class="w-8 text-center font-medium">${item.quantity}</span>
+                            <button class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200" onclick="updateCartQuantity('${item.id}', ${item.quantity + 1})">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <button class="text-red-500 hover:text-red-700" onclick="removeFromCart('${item.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            updateCartTotals();
+        }
+        
+        function updateCartQuantity(productId, newQuantity) {
+            let cart = JSON.parse(localStorage.getItem('simpleCart') || '[]');
+            
+            if (newQuantity <= 0) {
+                cart = cart.filter(item => item.id !== productId);
+            } else {
+                const item = cart.find(item => item.id === productId);
+                if (item) {
+                    item.quantity = newQuantity;
+                }
+            }
+            
+            localStorage.setItem('simpleCart', JSON.stringify(cart));
+            updateCartCount();
+            updateCartDisplay();
+        }
+        
+        function removeFromCart(productId) {
+            let cart = JSON.parse(localStorage.getItem('simpleCart') || '[]');
+            cart = cart.filter(item => item.id !== productId);
+            localStorage.setItem('simpleCart', JSON.stringify(cart));
+            updateCartCount();
+            updateCartDisplay();
+        }
+        
+        function updateCartTotals() {
+            const cart = JSON.parse(localStorage.getItem('simpleCart') || '[]');
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const deliveryFee = cart.length > 0 ? 300 : 0;
+            const tax = cart.length > 0 ? Math.round(subtotal * 0.12) : 0;
+            const total = subtotal + tax + deliveryFee;
+            
+            // Update all total elements
+            const elements = [
+                { id: 'subtotal', value: subtotal },
+                { id: 'tax', value: tax },
+                { id: 'deliveryFee', value: deliveryFee },
+                { id: 'total', value: total }
+            ];
+            
+            elements.forEach(({ id, value }) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = `LKR ${value.toLocaleString()}`;
+                }
+            });
+            
+            // Hide/show checkout button
+            const checkoutBtn = document.getElementById('proceedToCheckout');
+            if (checkoutBtn) {
+                if (cart.length === 0) {
+                    checkoutBtn.disabled = true;
+                    checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        }
+        
+        function proceedToCheckoutSimple() {
+            const cart = JSON.parse(localStorage.getItem('simpleCart') || '[]');
+            if (cart.length === 0) {
+                alert('Your cart is empty! Add some items first.');
+                return;
+            }
+            
+            if (window.app && window.app.showSection) {
+                window.app.showSection('checkout');
+            } else {
+                showSectionFallback('checkout');
+            }
+        }
+    </script>
+    
+    <script src="js/products.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/modal-auth.js"></script>
     <script src="js/cities.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/checkout.js"></script>
-    <script src="js/products.js"></script>
+    <script src="js/features.js"></script>
     <script src="js/app.js"></script>
+    
+    <script>
+        // Fallback initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing fallback...');
+            
+            setTimeout(() => {
+                if (typeof window.app === 'undefined') {
+                    console.log('Main app not loaded, adding fallback handlers');
+                    
+                    document.querySelectorAll('[onclick*="showSection"]').forEach(btn => {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const section = this.getAttribute('onclick').match(/showSection\('([^']+)'\)/)?.[1];
+                            if (section) {
+                                showSectionFallback(section);
+                            }
+                        });
+                    });
+                }
+            }, 1500);
+        });
+        
+        function showSectionFallback(section) {
+            console.log('Showing section:', section);
+            const sections = ['home', 'products', 'cart', 'checkout', 'confirmation', 'profile', 'productDetail', 'wishlist', 'orderTracking'];
+            sections.forEach(s => {
+                const element = document.getElementById(s + 'Section');
+                if (element) {
+                    element.classList.toggle('hidden', s !== section);
+                }
+            });
+        }
+        
+        function handleSearchFallback(query) {
+            if (!window.products) return;
+            
+            showSectionFallback('products');
+            
+            setTimeout(() => {
+                const grid = document.getElementById('productsGrid');
+                if (!grid) return;
+                
+                let filtered = window.products;
+                if (query && query.trim() !== '') {
+                    const searchTerm = query.toLowerCase().trim();
+                    filtered = window.products.filter(product => 
+                        product.name.toLowerCase().includes(searchTerm) ||
+                        product.description.toLowerCase().includes(searchTerm) ||
+                        product.category.toLowerCase().includes(searchTerm) ||
+                        (product.brand && product.brand.toLowerCase().includes(searchTerm))
+                    );
+                }
+                
+                if (filtered.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <div class="text-6xl mb-4 opacity-60 text-green-500">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-600 mb-2">No products found</h3>
+                            <p class="text-gray-500">Try a different search term</p>
+                        </div>
+                    `;
+                } else {
+                    grid.innerHTML = filtered.map(product => `
+                        <div class="bg-white rounded-lg p-4 shadow-md border">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-32 object-cover rounded mb-3 cursor-pointer hover:opacity-80" onclick="openProduct('${product.id}')">
+                            <h3 class="font-semibold mb-2">${product.name}</h3>
+                            <p class="text-green-600 font-bold">LKR ${product.price.toLocaleString()}</p>
+                            <button onclick="addToCartSimple('${product.id}')" class="bg-green-600 text-white px-3 py-2 rounded mt-2 hover:bg-green-700 w-full">
+                                <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                            </button>
+                        </div>
+                    `).join('');
+                }
+                
+                const countElement = document.getElementById('productCount');
+                if (countElement) {
+                    if (filtered.length === window.products.length) {
+                        countElement.textContent = `Showing all ${filtered.length} products`;
+                    } else {
+                        countElement.textContent = `Showing ${filtered.length} of ${window.products.length} products`;
+                    }
+                }
+            }, 100);
+        }
+        
+        // Make functions globally available
+        window.showSectionFallback = showSectionFallback;
+        window.filterCategory = filterCategory;
+        window.showAllProducts = showAllProducts;
+        window.showProfile = showProfile;
+        window.showLoginModal = showLoginModal;
+        window.showRegisterModal = showRegisterModal;
+        window.closeAuthModal = closeAuthModal;
+        window.switchToRegister = switchToRegister;
+        window.switchToLogin = switchToLogin;
+        window.addToCartSimple = addToCartSimple;
+        window.loadProfileData = loadProfileData;
+        window.showProfileTab = showProfileTab;
+        window.openProduct = openProduct;
+        window.showProductDetailFallback = showProductDetailFallback;
+        window.setupProductDetailButtons = setupProductDetailButtons;
+        window.increaseQuantity = increaseQuantity;
+        window.decreaseQuantity = decreaseQuantity;
+        window.addToCartFromDetail = addToCartFromDetail;
+        window.toggleWishlistSimple = toggleWishlistSimple;
+        window.loadProductReviews = loadProductReviews;
+        window.showReviewForm = showReviewForm;
+        window.closeReviewForm = closeReviewForm;
+        window.submitReview = submitReview;
+        window.updateRatingStars = updateRatingStars;
+        window.goBackToProducts = goBackToProducts;
+        window.updateCartCount = updateCartCount;
+        window.showCartSimple = showCartSimple;
+        window.updateCartDisplay = updateCartDisplay;
+        window.updateCartQuantity = updateCartQuantity;
+        window.removeFromCart = removeFromCart;
+        window.updateCartTotals = updateCartTotals;
+        window.proceedToCheckoutSimple = proceedToCheckoutSimple;
+        let currentFallbackCategory = '';
+        
+        function handleSortFallback(sortBy) {
+            if (!window.products) return;
+            
+            let sortedProducts = currentFallbackCategory ? 
+                window.products.filter(p => p.category === currentFallbackCategory) : 
+                [...window.products];
+            
+            switch (sortBy) {
+                case 'price-low':
+                    sortedProducts.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    sortedProducts.sort((a, b) => b.price - a.price);
+                    break;
+                case 'stock':
+                    sortedProducts.sort((a, b) => b.stock - a.stock);
+                    break;
+                case 'name':
+                default:
+                    sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
+            }
+            
+            const grid = document.getElementById('productsGrid');
+            if (grid) {
+                grid.innerHTML = sortedProducts.map(product => `
+                    <div class="bg-white rounded-lg p-4 shadow-md border">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-32 object-cover rounded mb-3 cursor-pointer hover:opacity-80" onclick="openProduct('${product.id}')">
+                        <h3 class="font-semibold mb-2">${product.name}</h3>
+                        <p class="text-green-600 font-bold">LKR ${product.price.toLocaleString()}</p>
+                        <div class="text-xs text-gray-500 mb-2">Stock: ${product.stock || 20}</div>
+                        <button onclick="addToCartSimple('${product.id}')" class="bg-green-600 text-white px-3 py-2 rounded mt-2 hover:bg-green-700 w-full">
+                            <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function removeFromWishlistSimple(productId) {
+            let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            wishlist = wishlist.filter(item => item.id !== productId);
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            renderWishlistSimple();
+        }
+        
+        function renderWishlistSimple() {
+            const container = document.getElementById('wishlistGrid');
+            const emptyState = document.getElementById('emptyWishlist');
+            const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            
+            if (wishlist.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            container.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            
+            container.innerHTML = wishlist.map(item => `
+                <div class="bg-white rounded-2xl p-4 shadow-md border border-green-100">
+                    <div class="h-40 overflow-hidden rounded-xl mb-3">
+                        <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover cursor-pointer" onclick="openProduct('${item.id}')">
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">${item.name}</h3>
+                    <div class="text-xl font-bold text-green-700 mb-3">LKR ${item.price.toLocaleString()}</div>
+                    <div class="flex gap-2">
+                        <button onclick="addToCartSimple('${item.id}')" class="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-green-700">
+                            <i class="fas fa-cart-plus mr-1"></i>Add to Cart
+                        </button>
+                        <button onclick="removeFromWishlistSimple('${item.id}')" class="bg-red-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-600">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        window.handleSearchFallback = handleSearchFallback;
+        window.handleSortFallback = handleSortFallback;
+        window.removeFromWishlistSimple = removeFromWishlistSimple;
+        window.renderWishlistSimple = renderWishlistSimple;
+        
+        // Initialize cart count and search on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(updateCartCount, 500);
+            
+            // Setup search event listeners
+            setTimeout(() => {
+                const searchInput = document.getElementById('searchInput');
+                const headerSearch = document.getElementById('headerSearch');
+                
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        if (window.app && window.app.handleSearch) {
+                            window.app.handleSearch(e.target.value);
+                        } else {
+                            handleSearchFallback(e.target.value);
+                        }
+                    });
+                    searchInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            if (window.app && window.app.handleSearch) {
+                                window.app.handleSearch(e.target.value);
+                            } else {
+                                handleSearchFallback(e.target.value);
+                            }
+                        }
+                    });
+                }
+                
+                if (headerSearch) {
+                    headerSearch.addEventListener('input', (e) => {
+                        if (window.app && window.app.handleSearch) {
+                            window.app.handleSearch(e.target.value);
+                            window.app.showSection('products');
+                        } else {
+                            handleSearchFallback(e.target.value);
+                        }
+                    });
+                    headerSearch.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            if (window.app && window.app.handleSearch) {
+                                window.app.handleSearch(e.target.value);
+                                window.app.showSection('products');
+                            } else {
+                                handleSearchFallback(e.target.value);
+                            }
+                        }
+                    });
+                    
+                    // Search button click
+                    const searchBtn = headerSearch.nextElementSibling;
+                    if (searchBtn) {
+                        searchBtn.addEventListener('click', () => {
+                            if (window.app && window.app.handleSearch) {
+                                window.app.handleSearch(headerSearch.value);
+                                window.app.showSection('products');
+                            } else {
+                                handleSearchFallback(headerSearch.value);
+                            }
+                        });
+                    }
+                }
+                
+                // Fallback sort functionality
+                const sortBy = document.getElementById('sortBy');
+                if (sortBy) {
+                    sortBy.addEventListener('change', (e) => {
+                        console.log('Sort changed to:', e.target.value);
+                        if (window.app && window.app.sortProducts) {
+                            window.app.sortProducts(e.target.value);
+                        } else {
+                            handleSortFallback(e.target.value);
+                        }
+                    });
+                }
+            }, 1000);
+        });
+        
+        // Setup rating stars click handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.querySelectorAll('#ratingStars i').forEach(star => {
+                    star.addEventListener('click', (e) => {
+                        currentRating = parseInt(e.target.dataset.rating);
+                        updateRatingStars();
+                    });
+                });
+            }, 1000);
+        });
+    </script>
 </body>
 </html>
