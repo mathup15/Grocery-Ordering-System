@@ -426,9 +426,25 @@
       if(sort) url.searchParams.set('sort', sort);
       if(healthy.length) url.searchParams.set('healthy', healthy.join(','));
 
-      const res = await fetch(url, { headers: { ...authHeaders() }});
-      if(!res.ok) throw new Error('Failed to load products');
-      const data = await res.json(); // expect {items, total}
+      let data;
+      let demoMode = false;
+      try {
+        const res = await fetch(url, { headers: { ...authHeaders() }});
+        if(!res.ok) throw new Error('Failed to load products');
+        data = await res.json(); // expect {items, total}
+      } catch (apiErr) {
+        // Fallback demo data
+        demoMode = true;
+        data = {
+          total: 3,
+          items: [
+            { id: 1, name: 'Banana', sku: 'BN001', category: 'Fruits', price: 120, availableQty: 50, imageUrl: '', promotion: null },
+            { id: 2, name: 'Milk', sku: 'ML002', category: 'Dairy', price: 250, availableQty: 30, imageUrl: '', promotion: { type: 'PERCENTAGE', value: 10, finalAmount: 225 } },
+            { id: 3, name: 'Bread', sku: 'BR003', category: 'Bakery', price: 80, availableQty: 0, imageUrl: '', promotion: null }
+          ]
+        };
+        toast('Demo products loaded (API unavailable)');
+      }
       total = data.total || 0;
       const pageItems = data.items || [];
 
