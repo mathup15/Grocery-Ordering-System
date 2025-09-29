@@ -33,3 +33,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.inventory i WHERE p.id IN :ids")
     List<Product> findAllByIdWithInventory(@Param("ids") List<Long> ids);
 }
+
+
+

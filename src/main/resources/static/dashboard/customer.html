@@ -1,228 +1,600 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Dashboard • FreshCartLanka</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard - FreshCart</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .card { @apply bg-white rounded-2xl shadow-sm border border-gray-100; }
-        .press { @apply transition duration-150 hover:shadow-md hover:-translate-y-0.5; }
-        .pill { @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .offer-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .offer-card:nth-child(2) {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            box-shadow: 0 20px 40px rgba(255, 154, 158, 0.3);
+        }
+        .offer-card:nth-child(3) {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #d299c2 100%);
+            box-shadow: 0 20px 40px rgba(168, 237, 234, 0.3);
+        }
+        .offer-card:nth-child(4) {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff8a80 100%);
+            box-shadow: 0 20px 40px rgba(255, 236, 210, 0.3);
+        }
+        .offer-card:nth-child(5) {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 50%, #a8c0ff 100%);
+            box-shadow: 0 20px 40px rgba(132, 250, 176, 0.3);
+        }
+        .offer-card:nth-child(6) {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 50%, #ff6b6b 100%);
+            box-shadow: 0 20px 40px rgba(250, 112, 154, 0.3);
+        }
+        .offer-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        }
+        .offer-card > * {
+            position: relative;
+            z-index: 1;
+        }
+        .price-old {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        .price-new {
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+        .discount-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 0.875rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .offer-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .offer-image:hover {
+            transform: scale(1.1);
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .feature-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .cart-indicator {
+            position: relative;
+        }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-b from-green-50 to-green-50/40">
+<body class="min-h-screen bg-gray-50">
 <script src="/js/app.js"></script>
 <script>Auth.requireRole(["CUSTOMER","ADMIN","STAFF","DELIVERY"]);</script>
 
-<!-- NAVBAR -->
-<header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-gray-100">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
-        <a href="/" class="flex items-center gap-2 font-extrabold text-lg text-emerald-700">
-            <span class="h-9 w-9 grid place-content-center rounded-xl bg-emerald-600 text-white text-xl">🛒</span>
-            FreshCartLanka
-        </a>
-
-        <div class="flex-1 hidden md:block">
-            <label class="relative block">
-                <input placeholder="Search products…" class="w-full rounded-xl bg-gray-50 border border-gray-200 pl-10 pr-4 py-2 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-600 outline-none">
-                <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="m21 21-4.3-4.3M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/></svg>
-            </label>
+<div class="max-w-7xl mx-auto p-6">
+    <!-- Header -->
+    <header class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Welcome to FreshCart</h1>
+            <p class="text-gray-600 mt-1">Your fresh grocery shopping experience</p>
         </div>
-
-        <nav class="hidden md:flex items-center gap-2">
-            <a href="/catalog-advanced.html" class="px-3 py-2 rounded-lg hover:bg-gray-100">Shop</a>
-            <a href="/dashboard/customer-orders.html" class="px-3 py-2 rounded-lg hover:bg-gray-100">Orders</a>
-            <a href="/dashboard/customer-cart.html" class="px-3 py-2 rounded-lg hover:bg-gray-100">Cart</a>
-        </nav>
-
-        <!-- Profile -->
-        <div class="relative">
-            <button id="profileBtn" class="flex items-center gap-3 rounded-xl border border-gray-200 px-3 py-2 hover:bg-gray-50">
-                <img class="h-8 w-8 rounded-full object-cover" src="https://i.pravatar.cc/80?img=12" alt="">
-                <div class="hidden sm:block text-left">
-                    <div id="who" class="text-sm font-semibold">Hi there</div>
-                    <div class="text-[11px] text-gray-500">Customer</div>
-                </div>
-                <svg class="ml-1 h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+        <div class="flex items-center gap-4">
+            <div class="cart-indicator">
+                <button onclick="showCart()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-shopping-cart"></i> Cart <span class="cart-count" id="cartCount">0</span>
+                </button>
+            </div>
+            <button onclick="Auth.logout()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                <i class="fas fa-sign-out-alt"></i> Logout
             </button>
-            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-56 card overflow-hidden">
-                <a href="/dashboard/customer-profile.html" class="block px-4 py-3 hover:bg-gray-50">My profile</a>
-                <a href="/dashboard/customer-addresses.html" class="block px-4 py-3 hover:bg-gray-50">Addresses</a>
-                <a href="/dashboard/customer-payments.html" class="block px-4 py-3 hover:bg-gray-50">Payment methods</a>
-                <button onclick="Auth.logout()" class="w-full text-left px-4 py-3 hover:bg-gray-50 text-red-600">Logout</button>
-            </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
-
-    <!-- WELCOME + QUICK ACTIONS -->
-    <section class="card p-6 md:p-8">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-                <div class="pill bg-emerald-100 text-emerald-700">Customer</div>
-                <h1 class="mt-2 text-2xl md:text-3xl font-extrabold tracking-tight">
-                    Welcome back, <span id="firstName" class="text-emerald-700">Shopper</span> 👋
-                </h1>
-                <p class="text-gray-600 mt-1">Let’s get those groceries delivered fast.</p>
-            </div>
-            <div class="flex flex-wrap gap-2">
-                <a href="/catalog-advanced.html" class="press inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 6H21l-2 9H9L7 4H3"/></svg>
-                    Shop now
-                </a>
-                <a href="/dashboard/customer-cart.html" class="press inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h2l.4 2M7 13h10l3-7H6.4M7 13l-1.6 6H18"/></svg>
-                    View cart
-                </a>
-                <a href="/dashboard/customer-orders.html" class="press inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-200">
-                    <svg class="h-5 w-5 text-gray-700" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v2H7zM7 11h10v2H7zM7 15h7v2H7z"/></svg>
-                    Orders
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- KPIs -->
-    <section class="grid md:grid-cols-3 gap-4">
-        <div class="card press p-5">
-            <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-500">This month’s orders</span>
-                <span class="pill bg-emerald-50 text-emerald-700">+12%</span>
-            </div>
-            <div class="mt-2 text-3xl font-extrabold">4</div>
-            <p class="text-xs text-gray-500 mt-1">Delivered & in-progress</p>
-        </div>
-        <div class="card press p-5">
-            <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-500">Savings</span>
-                <span class="pill bg-blue-50 text-blue-700">Deals</span>
-            </div>
-            <div class="mt-2 text-3xl font-extrabold">LKR 1,240</div>
-            <p class="text-xs text-gray-500 mt-1">With coupons & bundles</p>
-        </div>
-        <div class="card press p-5">
-            <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-500">Reward points</span>
-                <span class="pill bg-yellow-50 text-yellow-700">Gold</span>
-            </div>
-            <div class="mt-2 text-3xl font-extrabold">820</div>
-            <p class="text-xs text-gray-500 mt-1">Redeem at checkout</p>
-        </div>
-    </section>
-
-    <!-- CONTINUE SHOPPING / RECENTLY VIEWED -->
-    <section class="grid lg:grid-cols-2 gap-4">
-        <div class="card p-5">
-            <div class="flex items-center justify-between">
-                <h3 class="font-semibold">Continue shopping</h3>
-                <a href="/catalog-advanced.html" class="text-sm text-emerald-700 hover:underline">See all</a>
-            </div>
-            <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <a href="/catalog-advanced.html#fruits" class="press block p-3 rounded-xl border border-gray-200 bg-white">
-                    <img class="h-24 w-full object-cover rounded-lg mb-2" src="https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?q=80&w=600&auto=format&fit=crop" alt="">
-                    <div class="text-sm font-medium">Fresh Fruits</div>
-                    <div class="text-xs text-gray-500">Seasonal picks</div>
-                </a>
-                <a href="/catalog-advanced.html#veggies" class="press block p-3 rounded-xl border border-gray-200 bg-white">
-                    <img class="h-24 w-full object-cover rounded-lg mb-2" src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600&auto=format&fit=crop" alt="">
-                    <div class="text-sm font-medium">Veggies</div>
-                    <div class="text-xs text-gray-500">Daily essentials</div>
-                </a>
-                <a href="/catalog-advanced.html#dairy" class="press block p-3 rounded-xl border border-gray-200 bg-white">
-                    <img class="h-24 w-full object-cover rounded-lg mb-2" src="https://images.unsplash.com/photo-1550583724-b2692b85b150?q=80&w=600&auto=format&fit=crop" alt="">
-                    <div class="text-sm font-medium">Dairy</div>
-                    <div class="text-xs text-gray-500">Milk & yogurt</div>
-                </a>
-            </div>
-        </div>
-
-        <div class="card p-5">
-            <div class="flex items-center justify-between">
-                <h3 class="font-semibold">Recently viewed</h3>
-                <a href="/catalog-advanced.html" class="text-sm text-emerald-700 hover:underline">Browse again</a>
-            </div>
-            <ul class="mt-3 divide-y">
-                <li class="py-3 flex items-center gap-3">
-                    <img class="h-12 w-12 rounded-lg object-cover" src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=400&auto=format&fit=crop" alt="">
-                    <div class="flex-1">
-                        <div class="text-sm font-medium">Whole Wheat Bread</div>
-                        <div class="text-xs text-gray-500">Bakery • LKR 180</div>
+    <!-- Quick Actions -->
+    <section class="mb-10">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Quick Actions</h2>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="feature-card rounded-2xl bg-white p-6 shadow-lg border border-gray-100" onclick="window.location.href='/catalog-advanced.html'">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-store text-green-600 text-xl"></i>
                     </div>
-                    <a href="/catalog-advanced.html#bakery" class="px-3 py-1.5 rounded-lg border text-sm hover:bg-gray-50">View</a>
-                </li>
-                <li class="py-3 flex items-center gap-3">
-                    <img class="h-12 w-12 rounded-lg object-cover" src="https://images.unsplash.com/photo-1526318472351-c75fcf070305?q=80&w=400&auto=format&fit=crop" alt="">
-                    <div class="flex-1">
-                        <div class="text-sm font-medium">Eggs (10 pack)</div>
-                        <div class="text-xs text-gray-500">Dairy • LKR 520</div>
+                    <div>
+                        <h3 class="font-bold text-gray-800">Browse Products</h3>
+                        <p class="text-sm text-gray-600">Fresh fruits, veggies, and more</p>
                     </div>
-                    <a href="/catalog-advanced.html#dairy" class="px-3 py-1.5 rounded-lg border text-sm hover:bg-gray-50">View</a>
-                </li>
-            </ul>
+                </div>
+            </div>
+            <div class="feature-card rounded-2xl bg-white p-6 shadow-lg border border-gray-100" onclick="showCart()">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-shopping-cart text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800">My Cart</h3>
+                        <p class="text-sm text-gray-600">Review and checkout items</p>
+                    </div>
+                </div>
+            </div>
+            <div class="feature-card rounded-2xl bg-white p-6 shadow-lg border border-gray-100" onclick="showOrders()">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-box text-purple-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800">My Orders</h3>
+                        <p class="text-sm text-gray-600">Track order status</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- RECENT ORDERS -->
-    <section class="card p-5">
-        <div class="flex items-center justify-between">
-            <h3 class="font-semibold">Recent orders</h3>
-            <a href="/dashboard/customer-orders.html" class="text-sm text-emerald-700 hover:underline">View all</a>
+    <!-- Special Offers Section -->
+    <section class="mb-10">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">🔥 Special Offers</h2>
+            <span class="text-sm text-gray-500">Limited time deals</span>
         </div>
-        <div class="mt-3 overflow-x-auto">
-            <table class="min-w-full text-sm">
-                <thead class="text-left text-gray-500">
-                <tr>
-                    <th class="py-2 pr-4">Order</th>
-                    <th class="py-2 pr-4">Date</th>
-                    <th class="py-2 pr-4">Total</th>
-                    <th class="py-2 pr-4">Status</th>
-                    <th class="py-2"></th>
-                </tr>
-                </thead>
-                <tbody class="divide-y">
-                <tr class="hover:bg-gray-50">
-                    <td class="py-3 pr-4 font-medium">#FCL-1042</td>
-                    <td class="py-3 pr-4">2025-09-12</td>
-                    <td class="py-3 pr-4">LKR 3,450</td>
-                    <td class="py-3 pr-4"><span class="pill bg-amber-100 text-amber-800">Preparing</span></td>
-                    <td class="py-3 text-right"><a href="/dashboard/customer-orders.html" class="px-3 py-1.5 rounded-lg border hover:bg-gray-50">Details</a></td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="py-3 pr-4 font-medium">#FCL-1038</td>
-                    <td class="py-3 pr-4">2025-09-05</td>
-                    <td class="py-3 pr-4">LKR 2,180</td>
-                    <td class="py-3 pr-4"><span class="pill bg-emerald-100 text-emerald-800">Delivered</span></td>
-                    <td class="py-3 text-right"><a href="/dashboard/customer-orders.html" class="px-3 py-1.5 rounded-lg border hover:bg-gray-50">Details</a></td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="py-3 pr-4 font-medium">#FCL-1032</td>
-                    <td class="py-3 pr-4">2025-08-29</td>
-                    <td class="py-3 pr-4">LKR 5,020</td>
-                    <td class="py-3 pr-4"><span class="pill bg-blue-100 text-blue-800">In transit</span></td>
-                    <td class="py-3 text-right"><a href="/dashboard/customer-orders.html" class="px-3 py-1.5 rounded-lg border hover:bg-gray-50">Details</a></td>
-                </tr>
-                </tbody>
-            </table>
+        <div id="offersGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Loading skeleton -->
+            <div class="animate-pulse">
+                <div class="bg-gray-200 rounded-2xl h-64"></div>
+            </div>
+            <div class="animate-pulse">
+                <div class="bg-gray-200 rounded-2xl h-64"></div>
+            </div>
+            <div class="animate-pulse">
+                <div class="bg-gray-200 rounded-2xl h-64"></div>
+            </div>
         </div>
     </section>
-</main>
 
+    <!-- Related Products Section -->
+    <section class="mb-10">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">💡 You Might Also Like</h2>
+        <div id="relatedProducts" class="grid md:grid-cols-4 gap-6">
+            <!-- Related products will be loaded here -->
+        </div>
+    </section>
+</div>
 <script>
-    // profile dropdown
-    const btn = document.getElementById('profileBtn');
-    const menu = document.getElementById('profileMenu');
-    btn?.addEventListener('click', () => menu.classList.toggle('hidden'));
-    document.addEventListener('click', (e) => {
-        if (!btn.contains(e.target) && !menu.contains(e.target)) menu.classList.add('hidden');
-    });
+// Cart functionality
+let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-    // greet with saved name if available
-    const full = localStorage.getItem('auth.name') || '';
-    const first = full.split(' ')[0] || 'Shopper';
-    document.getElementById('firstName').textContent = first;
-    document.getElementById('who').textContent = `Hi, ${first}`;
+function updateCartDisplay() {
+    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    document.getElementById('cartCount').textContent = cartCount;
+}
+
+function showCart() {
+    if (cart.length === 0) {
+        showToast('Your cart is empty!');
+        return;
+    }
+    
+    const cartModal = document.createElement('div');
+    cartModal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4';
+    cartModal.innerHTML = `
+        <div class="fixed inset-0 bg-black bg-opacity-50" onclick="this.parentElement.remove()"></div>
+        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col relative shadow-2xl">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-green-50 rounded-t-2xl">
+                <h3 class="text-xl font-bold text-gray-800">🛒 Shopping Cart (${cart.length} items)</h3>
+                <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+                ${cart.map(item => `
+                    <div class="flex gap-4 p-4 border border-gray-200 rounded-xl mb-4 bg-white">
+                        <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=200&auto=format&fit=crop'}" 
+                             alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-800 mb-1">${item.name}</h4>
+                            <div class="text-sm text-gray-600 mb-2">Qty: ${item.quantity}</div>
+                            <div class="font-bold text-green-600">LKR ${(item.price * item.quantity).toLocaleString('en-LK', {minimumFractionDigits: 2})}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+                <div class="text-center mb-4 text-xl font-bold">
+                    Total: LKR ${cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString('en-LK', {minimumFractionDigits: 2})}
+                </div>
+                <button class="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition-colors" 
+                        onclick="checkout()">Checkout</button>
+            </div>
+        </div>
+//     `;
+//     document.body.appendChild(cartModal);
+// }
+//
+// function showOrders() {
+//     showToast('Order tracking functionality would be implemented here!');
+// }
+//
+// function checkout() {
+//     showToast('Checkout functionality would be implemented here!');
+// }
+//
+// function showToast(message) {
+//     const toast = document.createElement('div');
+//     toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+//     toast.textContent = message;
+//     document.body.appendChild(toast);
+//     setTimeout(() => toast.remove(), 3000);
+// }
+//
+// // Load offers with beautiful display
+// function loadOffers() {
+//     fetch('/promotions/all')
+//         .then(res => res.json())
+//         .then(offers => {
+//             // Debug: Log the offers data to console
+//             console.log('Loaded offers:', offers);
+//             const grid = document.getElementById('offersGrid');
+//             if (!offers || offers.length === 0) {
+//                 grid.innerHTML = `
+//                     <div class="col-span-full text-center py-12">
+//                         <div class="text-6xl mb-4">🎁</div>
+//                         <h3 class="text-xl font-semibold text-gray-600 mb-2">No offers available</h3>
+//                         <p class="text-gray-500">Check back later for amazing deals!</p>
+//                     </div>
+//                 `;
+//                 return;
+//             }
+//
+//             grid.innerHTML = offers.map(offer => {
+//                 const originalPrice = offer.productPrice || 0;
+//                 const finalPrice = offer.finalAmount || originalPrice;
+//
+//                 // Calculate discount based on promotion type and value
+//                 let calculatedFinalPrice = originalPrice;
+//                 if (offer.type === 'PERCENTAGE' && offer.value > 0) {
+//                     calculatedFinalPrice = originalPrice * (1 - offer.value / 100);
+//                 } else if (offer.type === 'FLAT_AMOUNT' && offer.value > 0) {
+//                     calculatedFinalPrice = Math.max(0, originalPrice - offer.value);
+//                 }
+//
+//                 // Use the calculated price if finalAmount is not set or is the same as original
+//                 const actualFinalPrice = (offer.finalAmount && offer.finalAmount !== originalPrice) ? offer.finalAmount : calculatedFinalPrice;
+//                 const discountPercent = originalPrice > 0 ? Math.round(((originalPrice - actualFinalPrice) / originalPrice) * 100) : 0;
+//                 const isActive = new Date(offer.endDate) > new Date();
+//
+//                 return `
+//                     <div class="offer-card rounded-2xl p-6 shadow-xl ${isActive ? 'pulse' : 'opacity-75'}">
+//                         <div class="discount-badge">-${discountPercent}% OFF</div>
+//                         <div class="text-center">
+//                             <img src="${offer.productImageUrl || 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=300&auto=format&fit=crop'}"
+//                                  alt="${offer.productName}" class="offer-image mx-auto mb-4">
+//                             <h3 class="font-bold text-lg mb-2 text-shadow">${offer.title}</h3>
+//                             <p class="text-sm opacity-90 mb-3">${offer.productName}</p>
+//                             <div class="mb-3">
+//                                 <div class="price-old text-sm">LKR ${originalPrice.toLocaleString('en-LK', {minimumFractionDigits: 2})}</div>
+//                                 <div class="price-new">LKR ${actualFinalPrice.toLocaleString('en-LK', {minimumFractionDigits: 2})}</div>
+//                                 <div class="text-sm opacity-90">Save LKR ${(originalPrice - actualFinalPrice).toLocaleString('en-LK', {minimumFractionDigits: 2})}</div>
+//                             </div>
+//                             <div class="text-xs opacity-75 mb-4">
+//                                 ${new Date(offer.startDate).toLocaleDateString()} - ${new Date(offer.endDate).toLocaleDateString()}
+//                             </div>
+//                             <button onclick="addToCartFromOffer('${offer.productName}', ${actualFinalPrice}, '${offer.productImageUrl}')"
+//                                     class="bg-white/25 backdrop-blur-sm text-white px-6 py-3 rounded-xl font-bold hover:bg-white/35 transition-all duration-300 transform hover:scale-105 shadow-lg">
+//                                 <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
+//                             </button>
+//                         </div>
+//                     </div>
+//                 `;
+//             }).join('');
+//         })
+//         .catch(err => {
+//             console.error('Error loading offers:', err);
+//             document.getElementById('offersGrid').innerHTML = `
+//                 <div class="col-span-full text-center py-12">
+//                     <div class="text-6xl mb-4">⚠️</div>
+//                     <h3 class="text-xl font-semibold text-red-600 mb-2">Failed to load offers</h3>
+//                     <p class="text-gray-500">Please try again later</p>
+//                 </div>
+//             `;
+//         });
+// }
+//
+// // Load related products
+// function loadRelatedProducts() {
+//     fetch('/api/catalog/products?size=4')
+//         .then(res => res.json())
+//         .then(data => {
+//             const container = document.getElementById('relatedProducts');
+//             if (!data.items || data.items.length === 0) {
+//                 container.innerHTML = '<div class="col-span-full text-center text-gray-500">No products available</div>';
+//                 return;
+//             }
+//
+//             container.innerHTML = data.items.map(product => `
+//                 <div class="bg-white rounded-xl p-4 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow cursor-pointer"
+//                      onclick="window.location.href='/catalog-advanced.html'">
+//                     <img src="${product.imageUrl || 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=200&auto=format&fit=crop'}"
+//                          alt="${product.name}" class="w-full h-32 object-cover rounded-lg mb-3">
+//                     <h4 class="font-semibold text-gray-800 mb-1">${product.name}</h4>
+//                     <p class="text-sm text-gray-600 mb-2">${product.category || 'General'}</p>
+//                     <div class="font-bold text-green-600">LKR ${product.price.toLocaleString('en-LK', {minimumFractionDigits: 2})}</div>
+//                 </div>
+//             `).join('');
+//         })
+//         .catch(err => {
+//             console.error('Error loading related products:', err);
+//             document.getElementById('relatedProducts').innerHTML = '<div class="col-span-full text-center text-gray-500">Failed to load products</div>';
+//         });
+// }
+//
+// function addToCartFromOffer(name, price, imageUrl) {
+//     const existingItem = cart.find(item => item.name === name);
+//
+//     if (existingItem) {
+//         existingItem.quantity += 1;
+//     } else {
+//         cart.push({
+//             id: Date.now(),
+//             name: name,
+//             price: price,
+//             imageUrl: imageUrl,
+//             quantity: 1
+//         });
+//     }
+//
+//     localStorage.setItem('cart', JSON.stringify(cart));
+//     updateCartDisplay();
+//     showToast(`Added ${name} to cart!`);
+// }
+//
+// // Initialize
+// document.addEventListener('DOMContentLoaded', function() {
+//     updateCartDisplay();
+//     loadOffers();
+//     loadRelatedProducts();
+// });
+    document.body.appendChild(cartModal);
+}
+
+function showOrders() {
+    showToast('Order tracking functionality would be implemented here!');
+}
+
+function checkout() {
+    showToast('Checkout functionality would be implemented here!');
+}
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// Load offers with beautiful display
+function loadOffers() {
+    fetch('/promotions/all')
+        .then(res => res.json())
+        .then(offers => {
+            // Debug: Log the offers data to console
+            console.log('Loaded offers:', offers);
+            const grid = document.getElementById('offersGrid');
+            if (!offers || offers.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <div class="text-6xl mb-4">🎁</div>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">No offers available</h3>
+                        <p class="text-gray-500">Check back later for amazing deals!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = offers.map(offer => {
+                const originalPrice = offer.productPrice || 0;
+                const finalPrice = offer.finalAmount || originalPrice;
+
+                // Calculate discount based on promotion type and value
+                let calculatedFinalPrice = originalPrice;
+                if (offer.type === 'PERCENTAGE' && offer.value > 0) {
+                    calculatedFinalPrice = originalPrice * (1 - offer.value / 100);
+                } else if (offer.type === 'FLAT_AMOUNT' && offer.value > 0) {
+                    calculatedFinalPrice = Math.max(0, originalPrice - offer.value);
+                }
+
+                // Use the calculated price if finalAmount is not set or is the same as original
+                const actualFinalPrice = (offer.finalAmount && offer.finalAmount !== originalPrice) ? offer.finalAmount : calculatedFinalPrice;
+                const discountPercent = originalPrice > 0 ? Math.round(((originalPrice - actualFinalPrice) / originalPrice) * 100) : 0;
+                const isActive = new Date(offer.endDate) > new Date();
+
+                return `
+                    <div class="offer-card rounded-2xl p-6 shadow-xl ${isActive ? 'offer-glow' : 'opacity-75'} transform transition-all duration-500 hover:scale-105 hover:shadow-2xl">
+                        <div class="discount-badge bg-gradient-to-r from-green-400 to-green-600 text-white px-3 py-1 rounded-full text-sm font-bold absolute -top-2 -right-2 shadow-lg animate-bounce">-${discountPercent}% OFF</div>
+                        <div class="text-center">
+                            <img src="${offer.productImageUrl || 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=300&auto=format&fit=crop'}"
+                                 alt="${offer.productName}" class="offer-image mx-auto mb-4 rounded-xl transition-transform duration-300 hover:scale-110">
+                            <h3 class="font-bold text-lg mb-2 text-shadow text-white">${offer.title}</h3>
+                            <p class="text-sm opacity-90 mb-3 text-white">${offer.productName}</p>
+                            <div class="mb-3">
+                                <div class="price-old text-sm line-through text-red-300">LKR ${originalPrice.toLocaleString('en-LK', {minimumFractionDigits: 2})}</div>
+                                <div class="price-new text-2xl font-bold text-green-300">LKR ${actualFinalPrice.toLocaleString('en-LK', {minimumFractionDigits: 2})}</div>
+                                <div class="text-sm text-green-200 font-semibold">Save LKR ${(originalPrice - actualFinalPrice).toLocaleString('en-LK', {minimumFractionDigits: 2})}</div>
+                            </div>
+                            <div class="text-xs opacity-75 mb-4 text-white">
+                                ${new Date(offer.startDate).toLocaleDateString()} - ${new Date(offer.endDate).toLocaleDateString()}
+                            </div>
+                            <button onclick="addToCartFromOffer('${offer.productName}', ${actualFinalPrice}, '${offer.productImageUrl}')"
+                                    class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl border-2 border-green-300 hover:border-green-200">
+                                <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        })
+        .catch(err => {
+            console.error('Error loading offers:', err);
+            document.getElementById('offersGrid').innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <div class="text-6xl mb-4">⚠️</div>
+                    <h3 class="text-xl font-semibold text-red-600 mb-2">Failed to load offers</h3>
+                    <p class="text-gray-500">Please try again later</p>
+                    <button onclick="loadOffers()" class="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors duration-300">
+                        <i class="fas fa-refresh mr-2"></i>Try Again
+                    </button>
+                </div>
+            `;
+        });
+}
+
+// Load related products
+function loadRelatedProducts() {
+    fetch('/api/catalog/products?size=4')
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('relatedProducts');
+            if (!data.items || data.items.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center text-gray-500">No products available</div>';
+                return;
+            }
+
+            container.innerHTML = data.items.map(product => `
+                <div class="bg-white rounded-xl p-4 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105 hover:border-green-300"
+                     onclick="window.location.href='/catalog-advanced.html'">
+                    <img src="${product.imageUrl || 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=200&auto=format&fit=crop'}"
+                         alt="${product.name}" class="w-full h-32 object-cover rounded-lg mb-3 transition-transform duration-300 hover:scale-110">
+                    <h4 class="font-semibold text-gray-800 mb-1">${product.name}</h4>
+                    <p class="text-sm text-gray-600 mb-2">${product.category || 'General'}</p>
+                    <div class="font-bold text-green-600">LKR ${product.price.toLocaleString('en-LK', {minimumFractionDigits: 2})}</div>
+                </div>
+            `).join('');
+        })
+        .catch(err => {
+            console.error('Error loading related products:', err);
+            document.getElementById('relatedProducts').innerHTML = `
+                <div class="col-span-full text-center text-gray-500">
+                    <div class="mb-4">Failed to load products</div>
+                    <button onclick="loadRelatedProducts()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors duration-300">
+                        <i class="fas fa-refresh mr-2"></i>Retry
+                    </button>
+                </div>
+            `;
+        });
+}
+
+function addToCartFromOffer(name, price, imageUrl) {
+    const existingItem = cart.find(item => item.name === name);
+
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({
+            id: Date.now(),
+            name: name,
+            price: price,
+            imageUrl: imageUrl,
+            quantity: 1
+        });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartDisplay();
+    showToast(`Added ${name} to cart!`);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    updateCartDisplay();
+    loadOffers();
+    loadRelatedProducts();
+});
+
+// Add CSS styles for smooth animations (you'll need to add this to your CSS file)
+const style = document.createElement('style');
+style.textContent = `
+    .offer-glow {
+        background: linear-gradient(135deg, #10b981, #059669, #047857);
+        animation: gentle-glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes gentle-glow {
+        0% {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        100% {
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.5), 0 0 40px rgba(16, 185, 129, 0.2);
+        }
+    }
+
+    .discount-badge {
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-10px);
+        }
+        60% {
+            transform: translateY(-5px);
+        }
+    }
+`;
+document.head.appendChild(style);
+
 </script>
 </body>
 </html>

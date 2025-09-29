@@ -26,17 +26,27 @@
         .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:16px}
         .card{background:var(--card);border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);transition:transform .15s}
         .card:hover{transform:translateY(-3px)}
-        .thumb{aspect-ratio:4/3;background:#ecfeff;display:grid;place-items:center}
-        .thumb img{width:100%;height:100%;object-fit:cover}
+        .card.has-promotion{border:2px solid #667eea;box-shadow:0 12px 28px rgba(102,126,234,.2);background:linear-gradient(135deg,#f8faff,#f0f4ff)}
+        .thumb{aspect-ratio:4/3;background:#ecfeff;display:grid;place-items:center;position:relative;overflow:hidden}
+        .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s ease}
+        .card.has-promotion .thumb img{transform:scale(1.05)}
+        .promo-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:6px 12px;border-radius:16px;font-size:11px;font-weight:900;box-shadow:0 6px 20px rgba(102,126,234,.4);animation:pulse 2s infinite;border:2px solid rgba(255,255,255,.3);backdrop-filter:blur(10px)}
         .meta{padding:12px}
         .title{font-weight:700;margin:2px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .muted{color:var(--muted);font-size:12px}
         .price{font-weight:800;margin-top:6px}
+        .price-section{margin-top:6px}
+        .price-old{text-decoration:line-through;color:#94a3b8;font-size:14px;font-weight:600;margin-bottom:2px}
+        .price-new{color:#667eea;font-weight:900;font-size:16px;margin-bottom:2px;text-shadow:0 2px 4px rgba(102,126,234,.2)}
+        .price-save{color:#10b981;font-size:11px;font-weight:700;background:linear-gradient(135deg,#ecfdf5,#d1fae5);padding:4px 8px;border-radius:8px;display:inline-block;border:1px solid #a7f3d0;box-shadow:0 2px 8px rgba(16,185,129,.15)}
         .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #fde68a;background:#fffbeb;color:#92400e}
         .low{border-color:#fecaca;background:#fff1f2;color:#b91c1c}
         .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}
-        .actions .a{border:1px solid #e2e8f0;border-radius:10px;padding:6px 10px;cursor:pointer;background:#fff}
+        .actions .a{border:1px solid #e2e8f0;border-radius:10px;padding:6px 10px;cursor:pointer;background:#fff;transition:all .2s ease}
         .actions .a.primary{border-color:#86efac;color:#065f46}
+        .actions .a.cart-btn{background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-color:#10b981}
+        .actions .a.cart-btn:hover{transform:scale(1.05);box-shadow:0 4px 12px rgba(16,185,129,.3)}
+        .actions .a:hover{transform:translateY(-1px)}
         .empty{text-align:center;color:var(--muted);padding:40px}
         .pager{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
         .pill{border:1px solid #86efac;background:#ecfdf5;color:#064e3b;border-radius:999px;padding:6px 12px;font-weight:700}
@@ -49,6 +59,11 @@
         .kv{display:grid;grid-template-columns:140px 1fr;gap:8px;font-size:14px}
         .kv div{padding:6px 0;border-bottom:1px dashed #e2e8f0}
         @media (max-width:900px){.filters{grid-template-columns:1fr 1fr;}.dlg-b{grid-template-columns:1fr}}
+        
+        /* Promotion animations */
+        @keyframes pulse{0%{opacity:.8;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}100%{opacity:.8;transform:scale(1)}}
+        @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .card.has-promotion{animation:slideIn .5s ease}
     </style>
 </head>
 <body>
@@ -127,7 +142,7 @@
         const t = localStorage.getItem('auth.token');
         return t ? { Authorization: `Bearer ${t}` } : {};
     }
-    function fmtPrice(v){ return (v ?? 0).toLocaleString(undefined,{style:'currency',currency:'LKR',maximumFractionDigits:2}); }
+    function fmtPrice(v){ return `LKR ${(v ?? 0).toLocaleString('en-LK', {minimumFractionDigits: 2})}`; }
     function imgEl(src,alt){ const i=new Image(); i.alt=alt||''; i.referrerPolicy='no-referrer'; i.src=src||PLACEHOLDER; i.onerror=()=>{i.src=PLACEHOLDER}; return i; }
 
     // ---------- load categories ----------
@@ -184,19 +199,50 @@
 
     function cardHtml(p){
         const bClass = p.availableQty<=0 ? 'badge low' : 'badge';
+        
+        // Check if product has promotion
+        const hasPromotion = p.promotion && p.promotion.finalAmount < p.price;
+        const originalPrice = p.price || 0;
+        let finalPrice = originalPrice;
+        
+        if (hasPromotion && p.promotion) {
+          // Calculate discount based on promotion type and value
+          if (p.promotion.type === 'PERCENTAGE' && p.promotion.value > 0) {
+            finalPrice = originalPrice * (1 - p.promotion.value / 100);
+          } else if (p.promotion.type === 'FLAT_AMOUNT' && p.promotion.value > 0) {
+            finalPrice = Math.max(0, originalPrice - p.promotion.value);
+          } else if (p.promotion.finalAmount && p.promotion.finalAmount !== originalPrice) {
+            finalPrice = p.promotion.finalAmount;
+          }
+        }
+        
+        const discountPercent = hasPromotion && originalPrice > 0 ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100) : 0;
+        
         return `
-      <div class="card" data-id="${p.id}">
-        <div class="thumb">${imgElString(p.imageUrl,p.name)}</div>
+      <div class="card ${hasPromotion ? 'has-promotion' : ''}" data-id="${p.id}">
+        <div class="thumb">
+          ${imgElString(p.imageUrl,p.name)}
+          ${hasPromotion ? `<div class="promo-badge">-${discountPercent}%</div>` : ''}
+        </div>
         <div class="meta">
           <div class="title" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
           <div class="muted">${escapeHtml(p.sku)} • <span class="${bClass}">${escapeHtml(p.category||'General')}</span></div>
           <div class="row">
             <div>
-              <div class="price">${fmtPrice(p.price||0)}</div>
+              <div class="price-section">
+                ${hasPromotion ? `
+                  <div class="price-old">${fmtPrice(originalPrice)}</div>
+                  <div class="price-new">${fmtPrice(finalPrice)}</div>
+                  <div class="price-save">Save ${fmtPrice(originalPrice - finalPrice)}</div>
+                ` : `
+                  <div class="price">${fmtPrice(originalPrice)}</div>
+                `}
+              </div>
               <div class="muted">${p.availableQty} available</div>
             </div>
             <div class="actions">
               <button class="a primary">View</button>
+              <button class="a cart-btn" onclick="addToCart(${p.id}, '${escapeHtml(p.name)}', ${finalPrice}, '${p.imageUrl || ''}')">🛒</button>
             </div>
           </div>
         </div>
@@ -246,8 +292,109 @@
     $('#inStock').addEventListener('change', ()=>{ inStock=$('#inStock').checked; page=0; load(); });
     $('#sort').addEventListener('change', ()=>{ sort=$('#sort').value; page=0; load(); });
 
+    // Cart functionality
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    
+    function addToCart(id, name, price, imageUrl){
+        const existingItem = cart.find(item => item.id === id);
+        
+        if(existingItem){
+            existingItem.quantity += 1;
+        } else {
+            cart.push({
+                id: id,
+                name: name,
+                price: price,
+                imageUrl: imageUrl,
+                quantity: 1
+            });
+        }
+        
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartDisplay();
+        showToast(`Added ${name} to cart!`);
+    }
+    
+    function updateCartDisplay(){
+        const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+        
+        // Add cart indicator to header
+        let cartIndicator = document.querySelector('.cart-indicator');
+        if(!cartIndicator){
+            cartIndicator = document.createElement('div');
+            cartIndicator.className = 'cart-indicator';
+            cartIndicator.innerHTML = `
+                <button class="btn" onclick="showCart()" style="position:relative">
+                    🛒 <span class="cart-count">${cartCount}</span>
+                </button>
+            `;
+            document.querySelector('.bar').appendChild(cartIndicator);
+        } else {
+            cartIndicator.querySelector('.cart-count').textContent = cartCount;
+        }
+    }
+    
+    function showCart(){
+        const cartModal = document.createElement('div');
+        cartModal.style.cssText = `
+            position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;
+            display:flex;align-items:center;justify-content:center;padding:20px;
+        `;
+        cartModal.innerHTML = `
+            <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5)" onclick="this.parentElement.remove()"></div>
+            <div style="background:#fff;border-radius:16px;width:100%;max-width:500px;max-height:80vh;display:flex;flex-direction:column;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:20px;border-bottom:1px solid #e2e8f0;background:#f0fdf4">
+                    <h3 style="margin:0">🛒 Shopping Cart (${cart.length} items)</h3>
+                    <button onclick="this.closest('div').parentElement.remove()" style="background:none;border:none;font-size:20px;cursor:pointer">✕</button>
+                </div>
+                <div style="flex:1;overflow-y:auto;padding:20px">
+                    ${cart.map(item => `
+                        <div style="display:flex;gap:15px;padding:15px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:10px;background:#fff">
+                            <img src="${item.imageUrl || PLACEHOLDER}" alt="${item.name}" style="width:60px;height:60px;object-fit:cover;border-radius:8px">
+                            <div style="flex:1">
+                                <h4 style="margin:0 0 5px 0;font-size:16px">${item.name}</h4>
+                                <div style="color:#64748b;font-size:12px;margin:0 0 8px 0">Qty: ${item.quantity}</div>
+                                <div style="font-weight:700;color:#10b981">${fmtPrice(item.price * item.quantity)}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="padding:20px;border-top:1px solid #e2e8f0;background:#f8f9fa">
+                    <div style="text-align:center;margin-bottom:15px;font-size:18px">
+                        <strong>Total: ${fmtPrice(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0))}</strong>
+                    </div>
+                    <button class="btn" style="width:100%;padding:15px;font-size:16px;background:#10b981;color:#fff;border:none" onclick="checkout()">Checkout</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(cartModal);
+    }
+    
+    function checkout(){
+        if(cart.length === 0){
+            showToast('Your cart is empty!');
+            return;
+        }
+        showToast('Checkout functionality would be implemented here!');
+    }
+    
+    function showToast(message){
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position:fixed;bottom:20px;right:20px;background:#111827;color:#fff;
+            padding:12px 16px;border-radius:8px;z-index:1001;box-shadow:0 8px 24px rgba(0,0,0,.15);
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
     // init
-    loadCategories().finally(load);
+    loadCategories().finally(() => {
+        load();
+        updateCartDisplay();
+    });
 </script>
 </body>
 </html>
