@@ -484,14 +484,11 @@
   function cardHtml(p){
     const bClass = p.availableQty<=0 ? 'badge low' : 'badge';
     const wrapClass = 'card' + (view==='list'?' list-row':'');
-    
     // Check if product has promotion
     const hasPromotion = p.promotion && p.promotion.finalAmount < p.price;
     const originalPrice = p.price || 0;
     let finalPrice = originalPrice;
-    
     if (hasPromotion && p.promotion) {
-      // Calculate discount based on promotion type and value
       if (p.promotion.type === 'PERCENTAGE' && p.promotion.value > 0) {
         finalPrice = originalPrice * (1 - p.promotion.value / 100);
       } else if (p.promotion.type === 'FLAT_AMOUNT' && p.promotion.value > 0) {
@@ -500,52 +497,36 @@
         finalPrice = p.promotion.finalAmount;
       }
     }
-    
     const discountPercent = hasPromotion && originalPrice > 0 ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100) : 0;
-    
     return `
-  <article class="${wrapClass} ${hasPromotion ? 'has-promotion' : ''}" data-id="${p.id}">
-    <div class="thumb">
-      <img src="${esc(p.imageUrl||PH)}" alt="${esc(p.name)}" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${PH}'">
-      ${hasPromotion ? `<div class="promo-badge">-${discountPercent}%</div>` : ''}
-    </div>
-    <div class="meta">
-      <div>
-        <div class="title" title="${esc(p.name)}">${esc(p.name)}</div>
-        <div class="muted">${esc(p.sku)} • <span class="${bClass}">${esc(p.category||'General')}</span></div>
-        <div class="price-section">
-          ${hasPromotion ? `
-            <div class="price-old">${fmtLKR(originalPrice)}</div>
-            <div class="price-new">${fmtLKR(finalPrice)}</div>
-            <div class="price-save">Save ${fmtLKR(originalPrice - finalPrice)}</div>
-          ` : `
-            <div class="price">${fmtLKR(originalPrice)}</div>
-          `}
+      <article class="${wrapClass} ${hasPromotion ? 'has-promotion' : ''}" data-id="${p.id}">
+        <div class="thumb">
+          <img src="${esc(p.imageUrl||PH)}" alt="${esc(p.name)}" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${PH}'">
+          ${hasPromotion ? `<div class="promo-badge">-${discountPercent}%</div>` : ''}
         </div>
-        <div class="muted">${(p.availableQty??0)} available</div>
-      </div>
-      <div class="actions">
-        <button class="a" data-act="fav" title="Save">♡</button>
-        <button class="a primary" data-act="view">View</button>
-        <button class="a cart-btn" data-act="cart" title="Add to Cart">🛒</button>
-      </div>
-    </div>
-  </article>`;
-    <article class="${wrapClass}" data-id="${p.id}">
-      <div class="thumb"><img src="${esc(p.imageUrl||PH)}" alt="${esc(p.name)}" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${PH}'"></div>
-      <div class="meta">
-        <div>
-          <div class="title" title="${esc(p.name)}">${esc(p.name)}</div>
-          <div class="muted">${esc(p.sku)} • <span class="${bClass}">${esc(p.category||'General')}</span></div>
-          <div class="price">${fmtLKR(p.price||0)}</div>
-          <div class="muted">${(p.availableQty??0)} available</div>
+        <div class="meta">
+          <div>
+            <div class="title" title="${esc(p.name)}">${esc(p.name)}</div>
+            <div class="muted">${esc(p.sku)} • <span class="${bClass}">${esc(p.category||'General')}</span></div>
+            <div class="price-section">
+              ${hasPromotion ? `
+                <div class="price-old">${fmtLKR(originalPrice)}</div>
+                <div class="price-new">${fmtLKR(finalPrice)}</div>
+                <div class="price-save">Save ${fmtLKR(originalPrice - finalPrice)}</div>
+              ` : `
+                <div class="price">${fmtLKR(originalPrice)}</div>
+              `}
+            </div>
+            <div class="muted">${(p.availableQty??0)} available</div>
+          </div>
+          <div class="actions">
+            <button class="a" data-act="fav" title="Save">♡</button>
+            <button class="a primary" data-act="view">View</button>
+            <button class="a cart-btn" data-act="cart" title="Add to Cart">🛒</button>
+          </div>
         </div>
-        <div class="actions">
-          <button class="a" data-act="fav" title="Save">♡</button>
-          <button class="a primary" data-act="view">View</button>
-        </div>
-      </div>
-    </article>`;
+      </article>
+    `;
   }
 
   function render(data, append=false){
