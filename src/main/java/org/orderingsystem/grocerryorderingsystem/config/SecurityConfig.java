@@ -37,7 +37,11 @@ public class SecurityConfig {
                                 "/css/**",
                                 "/js/**",
                                 "/dashboard/**",
-                                "/api/auth/**"
+                                "/api/auth/**",
+
+                                //promotion ui
+                                "/promotion/**"
+
                         ).permitAll()
 
                         // --- Public catalog API (optional; if you use /api/catalog/**) ---
@@ -48,6 +52,11 @@ public class SecurityConfig {
                                 "/api/inventory/products",
                                 "/api/inventory/products/**"
                         ).permitAll()
+
+
+                        // promotion uii
+                        .requestMatchers("/promotions/**").permitAll()
+
 
                         // --- Everything else requires auth ---
                         .anyRequest().authenticated()

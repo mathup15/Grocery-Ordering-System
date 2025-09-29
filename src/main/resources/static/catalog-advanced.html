@@ -50,18 +50,28 @@
     /* Card */
     .card{background:var(--card);border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;box-shadow:var(--shadow);transition:transform .12s ease}
     .card:hover{transform:translateY(-3px)}
-    .thumb{aspect-ratio:4/3;background:linear-gradient(180deg,#f0fdf4,#ecfeff 60%);display:grid;place-items:center}
-    .thumb img{width:100%;height:100%;object-fit:cover}
+    .card.has-promotion{border:2px solid #667eea;box-shadow:0 15px 35px rgba(102,126,234,.25);background:linear-gradient(135deg,#f8faff,#f0f4ff)}
+    .thumb{aspect-ratio:4/3;background:linear-gradient(180deg,#f0fdf4,#ecfeff 60%);display:grid;place-items:center;position:relative;overflow:hidden}
+    .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s ease}
+    .card.has-promotion .thumb img{transform:scale(1.05)}
+    .promo-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:6px 12px;border-radius:16px;font-size:11px;font-weight:900;box-shadow:0 6px 20px rgba(102,126,234,.4);animation:pulse 2s infinite;border:2px solid rgba(255,255,255,.3);backdrop-filter:blur(10px)}
     .meta{padding:12px 14px}
     .title{font-weight:800;margin:6px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .muted{color:var(--muted);font-size:12px}
     .price{font-weight:900;margin-top:8px}
+    .price-section{margin-top:8px}
+    .price-old{text-decoration:line-through;color:#94a3b8;font-size:14px;font-weight:600;margin-bottom:2px}
+    .price-new{color:#667eea;font-weight:900;font-size:18px;margin-bottom:2px;text-shadow:0 2px 4px rgba(102,126,234,.2)}
+    .price-save{color:#10b981;font-size:11px;font-weight:700;background:linear-gradient(135deg,#ecfdf5,#d1fae5);padding:4px 8px;border-radius:8px;display:inline-block;border:1px solid #a7f3d0;box-shadow:0 2px 8px rgba(16,185,129,.15)}
     .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}
     .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;border:1px solid #fde68a;background:#fffbeb;color:#92400e}
     .low{border-color:#fecaca;background:#fff1f2;color:#b91c1c}
     .actions{display:flex;gap:8px}
-    .a{border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;background:#fff;font-weight:700}
+    .a{border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;background:#fff;cursor:pointer;font-weight:700}
     .a.primary{border-color:var(--g-300);color:#065f46}
+    .a.cart-btn{background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-color:#10b981}
+    .a.cart-btn:hover{transform:scale(1.05);box-shadow:0 4px 12px rgba(16,185,129,.3)}
+    .a:hover{transform:translateY(-1px)}
 
     /* List variant */
     .card.list-row{display:grid;grid-template-columns:180px 1fr;gap:0}
@@ -77,6 +87,11 @@
     @keyframes pulse{0%{opacity:.5}50%{opacity:1}100%{opacity:.5}}
     .sk.card .thumb{background:#ecfdf5}
     .sk .line{height:12px;background:#e2e8f0;border-radius:8px;margin:8px 0}
+    
+    /* Promotion animations */
+    @keyframes pulse{0%{opacity:.8;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}100%{opacity:.8;transform:scale(1)}}
+    @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .card.has-promotion{animation:slideIn .5s ease}
 
     /* Dialog (Quick View) */
     dialog{border:none;border-radius:20px;width:min(860px,92vw);padding:0;box-shadow:0 24px 80px rgba(0,0,0,.25)}
@@ -250,7 +265,7 @@
     return t ? { Authorization: `Bearer ${t}` } : {};
   }
   const deb = (fn,ms=350)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms);} };
-  function fmtLKR(v){ return (v ?? 0).toLocaleString(undefined,{style:'currency',currency:'LKR'}); }
+  function fmtLKR(v){ return `LKR ${(v ?? 0).toLocaleString('en-LK', {minimumFractionDigits: 2})}`; }
   function esc(s){ return (s??'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
   function toast(msg){ const t=document.createElement('div'); t.className='t'; t.textContent=msg; toastBox.appendChild(t); setTimeout(()=>t.remove(),2400); }
   function qsFromState(){
@@ -452,22 +467,41 @@
   function cardHtml(p){
     const bClass = p.availableQty<=0 ? 'badge low' : 'badge';
     const wrapClass = 'card' + (view==='list'?' list-row':'');
+    
+    // Check if product has promotion
+    const hasPromotion = p.promotion && p.promotion.finalAmount < p.price;
+    const originalPrice = p.price || 0;
+    let finalPrice = originalPrice;
+    
+    if (hasPromotion && p.promotion) {
+      // Calculate discount based on promotion type and value
+      if (p.promotion.type === 'PERCENTAGE' && p.promotion.value > 0) {
+        finalPrice = originalPrice * (1 - p.promotion.value / 100);
+      } else if (p.promotion.type === 'FLAT_AMOUNT' && p.promotion.value > 0) {
+        finalPrice = Math.max(0, originalPrice - p.promotion.value);
+      } else if (p.promotion.finalAmount && p.promotion.finalAmount !== originalPrice) {
+        finalPrice = p.promotion.finalAmount;
+      }
+    }
+    
+    const discountPercent = hasPromotion && originalPrice > 0 ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100) : 0;
+    
     return `
-    <article class="${wrapClass}" data-id="${p.id}">
-      <div class="thumb"><img src="${esc(p.imageUrl||PH)}" alt="${esc(p.name)}" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${PH}'"></div>
-      <div class="meta">
-        <div>
-          <div class="title" title="${esc(p.name)}">${esc(p.name)}</div>
-          <div class="muted">${esc(p.sku)} • <span class="${bClass}">${esc(p.category||'General')}</span></div>
-          <div class="price">${fmtLKR(p.price||0)}</div>
-          <div class="muted">${(p.availableQty??0)} available</div>
-        </div>
-        <div class="actions">
-          <button class="a" data-act="fav" title="Save">♡</button>
-          <button class="a primary" data-act="view">View</button>
-        </div>
+  <article class="${wrapClass}" data-id="${p.id}">
+    <div class="thumb"><img src="${esc(p.imageUrl||PH)}" alt="${esc(p.name)}" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${PH}'"></div>
+    <div class="meta">
+      <div>
+        <div class="title" title="${esc(p.name)}">${esc(p.name)}</div>
+        <div class="muted">${esc(p.sku)} • <span class="${bClass}">${esc(p.category||'General')}</span></div>
+        <div class="price">${fmtLKR(p.price||0)}</div>
+        <div class="muted">${(p.availableQty??0)} available</div>
       </div>
-    </article>`;
+      <div class="actions">
+        <button class="a" data-act="fav" title="Save">♡</button>
+        <button class="a primary" data-act="view">View</button>
+      </div>
+    </div>
+  </article>`;
   }
 
   function render(data, append=false){
@@ -478,8 +512,12 @@
     elGrid.insertAdjacentHTML('beforeend', data.map(cardHtml).join(''));
     // bind actions
     elGrid.querySelectorAll('article[data-id]').forEach(card=>{
-      card.querySelectorAll('[data-act="view"]').forEach(btn=>btn.addEventListener('click', ()=>openDetail(card.dataset.id)));
-      card.querySelectorAll('[data-act="fav"]').forEach(btn=>btn.addEventListener('click', ()=>{ btn.textContent = btn.textContent==='♡'?'❤':'♡'; }));
+      card.querySelectorAll('[data-act="view"]').forEach(btn=>{
+        btn.addEventListener('click', ()=>openDetail(card.dataset.id));
+      });
+      card.querySelectorAll('[data-act="fav"]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{ btn.textContent = btn.textContent==='♡'?'❤':'♡'; });
+      });
     });
   }
 
@@ -489,23 +527,199 @@
       const res = await fetch(API.detail(id), { headers: { ...authHeaders() }});
       if(!res.ok) throw new Error('Failed to fetch detail');
       const d = await res.json();
+      
+      // Check for promotion
+      const hasPromotion = d.promotion && d.promotion.finalAmount < d.price;
+      const originalPrice = d.price || 0;
+      let finalPrice = originalPrice;
+      
+      if (hasPromotion && d.promotion) {
+        // Calculate discount based on promotion type and value
+        if (d.promotion.type === 'PERCENTAGE' && d.promotion.value > 0) {
+          finalPrice = originalPrice * (1 - d.promotion.value / 100);
+        } else if (d.promotion.type === 'FLAT_AMOUNT' && d.promotion.value > 0) {
+          finalPrice = Math.max(0, originalPrice - d.promotion.value);
+        } else if (d.promotion.finalAmount && d.promotion.finalAmount !== originalPrice) {
+          finalPrice = d.promotion.finalAmount;
+        }
+      }
+      
+      const discountPercent = hasPromotion && originalPrice > 0 ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100) : 0;
+      
       $('#dlgTitle').textContent = d.name;
       $('#dlgImg').src = d.imageUrl || PH;
       $('#dSku').textContent = d.sku;
       $('#dCat').textContent = d.category || '—';
       $('#dUnit').textContent = d.unit || '—';
-      $('#dPrice').textContent = fmtLKR(d.price||0);
+      
+      // Enhanced price display
+      if(hasPromotion){
+        $('#dPrice').innerHTML = `
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="text-decoration:line-through;color:#94a3b8;font-size:16px;">${fmtLKR(originalPrice)}</div>
+            <div style="color:#ef4444;font-weight:900;font-size:20px;">${fmtLKR(finalPrice)}</div>
+            <div style="color:#10b981;font-size:14px;font-weight:700;">Save ${fmtLKR(originalPrice - finalPrice)} (${discountPercent}% OFF)</div>
+          </div>
+        `;
+      } else {
+        $('#dPrice').textContent = fmtLKR(originalPrice);
+      }
+      
       $('#dSoh').textContent = d.stockOnHand ?? 0;
       $('#dRes').textContent = d.reservedQty ?? 0;
       $('#dAvail').textContent = d.availableQty ?? 0;
-
-      // Nutrition facts (if backend sends d.nutrition = {calories, sugar, protein})
-      $('#dCal').textContent    = d.nutrition?.calories ?? '—';
-      $('#dSugar').textContent  = d.nutrition?.sugar ?? '—';
-      $('#dProtein').textContent= d.nutrition?.protein ?? '—';
-
       $('#dlg').showModal();
     }catch(err){ toast(err.message||'Unable to load product'); }
+  }
+
+  /* =================== cart functionality =================== */
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  
+  function addToCart(product, price){
+    const existingItem = cart.find(item => item.id === product.id);
+    
+    if(existingItem){
+      existingItem.quantity += 1;
+    } else {
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: price,
+        originalPrice: product.price,
+        imageUrl: product.imageUrl,
+        quantity: 1,
+        sku: product.sku
+      });
+    }
+    
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartDisplay();
+    toast(`Added ${product.name} to cart!`);
+  }
+  
+  function updateCartDisplay(){
+    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // Update cart indicator in header
+    let cartIndicator = document.querySelector('.cart-indicator');
+    if(!cartIndicator){
+      cartIndicator = document.createElement('div');
+      cartIndicator.className = 'cart-indicator';
+      cartIndicator.innerHTML = `
+        <button class="btn cart-toggle" onclick="showCart()">
+          🛒 <span class="cart-count">${cartCount}</span>
+        </button>
+      `;
+      document.querySelector('.bar').appendChild(cartIndicator);
+    } else {
+      cartIndicator.querySelector('.cart-count').textContent = cartCount;
+    }
+  }
+  
+  function showCart(){
+    const cartModal = document.createElement('div');
+    cartModal.className = 'cart-modal';
+    cartModal.innerHTML = `
+      <div class="cart-overlay" onclick="this.parentElement.remove()"></div>
+      <div class="cart-content">
+        <div class="cart-header">
+          <h3>🛒 Shopping Cart (${cart.length} items)</h3>
+          <button onclick="this.closest('.cart-modal').remove()">✕</button>
+        </div>
+        <div class="cart-items">
+          ${cart.map(item => `
+            <div class="cart-item">
+              <img src="${item.imageUrl || PH}" alt="${item.name}" class="cart-item-img">
+              <div class="cart-item-details">
+                <h4>${item.name}</h4>
+                <p class="cart-item-sku">${item.sku}</p>
+                <div class="cart-item-price">
+                  ${item.price < item.originalPrice ? `
+                    <span class="price-old">${fmtLKR(item.originalPrice)}</span>
+                    <span class="price-new">${fmtLKR(item.price)}</span>
+                  ` : `
+                    <span class="price">${fmtLKR(item.price)}</span>
+                  `}
+                </div>
+                <div class="cart-item-controls">
+                  <button onclick="updateQuantity(${item.id}, -1)">-</button>
+                  <span>${item.quantity}</span>
+                  <button onclick="updateQuantity(${item.id}, 1)">+</button>
+                  <button onclick="removeFromCart(${item.id})" class="remove-btn">🗑️</button>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="cart-footer">
+          <div class="cart-total">
+            <strong>Total: ${fmtLKR(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0))}</strong>
+          </div>
+          <button class="btn primary checkout-btn" onclick="checkout()">Checkout</button>
+        </div>
+      </div>
+    `;
+    
+    // Add cart modal styles
+    const cartStyles = document.createElement('style');
+    cartStyles.textContent = `
+      .cart-modal{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+      .cart-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5)}
+      .cart-content{background:#fff;border-radius:20px;width:100%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+      .cart-header{display:flex;justify-content:space-between;align-items:center;padding:20px;border-bottom:1px solid #e2e8f0;background:var(--g-50)}
+      .cart-header h3{margin:0;color:var(--ink)}
+      .cart-header button{background:none;border:none;font-size:20px;cursor:pointer;padding:5px}
+      .cart-items{flex:1;overflow-y:auto;padding:20px}
+      .cart-item{display:flex;gap:15px;padding:15px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:10px;background:#fff}
+      .cart-item-img{width:60px;height:60px;object-fit:cover;border-radius:8px}
+      .cart-item-details{flex:1}
+      .cart-item-details h4{margin:0 0 5px 0;font-size:16px}
+      .cart-item-sku{color:var(--muted);font-size:12px;margin:0 0 8px 0}
+      .cart-item-price{margin-bottom:10px}
+      .cart-item-controls{display:flex;align-items:center;gap:10px}
+      .cart-item-controls button{width:30px;height:30px;border:1px solid #e2e8f0;background:#fff;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+      .cart-item-controls button:hover{background:#f8f9fa}
+      .remove-btn{color:#ef4444;border-color:#fecaca}
+      .cart-footer{padding:20px;border-top:1px solid #e2e8f0;background:#f8f9fa}
+      .cart-total{text-align:center;margin-bottom:15px;font-size:18px}
+      .checkout-btn{width:100%;padding:15px;font-size:16px}
+      .cart-indicator{position:relative}
+      .cart-toggle{position:relative;background:var(--g-500);color:#fff;border:none}
+      .cart-count{position:absolute;top:-8px;right:-8px;background:#ef4444;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+    `;
+    document.head.appendChild(cartStyles);
+    
+    document.body.appendChild(cartModal);
+  }
+  
+  function updateQuantity(productId, change){
+    const item = cart.find(item => item.id === productId);
+    if(item){
+      item.quantity += change;
+      if(item.quantity <= 0){
+        cart = cart.filter(item => item.id !== productId);
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartDisplay();
+      showCart(); // Refresh cart display
+    }
+  }
+  
+  function removeFromCart(productId){
+    cart = cart.filter(item => item.id !== productId);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartDisplay();
+    showCart(); // Refresh cart display
+  }
+  
+  function checkout(){
+    if(cart.length === 0){
+      toast('Your cart is empty!');
+      return;
+    }
+    toast('Checkout functionality would be implemented here!');
+    // Here you would typically redirect to checkout page or open checkout modal
   }
 
   /* =================== boot =================== */
@@ -514,6 +728,7 @@
     bindBasics();
     await loadCategories();
     await load();
+    updateCartDisplay();
   }
   boot();
 </script>
