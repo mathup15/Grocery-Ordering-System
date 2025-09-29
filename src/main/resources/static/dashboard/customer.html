@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard • FreshCartLanka</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card { @apply bg-white rounded-2xl shadow-sm border border-gray-100; }
+        .press { @apply transition duration-150 hover:shadow-md hover:-translate-y-0.5; }
+        .pill { @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium; }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-green-50 to-green-50/40">
+<script src="/js/app.js"></script>
+<script>Auth.requireRole(["CUSTOMER","ADMIN","STAFF","DELIVERY"]);</script>
+
+<!-- NAVBAR -->
+<header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
+        <a href="/" class="flex items-center gap-2 font-extrabold text-lg text-emerald-700">
+            <span class="h-9 w-9 grid place-content-center rounded-xl bg-emerald-600 text-white text-xl">🛒</span>
+            FreshCartLanka
+        </a>
+
+        <div class="flex-1 hidden md:block">
+            <label class="relative block">
+                <input placeholder="Search products…" class="w-full rounded-xl bg-gray-50 border border-gray-200 pl-10 pr-4 py-2 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-600 outline-none">
+                <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="m21 21-4.3-4.3M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/></svg>
+            </label>
+        </div>
+
+        <nav class="hidden md:flex items-center gap-2">
+            <a href="/catalog-advanced.html" class="px-3 py-2 rounded-lg hover:bg-gray-100">Shop</a>
+            <a href="/dashboard/customer-orders.html" class="px-3 py-2 rounded-lg hover:bg-gray-100">Orders</a>
+            <a href="/dashboard/customer-cart.html" class="px-3 py-2 rounded-lg hover:bg-gray-100">Cart</a>
+        </nav>
+
+        <!-- Profile -->
+        <div class="relative">
+            <button id="profileBtn" class="flex items-center gap-3 rounded-xl border border-gray-200 px-3 py-2 hover:bg-gray-50">
+                <img class="h-8 w-8 rounded-full object-cover" src="https://i.pravatar.cc/80?img=12" alt="">
+                <div class="hidden sm:block text-left">
+                    <div id="who" class="text-sm font-semibold">Hi there</div>
+                    <div class="text-[11px] text-gray-500">Customer</div>
+                </div>
+                <svg class="ml-1 h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-56 card overflow-hidden">
+                <a href="/dashboard/customer-profile.html" class="block px-4 py-3 hover:bg-gray-50">My profile</a>
+                <a href="/dashboard/customer-addresses.html" class="block px-4 py-3 hover:bg-gray-50">Addresses</a>
+                <a href="/dashboard/customer-payments.html" class="block px-4 py-3 hover:bg-gray-50">Payment methods</a>
+                <button onclick="Auth.logout()" class="w-full text-left px-4 py-3 hover:bg-gray-50 text-red-600">Logout</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- WELCOME + QUICK ACTIONS -->
+    <section class="card p-6 md:p-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <div class="pill bg-emerald-100 text-emerald-700">Customer</div>
+                <h1 class="mt-2 text-2xl md:text-3xl font-extrabold tracking-tight">
+                    Welcome back, <span id="firstName" class="text-emerald-700">Shopper</span> 👋
+                </h1>
+                <p class="text-gray-600 mt-1">Let’s get those groceries delivered fast.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a href="/catalog-advanced.html" class="press inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 6H21l-2 9H9L7 4H3"/></svg>
+                    Shop now
+                </a>
+                <a href="/dashboard/customer-cart.html" class="press inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h2l.4 2M7 13h10l3-7H6.4M7 13l-1.6 6H18"/></svg>
+                    View cart
+                </a>
+                <a href="/dashboard/customer-orders.html" class="press inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-200">
+                    <svg class="h-5 w-5 text-gray-700" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v2H7zM7 11h10v2H7zM7 15h7v2H7z"/></svg>
+                    Orders
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="grid md:grid-cols-3 gap-4">
+        <div class="card press p-5">
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-500">This month’s orders</span>
+                <span class="pill bg-emerald-50 text-emerald-700">+12%</span>
+            </div>
+            <div class="mt-2 text-3xl font-extrabold">4</div>
+            <p class="text-xs text-gray-500 mt-1">Delivered & in-progress</p>
+        </div>
+        <div class="card press p-5">
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-500">Savings</span>
+                <span class="pill bg-blue-50 text-blue-700">Deals</span>
+            </div>
+            <div class="mt-2 text-3xl font-extrabold">LKR 1,240</div>
+            <p class="text-xs text-gray-500 mt-1">With coupons & bundles</p>
+        </div>
+        <div class="card press p-5">
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-500">Reward points</span>
+                <span class="pill bg-yellow-50 text-yellow-700">Gold</span>
+            </div>
+            <div class="mt-2 text-3xl font-extrabold">820</div>
+            <p class="text-xs text-gray-500 mt-1">Redeem at checkout</p>
+        </div>
+    </section>
+
+    <!-- CONTINUE SHOPPING / RECENTLY VIEWED -->
+    <section class="grid lg:grid-cols-2 gap-4">
+        <div class="card p-5">
+            <div class="flex items-center justify-between">
+                <h3 class="font-semibold">Continue shopping</h3>
+                <a href="/catalog-advanced.html" class="text-sm text-emerald-700 hover:underline">See all</a>
+            </div>
+            <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <a href="/catalog-advanced.html#fruits" class="press block p-3 rounded-xl border border-gray-200 bg-white">
+                    <img class="h-24 w-full object-cover rounded-lg mb-2" src="https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?q=80&w=600&auto=format&fit=crop" alt="">
+                    <div class="text-sm font-medium">Fresh Fruits</div>
+                    <div class="text-xs text-gray-500">Seasonal picks</div>
+                </a>
+                <a href="/catalog-advanced.html#veggies" class="press block p-3 rounded-xl border border-gray-200 bg-white">
+                    <img class="h-24 w-full object-cover rounded-lg mb-2" src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600&auto=format&fit=crop" alt="">
+                    <div class="text-sm font-medium">Veggies</div>
+                    <div class="text-xs text-gray-500">Daily essentials</div>
+                </a>
+                <a href="/catalog-advanced.html#dairy" class="press block p-3 rounded-xl border border-gray-200 bg-white">
+                    <img class="h-24 w-full object-cover rounded-lg mb-2" src="https://images.unsplash.com/photo-1550583724-b2692b85b150?q=80&w=600&auto=format&fit=crop" alt="">
+                    <div class="text-sm font-medium">Dairy</div>
+                    <div class="text-xs text-gray-500">Milk & yogurt</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="card p-5">
+            <div class="flex items-center justify-between">
+                <h3 class="font-semibold">Recently viewed</h3>
+                <a href="/catalog-advanced.html" class="text-sm text-emerald-700 hover:underline">Browse again</a>
+            </div>
+            <ul class="mt-3 divide-y">
+                <li class="py-3 flex items-center gap-3">
+                    <img class="h-12 w-12 rounded-lg object-cover" src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=400&auto=format&fit=crop" alt="">
+                    <div class="flex-1">
+                        <div class="text-sm font-medium">Whole Wheat Bread</div>
+                        <div class="text-xs text-gray-500">Bakery • LKR 180</div>
+                    </div>
+                    <a href="/catalog-advanced.html#bakery" class="px-3 py-1.5 rounded-lg border text-sm hover:bg-gray-50">View</a>
+                </li>
+                <li class="py-3 flex items-center gap-3">
+                    <img class="h-12 w-12 rounded-lg object-cover" src="https://images.unsplash.com/photo-1526318472351-c75fcf070305?q=80&w=400&auto=format&fit=crop" alt="">
+                    <div class="flex-1">
+                        <div class="text-sm font-medium">Eggs (10 pack)</div>
+                        <div class="text-xs text-gray-500">Dairy • LKR 520</div>
+                    </div>
+                    <a href="/catalog-advanced.html#dairy" class="px-3 py-1.5 rounded-lg border text-sm hover:bg-gray-50">View</a>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- RECENT ORDERS -->
+    <section class="card p-5">
+        <div class="flex items-center justify-between">
+            <h3 class="font-semibold">Recent orders</h3>
+            <a href="/dashboard/customer-orders.html" class="text-sm text-emerald-700 hover:underline">View all</a>
+        </div>
+        <div class="mt-3 overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="text-left text-gray-500">
+                <tr>
+                    <th class="py-2 pr-4">Order</th>
+                    <th class="py-2 pr-4">Date</th>
+                    <th class="py-2 pr-4">Total</th>
+                    <th class="py-2 pr-4">Status</th>
+                    <th class="py-2"></th>
+                </tr>
+                </thead>
+                <tbody class="divide-y">
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 pr-4 font-medium">#FCL-1042</td>
+                    <td class="py-3 pr-4">2025-09-12</td>
+                    <td class="py-3 pr-4">LKR 3,450</td>
+                    <td class="py-3 pr-4"><span class="pill bg-amber-100 text-amber-800">Preparing</span></td>
+                    <td class="py-3 text-right"><a href="/dashboard/customer-orders.html" class="px-3 py-1.5 rounded-lg border hover:bg-gray-50">Details</a></td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 pr-4 font-medium">#FCL-1038</td>
+                    <td class="py-3 pr-4">2025-09-05</td>
+                    <td class="py-3 pr-4">LKR 2,180</td>
+                    <td class="py-3 pr-4"><span class="pill bg-emerald-100 text-emerald-800">Delivered</span></td>
+                    <td class="py-3 text-right"><a href="/dashboard/customer-orders.html" class="px-3 py-1.5 rounded-lg border hover:bg-gray-50">Details</a></td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 pr-4 font-medium">#FCL-1032</td>
+                    <td class="py-3 pr-4">2025-08-29</td>
+                    <td class="py-3 pr-4">LKR 5,020</td>
+                    <td class="py-3 pr-4"><span class="pill bg-blue-100 text-blue-800">In transit</span></td>
+                    <td class="py-3 text-right"><a href="/dashboard/customer-orders.html" class="px-3 py-1.5 rounded-lg border hover:bg-gray-50">Details</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script>
+    // profile dropdown
+    const btn = document.getElementById('profileBtn');
+    const menu = document.getElementById('profileMenu');
+    btn?.addEventListener('click', () => menu.classList.toggle('hidden'));
+    document.addEventListener('click', (e) => {
+        if (!btn.contains(e.target) && !menu.contains(e.target)) menu.classList.add('hidden');
+    });
+
+    // greet with saved name if available
+    const full = localStorage.getItem('auth.name') || '';
+    const first = full.split(' ')[0] || 'Shopper';
+    document.getElementById('firstName').textContent = first;
+    document.getElementById('who').textContent = `Hi, ${first}`;
+</script>
+</body>
+</html>

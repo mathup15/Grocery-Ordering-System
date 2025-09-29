@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FreshCart • Product Catalog (Advanced)</title>
+  <style>
+    :root{
+      --g-50:#ecfdf5; --g-100:#d1fae5; --g-200:#a7f3d0; --g-300:#6ee7b7; --g-400:#34d399;
+      --g-500:#10b981; --g-600:#059669; --g-700:#047857; --ink:#0f172a; --muted:#64748b;
+      --bg:#f8fafc; --card:#ffffff; --ring:rgba(16,185,129,.35); --warn:#f59e0b; --danger:#ef4444;
+      --r:16px; --shadow:0 10px 30px rgba(2,6,23,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+    a{color:inherit;text-decoration:none}
+    button{font:inherit;cursor:pointer}
+
+    /* Topbar */
+    header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,var(--g-50),#fff 60%);border-bottom:1px solid var(--g-200)}
+    .bar{max-width:1180px;margin:auto;padding:14px 16px;display:flex;align-items:center;gap:12px}
+    .logo{width:42px;height:42px;border-radius:12px;background:var(--g-500);color:#fff;display:grid;place-items:center;font-weight:800;letter-spacing:.5px}
+    .ttl{font-weight:800}
+    .grow{flex:1}
+    .view-toggle{display:flex;gap:8px}
+    .icon-btn{border:1px solid var(--g-200);background:#fff;border-radius:12px;padding:8px 10px}
+    .icon-btn.active{border-color:var(--g-400);box-shadow:0 0 0 4px var(--ring)}
+    .icon{width:20px;height:20px;display:inline-block}
+
+    /* Filter bar */
+    .filters-wrap{position:sticky;top:70px;z-index:40;background:#fff;border-bottom:1px solid #e2e8f0}
+    .filters{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:10px;padding:12px 16px}
+    .filters input,.filters select{border:1px solid #cbd5e1;border-radius:12px;padding:10px 12px;outline:none;background:#fff}
+    .filters input:focus,.filters select:focus{box-shadow:0 0 0 4px var(--ring);border-color:var(--g-400)}
+    .chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .chip{border:1px solid #e2e8f0;background:#fff;border-radius:999px;padding:6px 10px;font-weight:600}
+    .chip.active{border-color:var(--g-300);background:var(--g-50);color:var(--g-700)}
+    .chk{display:flex;align-items:center;gap:8px;white-space:nowrap;font-weight:600}
+    .btn{border:1px solid var(--g-300);background:#fff;border-radius:12px;padding:10px 12px;font-weight:700;color:var(--g-700)}
+    .btn.primary{background:var(--g-500);border-color:var(--g-500);color:#fff}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+
+    /* Main */
+    main{max-width:1180px;margin:18px auto;padding:0 16px 40px}
+    .summary{display:flex;align-items:center;gap:12px;margin-bottom:10px;color:var(--muted)}
+    .pill{border:1px solid var(--g-300);background:var(--g-50);color:var(--g-700);border-radius:999px;padding:6px 12px;font-weight:800}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+    .list{display:flex;flex-direction:column;gap:12px}
+
+    /* Card */
+    .card{background:var(--card);border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;box-shadow:var(--shadow);transition:transform .12s ease}
+    .card:hover{transform:translateY(-3px)}
+    .thumb{aspect-ratio:4/3;background:linear-gradient(180deg,#f0fdf4,#ecfeff 60%);display:grid;place-items:center}
+    .thumb img{width:100%;height:100%;object-fit:cover}
+    .meta{padding:12px 14px}
+    .title{font-weight:800;margin:6px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .muted{color:var(--muted);font-size:12px}
+    .price{font-weight:900;margin-top:8px}
+    .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}
+    .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;border:1px solid #fde68a;background:#fffbeb;color:#92400e}
+    .low{border-color:#fecaca;background:#fff1f2;color:#b91c1c}
+    .actions{display:flex;gap:8px}
+    .a{border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;background:#fff;font-weight:700}
+    .a.primary{border-color:var(--g-300);color:#065f46}
+
+    /* List variant */
+    .card.list-row{display:grid;grid-template-columns:180px 1fr;gap:0}
+    .card.list-row .thumb{height:100%}
+    .card.list-row .meta{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+
+    /* Pager / Infinite */
+    .pager{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+    .sizer{display:flex;align-items:center;gap:8px;color:var(--muted)}
+
+    /* Skeletons */
+    .sk{animation:pulse 1.2s infinite}
+    @keyframes pulse{0%{opacity:.5}50%{opacity:1}100%{opacity:.5}}
+    .sk.card .thumb{background:#ecfdf5}
+    .sk .line{height:12px;background:#e2e8f0;border-radius:8px;margin:8px 0}
+
+    /* Dialog (Quick View) */
+    dialog{border:none;border-radius:20px;width:min(860px,92vw);padding:0;box-shadow:0 24px 80px rgba(0,0,0,.25)}
+    dialog::backdrop{background:rgba(2,6,23,.45)}
+    .dlg-h{padding:14px 16px;border-bottom:1px solid #e2e8f0;background:var(--g-50);display:flex;justify-content:space-between;align-items:center}
+    .dlg-b{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px}
+    .dlg-img{border-radius:14px;border:1px solid #e2e8f0;overflow:hidden}
+    .dlg-img img{width:100%;height:100%;object-fit:cover}
+    .kv{display:grid;grid-template-columns:140px 1fr;gap:8px;font-size:14px}
+    .kv div{padding:6px 0;border-bottom:1px dashed #e2e8f0}
+    .dlg-f{padding:12px 16px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:8px}
+
+    /* Toasts */
+    .toast{position:fixed;right:16px;bottom:16px;z-index:60;display:grid;gap:8px}
+    .toast .t{background:#111827;color:#fff;border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);opacity:.95}
+
+    /* Accessibility mode */
+    body.accessibility{font-size:1.15rem;background:#000 !important;color:#fff !important}
+    body.accessibility header, body.accessibility .filters-wrap, body.accessibility .card, body.accessibility dialog{background:#111 !important;color:#fff}
+    body.accessibility .card{border:2px solid #ff0 !important}
+    body.accessibility .filters input, body.accessibility .filters select{background:#111;color:#fff;border-color:#999}
+
+    /* Mobile */
+    @media (max-width:980px){
+      .filters{grid-template-columns:1fr 1fr;grid-auto-rows:auto}
+      .filters-wrap{top:62px}
+      .dlg-b{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="logo">FC</div>
+    <div class="ttl">FreshCart • Catalog</div>
+    <div class="grow"></div>
+    <div class="view-toggle">
+      <button id="gridBtn" class="icon-btn active" title="Grid view" aria-pressed="true">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
+      </button>
+      <button id="listBtn" class="icon-btn" title="List view" aria-pressed="false">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="7" height="7" rx="2"/><path d="M12 7h9"/><rect x="3" y="13" width="7" height="7" rx="2"/><path d="M12 16h9"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- FILTER BAR -->
+<div class="filters-wrap">
+  <div class="filters" role="region" aria-label="Filters">
+    <input id="q" type="search" placeholder="Search name / SKU / category…" aria-label="Search">
+    <select id="cat" aria-label="Category"><option value="">All categories</option></select>
+    <input id="min" type="number" min="0" step="0.01" placeholder="Min LKR" aria-label="Min price">
+    <input id="max" type="number" min="0" step="0.01" placeholder="Max LKR" aria-label="Max price">
+    <select id="sort" aria-label="Sort">
+      <option value="name">Name (A→Z)</option>
+      <option value="newest">Newest</option>
+      <option value="price_asc">Price (Low→High)</option>
+      <option value="price_desc">Price (High→Low)</option>
+    </select>
+    <label class="chk"><input id="inStock" type="checkbox"> In stock</label>
+
+    <!-- QUICK CATEGORIES -->
+    <div class="chip-row" id="quickCats" style="grid-column:1/-1" aria-label="Quick categories"></div>
+
+    <!-- HEALTHY FILTERS -->
+    <div class="chip-row" id="healthyFilters" style="grid-column:1/-1" aria-label="Healthy filters">
+      <button class="chip" data-hf="organic">Organic</button>
+      <button class="chip" data-hf="lowSugar">Low Sugar</button>
+      <button class="chip" data-hf="glutenFree">Gluten Free</button>
+    </div>
+
+    <!-- ACCESSIBILITY + ACTIONS -->
+    <div style="grid-column:1/-1;display:flex;align-items:center;gap:10px;justify-content:space-between">
+      <div class="sizer" style="display:flex;align-items:center;gap:14px">
+        <label for="sizeSel">Page size</label>
+        <select id="sizeSel"><option>12</option><option>24</option><option>36</option><option>48</option></select>
+        <label class="chk" title="Auto-load next page on scroll"><input id="infinite" type="checkbox"> Infinite scroll</label>
+        <label class="chk" title="Large text, high contrast"><input id="accessibility" type="checkbox"> Accessibility mode</label>
+      </div>
+      <div>
+        <button class="btn" id="clear">Clear</button>
+        <button class="btn primary" id="apply">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+  <div class="summary">
+    <span class="pill" id="count">0 items</span>
+    <span id="applied" class="muted">Filters: none</span>
+  </div>
+
+  <section id="results" class="grid"></section>
+
+  <div id="empty" class="muted" style="display:none;padding:30px;text-align:center">
+    No results. Try clearing some filters.
+  </div>
+
+  <div class="pager">
+    <button class="btn" id="prev" disabled>Prev</button>
+    <div class="muted">Page <span id="pgN">1</span></div>
+    <button class="btn" id="next" disabled>Next</button>
+  </div>
+</main>
+
+<!-- QUICK VIEW -->
+<dialog id="dlg" aria-modal="true">
+  <div class="dlg-h">
+    <strong id="dlgTitle">Product</strong>
+    <button class="icon-btn" onclick="document.getElementById('dlg').close()" aria-label="Close">✕</button>
+  </div>
+  <div class="dlg-b">
+    <div class="dlg-img"><img id="dlgImg" alt=""></div>
+    <div>
+      <div class="kv"><div>SKU</div><div id="dSku"></div></div>
+      <div class="kv"><div>Category</div><div id="dCat"></div></div>
+      <div class="kv"><div>Unit</div><div id="dUnit"></div></div>
+      <div class="kv"><div>Price</div><div id="dPrice"></div></div>
+      <div class="kv"><div>Stock on hand</div><div id="dSoh"></div></div>
+      <div class="kv"><div>Reserved</div><div id="dRes"></div></div>
+      <div class="kv"><div>Available</div><div id="dAvail"></div></div>
+      <!-- Nutrition facts -->
+      <div class="kv"><div>Calories</div><div id="dCal"></div></div>
+      <div class="kv"><div>Sugar</div><div id="dSugar"></div></div>
+      <div class="kv"><div>Protein</div><div id="dProtein"></div></div>
+    </div>
+  </div>
+  <div class="dlg-f">
+    <button class="btn" onclick="document.getElementById('dlg').close()">Close</button>
+    <button class="btn primary" id="dlgAction">Add to cart</button>
+  </div>
+</dialog>
+
+<!-- TOASTS + TEST PANEL -->
+<div id="toast" class="toast" aria-live="polite" aria-atomic="true"></div>
+<div id="testPanel" style="display:none;position:fixed;right:16px;bottom:16px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.12);gap:6px">
+  <button id="btnTestFilters" class="btn">Test Filters</button>
+  <button id="btnTestAccess" class="btn">Test Access</button>
+</div>
+
+<script>
+  /* =================== config =================== */
+  const API = {
+    categories: '/api/catalog/categories',
+    products:   '/api/catalog/products',
+    detail: id => `/api/catalog/products/${id}`
+  };
+  const PH = 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=800&auto=format&fit=crop';
+
+  /* =================== state =================== */
+  let view = 'grid';
+  let page = 0;                // 0-based
+  let size = 12;
+  let q = '', cat = '', min = '', max = '', inStock = false, sort = 'name';
+  let healthy = [];            // ['organic','lowSugar','glutenFree']
+  let inf = false;             // infinite scroll
+  let total = 0, items = [];
+  let loading = false;
+
+  /* =================== elements =================== */
+  const $  = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+  const elGrid = $('#results'), elEmpty = $('#empty'), elCount = $('#count'), elPgN = $('#pgN'), elApplied = $('#applied'), toastBox = $('#toast');
+
+  /* =================== helpers =================== */
+  function authHeaders(){
+    const t = localStorage.getItem('auth.token');
+    return t ? { Authorization: `Bearer ${t}` } : {};
+  }
+  const deb = (fn,ms=350)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms);} };
+  function fmtLKR(v){ return (v ?? 0).toLocaleString(undefined,{style:'currency',currency:'LKR'}); }
+  function esc(s){ return (s??'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+  function toast(msg){ const t=document.createElement('div'); t.className='t'; t.textContent=msg; toastBox.appendChild(t); setTimeout(()=>t.remove(),2400); }
+  function qsFromState(){
+    const p = new URLSearchParams();
+    if(page) p.set('page',page);
+    p.set('size',size);
+    if(q) p.set('q',q);
+    if(cat) p.set('category',cat);
+    if(min) p.set('minPrice',min);
+    if(max) p.set('maxPrice',max);
+    if(inStock) p.set('inStock','true');
+    if(sort && sort!=='name') p.set('sort',sort);
+    if(healthy.length) p.set('healthy', healthy.join(','));
+    history.replaceState(null,'',location.pathname + (p.toString()?`?${p}`:''));
+  }
+  function stateFromQs(){
+    const p = new URLSearchParams(location.search);
+    page = +(p.get('page')||0);
+    size = +(p.get('size')||12);
+    q    = p.get('q')||'';
+    cat  = p.get('category')||'';
+    min  = p.get('minPrice')||'';
+    max  = p.get('maxPrice')||'';
+    inStock = p.get('inStock')==='true';
+    sort = p.get('sort')||'name';
+    healthy = (p.get('healthy')||'').split(',').filter(Boolean);
+  }
+
+  /* =================== UI binding =================== */
+  function bindBasics(){
+    syncInputs();
+
+    // search & filters
+    $('#q').addEventListener('input', deb(()=>{ q=$('#q').value.trim(); page=0; applyAndLoad(); }));
+    $('#cat').addEventListener('change', ()=>{ cat=$('#cat').value; page=0; applyAndLoad(); });
+    $('#min').addEventListener('input', deb(()=>{ min=$('#min').value; page=0; applyAndLoad(); }));
+    $('#max').addEventListener('input', deb(()=>{ max=$('#max').value; page=0; applyAndLoad(); }));
+    $('#inStock').addEventListener('change', ()=>{ inStock=$('#inStock').checked; page=0; applyAndLoad(); });
+    $('#sort').addEventListener('change', ()=>{ sort=$('#sort').value; page=0; applyAndLoad(); });
+
+    // page size & infinite
+    $('#sizeSel').addEventListener('change', ()=>{ size=+$('#sizeSel').value; page=0; applyAndLoad(); });
+    $('#infinite').addEventListener('change', ()=>{ inf=$('#infinite').checked; page=0; applyAndLoad(); });
+
+    // accessibility
+    $('#accessibility').addEventListener('change', e=>{
+      document.body.classList.toggle('accessibility', e.target.checked);
+      localStorage.setItem('ux.accessibility', e.target.checked ? '1' : '0');
+    });
+    if(localStorage.getItem('ux.accessibility')==='1'){ $('#accessibility').checked=true; document.body.classList.add('accessibility'); }
+
+    // explicit buttons
+    $('#apply').addEventListener('click', ()=>{ page=0; applyAndLoad(); });
+    $('#clear').addEventListener('click', ()=>{
+      q='';cat='';min='';max='';inStock=false;sort='name';size=12;page=0; inf=false; healthy=[];
+      syncInputs(); chipSync(); applyAndLoad();
+    });
+
+    // pager
+    $('#prev').addEventListener('click', ()=>{ if(page>0){ page--; load(); } });
+    $('#next').addEventListener('click', ()=>{ if((page+1)*size<total){ page++; load(); } });
+
+    // view toggle
+    $('#gridBtn').addEventListener('click', ()=>setView('grid'));
+    $('#listBtn').addEventListener('click', ()=>setView('list'));
+
+    // infinite scroll sentinel
+    const sentinel = document.createElement('div'); sentinel.id='sentinel'; document.body.appendChild(sentinel);
+    const io = new IntersectionObserver(entries=>{
+      if(!inf || loading) return;
+      if(entries.some(e=>e.isIntersecting)){
+        if((page+1)*size<total){ page++; load(true); }
+      }
+    });
+    io.observe(sentinel);
+
+    // healthy filter chips
+    $('#healthyFilters').addEventListener('click', e=>{
+      const b = e.target.closest('.chip'); if(!b) return;
+      const v = b.dataset.hf;
+      if(healthy.includes(v)) healthy = healthy.filter(x=>x!==v);
+      else healthy.push(v);
+      b.classList.toggle('active');
+      page=0; applyAndLoad();
+    });
+
+    // test panel (press T to toggle)
+    document.addEventListener('keydown', e=>{
+      if(e.key.toLowerCase()==='t' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); $('#testPanel').style.display = $('#testPanel').style.display ? '' : 'none'; }
+    });
+    $('#btnTestFilters').addEventListener('click', ()=>toast('Healthy filters → ' + (healthy.join(', ')||'none')));
+    $('#btnTestAccess').addEventListener('click', ()=>toast('Accessibility mode: ' + (document.body.classList.contains('accessibility')?'ON':'OFF')));
+  }
+
+  function syncInputs(){
+    $('#q').value = q; $('#cat').value = cat; $('#min').value = min; $('#max').value = max;
+    $('#inStock').checked = inStock; $('#sort').value = sort; $('#sizeSel').value = String(size); $('#infinite').checked = inf;
+  }
+  function chipSync(){
+    $$('#healthyFilters .chip').forEach(x=>x.classList.toggle('active', healthy.includes(x.dataset.hf)));
+  }
+
+  function setView(v){
+    view = v;
+    $('#gridBtn').classList.toggle('active', v==='grid');
+    $('#listBtn').classList.toggle('active', v==='list');
+    $('#gridBtn').setAttribute('aria-pressed', v==='grid');
+    $('#listBtn').setAttribute('aria-pressed', v==='list');
+    render(items);
+  }
+
+  /* =================== Data fetch =================== */
+  async function loadCategories(){
+    try{
+      const res = await fetch(API.categories, { headers: { ...authHeaders() }});
+      const cats = await res.json();
+      const sel = $('#cat');
+      sel.innerHTML = '<option value="">All categories</option>' + (cats||[]).map(c=>`<option>${esc(c)}</option>`).join('');
+      // quick chips
+      const quick = $('#quickCats');
+      quick.innerHTML = (cats||[]).slice(0,8).map(c=>`<button class="chip" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+      quick.addEventListener('click', e=>{
+        const b = e.target.closest('.chip'); if(!b) return;
+        const c = b.dataset.cat;
+        cat = (cat===c) ? '' : c;
+        $$('#quickCats .chip').forEach(x=>x.classList.toggle('active', x.dataset.cat===cat));
+        $('#cat').value = cat; page=0; applyAndLoad();
+      });
+      $('#cat').value = cat;
+    }catch{/* ignore */}
+  }
+
+  function skelCards(n){
+    return Array.from({length:n}).map(()=>`
+      <article class="card sk ${view==='list'?'list-row':''}">
+        <div class="thumb"></div>
+        <div class="meta">
+          <div class="line" style="width:60%"></div>
+          <div class="line" style="width:40%"></div>
+          <div class="line" style="width:30%"></div>
+        </div>
+      </article>`).join('');
+  }
+
+  async function load(append=false){
+    qsFromState(); loading = true;
+    try{
+      if(!append){ elGrid.innerHTML = skelCards(size); elEmpty.style.display='none'; }
+      else{ elGrid.insertAdjacentHTML('beforeend', skelCards(4)); }
+
+      const url = new URL(API.products, location.origin);
+      url.searchParams.set('page',page); url.searchParams.set('size',size);
+      if(q) url.searchParams.set('q', q);
+      if(cat) url.searchParams.set('category', cat);
+      if(min) url.searchParams.set('minPrice', min);
+      if(max) url.searchParams.set('maxPrice', max);
+      if(inStock) url.searchParams.set('inStock', true);
+      if(sort) url.searchParams.set('sort', sort);
+      if(healthy.length) url.searchParams.set('healthy', healthy.join(','));
+
+      const res = await fetch(url, { headers: { ...authHeaders() }});
+      if(!res.ok) throw new Error('Failed to load products');
+      const data = await res.json(); // expect {items, total}
+      total = data.total || 0;
+      const pageItems = data.items || [];
+
+      items = append ? items.concat(pageItems) : pageItems;
+      render(items, append);
+
+      elPgN.textContent = (page+1);
+      elCount.textContent = `${total.toLocaleString()} items`;
+
+      const filtersText = [
+        q && `q:“${q}”`,
+        cat && `cat:${cat}`,
+        (min||max) && `price:${min||0}-${max||'∞'}`,
+        inStock && `in-stock`,
+        healthy.length && `healthy:${healthy.join(',')}`,
+        sort!=='name' && `sort:${sort}`
+      ].filter(Boolean).join(' • ') || 'none';
+      elApplied.textContent = `Filters: ${filtersText}`;
+
+      $('#prev').disabled = page<=0;
+      $('#next').disabled = (page+1)*size >= total;
+
+      chipSync();
+    }catch(err){
+      elGrid.innerHTML = '';
+      elEmpty.style.display='block';
+      toast(err.message||'Error');
+    }finally{
+      loading = false;
+    }
+  }
+
+  function applyAndLoad(){ qsFromState(); load(); }
+
+  /* =================== render =================== */
+  function cardHtml(p){
+    const bClass = p.availableQty<=0 ? 'badge low' : 'badge';
+    const wrapClass = 'card' + (view==='list'?' list-row':'');
+    return `
+    <article class="${wrapClass}" data-id="${p.id}">
+      <div class="thumb"><img src="${esc(p.imageUrl||PH)}" alt="${esc(p.name)}" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${PH}'"></div>
+      <div class="meta">
+        <div>
+          <div class="title" title="${esc(p.name)}">${esc(p.name)}</div>
+          <div class="muted">${esc(p.sku)} • <span class="${bClass}">${esc(p.category||'General')}</span></div>
+          <div class="price">${fmtLKR(p.price||0)}</div>
+          <div class="muted">${(p.availableQty??0)} available</div>
+        </div>
+        <div class="actions">
+          <button class="a" data-act="fav" title="Save">♡</button>
+          <button class="a primary" data-act="view">View</button>
+        </div>
+      </div>
+    </article>`;
+  }
+
+  function render(data, append=false){
+    if(!append){ elGrid.className = view==='grid' ? 'grid' : 'list'; elGrid.innerHTML = ''; }
+    else{ elGrid.querySelectorAll('.sk').forEach(n=>n.remove()); }
+    if(!data.length){ elEmpty.style.display='block'; return; }
+    elEmpty.style.display='none';
+    elGrid.insertAdjacentHTML('beforeend', data.map(cardHtml).join(''));
+    // bind actions
+    elGrid.querySelectorAll('article[data-id]').forEach(card=>{
+      card.querySelectorAll('[data-act="view"]').forEach(btn=>btn.addEventListener('click', ()=>openDetail(card.dataset.id)));
+      card.querySelectorAll('[data-act="fav"]').forEach(btn=>btn.addEventListener('click', ()=>{ btn.textContent = btn.textContent==='♡'?'❤':'♡'; }));
+    });
+  }
+
+  /* =================== detail =================== */
+  async function openDetail(id){
+    try{
+      const res = await fetch(API.detail(id), { headers: { ...authHeaders() }});
+      if(!res.ok) throw new Error('Failed to fetch detail');
+      const d = await res.json();
+      $('#dlgTitle').textContent = d.name;
+      $('#dlgImg').src = d.imageUrl || PH;
+      $('#dSku').textContent = d.sku;
+      $('#dCat').textContent = d.category || '—';
+      $('#dUnit').textContent = d.unit || '—';
+      $('#dPrice').textContent = fmtLKR(d.price||0);
+      $('#dSoh').textContent = d.stockOnHand ?? 0;
+      $('#dRes').textContent = d.reservedQty ?? 0;
+      $('#dAvail').textContent = d.availableQty ?? 0;
+
+      // Nutrition facts (if backend sends d.nutrition = {calories, sugar, protein})
+      $('#dCal').textContent    = d.nutrition?.calories ?? '—';
+      $('#dSugar').textContent  = d.nutrition?.sugar ?? '—';
+      $('#dProtein').textContent= d.nutrition?.protein ?? '—';
+
+      $('#dlg').showModal();
+    }catch(err){ toast(err.message||'Unable to load product'); }
+  }
+
+  /* =================== boot =================== */
+  async function boot(){
+    stateFromQs();
+    bindBasics();
+    await loadCategories();
+    await load();
+  }
+  boot();
+</script>
+</body>
+</html>

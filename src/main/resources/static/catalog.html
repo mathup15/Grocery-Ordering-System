@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>FreshCart • Browse</title>
+    <style>
+        :root{
+            --green:#10b981; --green-600:#059669; --ink:#0f172a; --muted:#64748b;
+            --bg:#f8fafc; --card:#ffffff; --ring:#a7f3d0; --warn:#f59e0b; --danger:#ef4444;
+            --r:14px; --shadow:0 8px 24px rgba(2,6,23,.07);
+        }
+        *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+        header{position:sticky;top:0;background:linear-gradient(0deg,#ecfdf5,#d1fae5);border-bottom:1px solid #bbf7d0;z-index:40}
+        .bar{max-width:1100px;margin:auto;padding:14px 16px;display:flex;align-items:center;gap:12px}
+        .logo{width:40px;height:40px;border-radius:10px;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800}
+        h1{font-size:18px;margin:0}
+        .sp{flex:1}
+        .btn{border:1px solid #86efac;background:#fff;color:var(--green-600);padding:8px 12px;border-radius:10px;font-weight:600;cursor:pointer}
+        .btn:hover{background:#f0fdf4}
+        .filters{max-width:1100px;margin:14px auto;background:var(--card);border:1px solid #e2e8f0;border-radius:16px;box-shadow:var(--shadow);padding:14px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:10px}
+        .filters input,.filters select{border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;width:100%;outline:none}
+        .filters input:focus,.filters select:focus{box-shadow:0 0 0 4px var(--ring);border-color:#34d399}
+        .chk{display:flex;align-items:center;gap:8px;color:var(--muted)}
+        main{max-width:1100px;margin:0 auto;padding:0 16px 32px}
+        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:16px}
+        .card{background:var(--card);border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);transition:transform .15s}
+        .card:hover{transform:translateY(-3px)}
+        .thumb{aspect-ratio:4/3;background:#ecfeff;display:grid;place-items:center}
+        .thumb img{width:100%;height:100%;object-fit:cover}
+        .meta{padding:12px}
+        .title{font-weight:700;margin:2px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .muted{color:var(--muted);font-size:12px}
+        .price{font-weight:800;margin-top:6px}
+        .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #fde68a;background:#fffbeb;color:#92400e}
+        .low{border-color:#fecaca;background:#fff1f2;color:#b91c1c}
+        .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}
+        .actions .a{border:1px solid #e2e8f0;border-radius:10px;padding:6px 10px;cursor:pointer;background:#fff}
+        .actions .a.primary{border-color:#86efac;color:#065f46}
+        .empty{text-align:center;color:var(--muted);padding:40px}
+        .pager{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+        .pill{border:1px solid #86efac;background:#ecfdf5;color:#064e3b;border-radius:999px;padding:6px 12px;font-weight:700}
+        dialog{border:none;border-radius:16px;width:min(780px,92vw);padding:0;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+        dialog::backdrop{background:rgba(2,6,23,.4)}
+        .dlg-h{padding:16px 18px;border-bottom:1px solid #e2e8f0;background:#f0fdf4}
+        .dlg-b{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:16px}
+        .dlg-img{border-radius:12px;border:1px solid #e2e8f0;overflow:hidden}
+        .dlg-img img{width:100%;height:100%;object-fit:cover}
+        .kv{display:grid;grid-template-columns:140px 1fr;gap:8px;font-size:14px}
+        .kv div{padding:6px 0;border-bottom:1px dashed #e2e8f0}
+        @media (max-width:900px){.filters{grid-template-columns:1fr 1fr;}.dlg-b{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+<header>
+    <div class="bar">
+        <div class="logo">FC</div>
+        <h1>FreshCart • Product Catalog</h1>
+        <div class="sp"></div>
+        <button class="btn" id="btnReload">Reload</button>
+    </div>
+</header>
+
+<section class="filters">
+    <input id="q" type="search" placeholder="Search by name, SKU or category…">
+    <select id="category"><option value="">All categories</option></select>
+    <input id="minPrice" type="number" min="0" step="0.01" placeholder="Min price">
+    <input id="maxPrice" type="number" min="0" step="0.01" placeholder="Max price">
+    <select id="sort">
+        <option value="name">Name (A→Z)</option>
+        <option value="newest">Newest</option>
+        <option value="price_asc">Price (Low→High)</option>
+        <option value="price_desc">Price (High→Low)</option>
+    </select>
+    <label class="chk"><input type="checkbox" id="inStock"> In stock only</label>
+</section>
+
+<main>
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" style="display:none">No results. Try clearing some filters.</div>
+    <div class="pager">
+        <button class="btn" id="prev" disabled>Prev</button>
+        <div class="pill" id="count">0 items</div>
+        <button class="btn" id="next" disabled>Next</button>
+    </div>
+</main>
+
+<dialog id="dlg">
+    <div class="dlg-h"><strong id="dlgTitle">Product</strong></div>
+    <div class="dlg-b">
+        <div class="dlg-img"><img id="dlgImg" alt=""></div>
+        <div>
+            <div class="kv"><div>SKU</div><div id="dSku"></div></div>
+            <div class="kv"><div>Category</div><div id="dCat"></div></div>
+            <div class="kv"><div>Unit</div><div id="dUnit"></div></div>
+            <div class="kv"><div>Price</div><div id="dPrice"></div></div>
+            <div class="kv"><div>Stock on hand</div><div id="dSoh"></div></div>
+            <div class="kv"><div>Reserved</div><div id="dRes"></div></div>
+            <div class="kv"><div>Available</div><div id="dAvail"></div></div>
+        </div>
+    </div>
+    <div style="padding:14px;display:flex;justify-content:flex-end;border-top:1px solid #e2e8f0">
+        <button class="btn" onclick="document.getElementById('dlg').close()">Close</button>
+    </div>
+</dialog>
+
+<script>
+    // ---------- config ----------
+    const API = {
+        products: '/api/catalog/products',
+        categories: '/api/catalog/categories',
+        detail: id => `/api/catalog/products/${id}`
+    };
+    const PLACEHOLDER = 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=800&auto=format&fit=crop';
+
+    // ---------- state ----------
+    let page = 0, size = 12;
+    let q = '', category = '', minPrice = '', maxPrice = '', inStock = false, sort = 'name';
+    let total = 0;
+
+    // ---------- elements ----------
+    const $ = sel => document.querySelector(sel);
+    const grid = $('#grid'), empty = $('#empty'), count = $('#count');
+
+    // ---------- helpers ----------
+    function authHeaders(){
+        const t = localStorage.getItem('auth.token');
+        return t ? { Authorization: `Bearer ${t}` } : {};
+    }
+    function fmtPrice(v){ return (v ?? 0).toLocaleString(undefined,{style:'currency',currency:'LKR',maximumFractionDigits:2}); }
+    function imgEl(src,alt){ const i=new Image(); i.alt=alt||''; i.referrerPolicy='no-referrer'; i.src=src||PLACEHOLDER; i.onerror=()=>{i.src=PLACEHOLDER}; return i; }
+
+    // ---------- load categories ----------
+    async function loadCategories(){
+        try{
+            const res = await fetch(API.categories, { headers: { ...authHeaders() }});
+            const cats = await res.json();
+            const sel = $('#category');
+            sel.innerHTML = '<option value="">All categories</option>' + (cats||[]).map(c=>`<option>${c}</option>`).join('');
+        }catch{ /* ignore */ }
+    }
+
+    // ---------- fetch page ----------
+    async function load(){
+        grid.innerHTML = Array.from({length:size}).map(()=>`<div class="card"><div class="thumb"></div><div class="meta"><div class="title" style="background:#f1f5f9;height:14px;border-radius:6px"></div><div class="muted" style="background:#f1f5f9;height:12px;border-radius:6px;margin-top:8px;width:60%"></div></div></div>`).join('');
+        empty.style.display='none';
+
+        const url = new URL(API.products, location.origin);
+        url.searchParams.set('page', page);
+        url.searchParams.set('size', size);
+        if(q) url.searchParams.set('q', q);
+        if(category) url.searchParams.set('category', category);
+        if(minPrice) url.searchParams.set('minPrice', minPrice);
+        if(maxPrice) url.searchParams.set('maxPrice', maxPrice);
+        if(inStock) url.searchParams.set('inStock', true);
+        if(sort) url.searchParams.set('sort', sort);
+
+        try{
+            const res = await fetch(url, { headers: { ...authHeaders() }});
+            if(!res.ok) throw new Error('Failed to load products');
+            const data = await res.json(); // {items,total}
+            total = data.total||0;
+            renderGrid(data.items||[]);
+        }catch(err){
+            grid.innerHTML = `<div class="empty" style="grid-column:1/-1;color:#b91c1c">${err.message}</div>`;
+            empty.style.display='none';
+        }
+    }
+
+    function renderGrid(items){
+        if(!items.length){ grid.innerHTML=''; empty.style.display='block'; count.textContent='0 items'; $('#prev').disabled=true; $('#next').disabled=true; return; }
+        empty.style.display='none';
+        grid.innerHTML = items.map(cardHtml).join('');
+        const start = page*size+1, end = Math.min(start+items.length-1, total);
+        count.textContent = `${start}-${end} of ${total} items`;
+        $('#prev').disabled = page<=0;
+        $('#next').disabled = (page+1)*size >= total;
+
+        // bind details
+        document.querySelectorAll('.card[data-id]').forEach(el=>{
+            el.querySelector('.a.primary').addEventListener('click',()=>openDetail(el.dataset.id));
+        });
+    }
+
+    function cardHtml(p){
+        const bClass = p.availableQty<=0 ? 'badge low' : 'badge';
+        return `
+      <div class="card" data-id="${p.id}">
+        <div class="thumb">${imgElString(p.imageUrl,p.name)}</div>
+        <div class="meta">
+          <div class="title" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
+          <div class="muted">${escapeHtml(p.sku)} • <span class="${bClass}">${escapeHtml(p.category||'General')}</span></div>
+          <div class="row">
+            <div>
+              <div class="price">${fmtPrice(p.price||0)}</div>
+              <div class="muted">${p.availableQty} available</div>
+            </div>
+            <div class="actions">
+              <button class="a primary">View</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    }
+
+    function imgElString(src,alt){
+        // embed as <img ...> string to avoid async image element creation
+        const sanitized = src ? src.replace(/"/g,'&quot;') : PLACEHOLDER;
+        const a = alt ? alt.replace(/"/g,'&quot;') : '';
+        return `<img src="${sanitized}" alt="${a}" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${PLACEHOLDER}'">`;
+    }
+
+    function escapeHtml(s){ return (s??'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+    async function openDetail(id){
+        try{
+            const res = await fetch(API.detail(id), { headers: { ...authHeaders() }});
+            if(!res.ok) throw new Error('Failed to load detail');
+            const d = await res.json();
+            $('#dlgTitle').textContent = d.name;
+            $('#dlgImg').src = d.imageUrl || PLACEHOLDER;
+            $('#dSku').textContent = d.sku;
+            $('#dCat').textContent = d.category || '—';
+            $('#dUnit').textContent = d.unit || '—';
+            $('#dPrice').textContent = fmtPrice(d.price||0);
+            $('#dSoh').textContent = d.stockOnHand ?? 0;
+            $('#dRes').textContent = d.reservedQty ?? 0;
+            $('#dAvail').textContent = d.availableQty ?? 0;
+            $('#dlg').showModal();
+        }catch(err){
+            alert(err.message);
+        }
+    }
+
+    // ---------- wiring ----------
+    $('#btnReload').addEventListener('click', ()=>{ page=0; load(); });
+    $('#prev').addEventListener('click', ()=>{ page=Math.max(0,page-1); load(); });
+    $('#next').addEventListener('click', ()=>{ page=page+1; load(); });
+
+    const deb = (fn,ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms);} };
+    $('#q').addEventListener('input', deb(()=>{ q=$('#q').value.trim(); page=0; load(); },300));
+    $('#category').addEventListener('change', ()=>{ category=$('#category').value; page=0; load(); });
+    $('#minPrice').addEventListener('input', deb(()=>{ minPrice=$('#minPrice').value; page=0; load(); },300));
+    $('#maxPrice').addEventListener('input', deb(()=>{ maxPrice=$('#maxPrice').value; page=0; load(); },300));
+    $('#inStock').addEventListener('change', ()=>{ inStock=$('#inStock').checked; page=0; load(); });
+    $('#sort').addEventListener('change', ()=>{ sort=$('#sort').value; page=0; load(); });
+
+    // init
+    loadCategories().finally(load);
+</script>
+</body>
+</html>
