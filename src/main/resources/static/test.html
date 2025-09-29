@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshMart - Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto p-8">
+        <h1 class="text-3xl font-bold text-green-600 mb-6">FreshMart Test Page</h1>
+        
+        <div class="bg-white rounded-lg p-6 shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test Buttons</h2>
+            <button onclick="testAlert()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mr-4">
+                Test Alert
+            </button>
+            <button onclick="showProducts()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Show Products
+            </button>
+        </div>
+        
+        <div id="productGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+    </div>
+
+    <script>
+        // Test products data
+        const testProducts = [
+            {
+                id: 'test-1',
+                name: 'Test Product 1',
+                price: 100,
+                image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400'
+            },
+            {
+                id: 'test-2', 
+                name: 'Test Product 2',
+                price: 200,
+                image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'
+            }
+        ];
+
+        function testAlert() {
+            alert('JavaScript is working!');
+        }
+
+        function showProducts() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = testProducts.map(product => `
+                <div class="bg-white rounded-lg p-4 shadow-md">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-32 object-cover rounded mb-3">
+                    <h3 class="font-semibold">${product.name}</h3>
+                    <p class="text-green-600 font-bold">LKR ${product.price}</p>
+                    <button onclick="addToCart('${product.id}')" class="bg-green-600 text-white px-3 py-1 rounded mt-2 hover:bg-green-700">
+                        Add to Cart
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(productId) {
+            alert(`Added product ${productId} to cart!`);
+        }
+    </script>
+</body>
+</html>
